@@ -5,7 +5,15 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@branvia/*": [
+        "../../packages/*/src"
+      ]
+    }
   },
   "include": [
     "**/*.ts",

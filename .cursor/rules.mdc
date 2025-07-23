@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Call me Luka
+Use PNPM as package manager
+Install every package in correct workspace
+Prefer string concatenation
+Do not run 'pnpm dev'
+
+Use PowerShell syntax instead of Unix-style commands

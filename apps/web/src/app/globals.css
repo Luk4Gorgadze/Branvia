@@ -16,6 +16,10 @@ body {
   overflow-x: hidden;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -44,6 +48,7 @@ a {
   .imgLight {
     display: none;
   }
+
   .imgDark {
     display: unset;
   }
