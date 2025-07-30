@@ -1,0 +1,191 @@
+.promptSection {
+    color: #fff;
+    width: 84vw;
+    margin: auto;
+    margin-top: 4rem;
+    margin-bottom: 6rem;
+}
+
+.userWelcome {
+    font-family: 'Inter', Arial, sans-serif;
+    margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
+    font-size: 1.8rem;
+}
+
+.promptHeadline {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 2.5rem;
+    color: #fff;
+    letter-spacing: -0.01em;
+    justify-content: center;
+}
+
+.platformLogos {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.platformLogo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 50px;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.platformLogo img {
+    height: 40px;
+    width: auto;
+    margin-bottom: 0.2rem;
+    filter: brightness(0) invert(1) grayscale(1) opacity(0.85);
+}
+
+.platformLogo span {
+    font-size: 1rem;
+    font-family: 'Inter', Arial, sans-serif;
+    opacity: 0.85;
+}
+
+.promptCardHolder {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.promptImageCard {
+    height: 30vh;
+    background: rgba(255, 255, 255, 0.07);
+    /* border-radius: 1.2rem; */
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: transform 0.25s cubic-bezier(.4, 2, .3, 1), box-shadow 0.25s;
+    cursor: pointer;
+    position: relative;
+}
+
+.promptOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 300;
+    background: rgba(20, 20, 20, 0.55);
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+    font-family: 'Inter', Arial, sans-serif;
+    font-weight: 500;
+}
+
+.promptImageCard:hover .promptOverlay {
+    opacity: 1;
+}
+
+.promptImageCard:hover {
+    transform: scale(1.04) translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+    z-index: 2;
+}
+
+.promptImageCard:hover img {
+    filter: brightness(1.08) saturate(1.2) blur(1px);
+}
+
+.promptImageCard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 0%, rgba(225, 107, 58, 0.12) 100%);
+}
+
+.promptImageCard:hover::after {
+    opacity: 1;
+}
+
+.promptImage {
+    object-fit: cover;
+    transition: filter 0.25s;
+}
+
+.platformReference {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+@media (max-width: 800px) {
+    .userWelcome {
+        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
+        font-size: 1.2rem;
+    }
+
+    .promptSection {
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        padding-left: var(--side-space);
+        padding-right: var(--side-space);
+    }
+
+    .promptHeadline {
+        color: #fff;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .platformLogos {
+        gap: 1.2rem;
+    }
+
+    .platformLogo img {
+        height: 28px;
+    }
+
+    .promptCardHolder {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+    }
+
+    .promptImageCard {
+        height: 22vh;
+        font-size: 0.8rem;
+    }
+
+    .platformReference {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: .5rem;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .promptCardHolder {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 400px) {
+    .promptCardHolder {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
