@@ -1,0 +1,138 @@
+.container {
+    color: #fff;
+    width: 84vw;
+    margin: auto;
+    margin-top: 8rem;
+    margin-bottom: 4rem;
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.title {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.subtitle {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.1rem;
+    color: #9ca3af;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section {
+    margin-bottom: 4rem;
+}
+
+.section h2 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.faqItem {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.faqItem h3 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.faqItem p {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin: 0;
+}
+
+.faqItem a {
+    color: #60a5fa;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.faqItem a:hover {
+    color: #93c5fd;
+}
+
+.contactMethods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contactMethod {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.contactMethod h3 {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.contactMethod p {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+
+.contactMethod a {
+    color: #60a5fa;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.contactMethod a:hover {
+    color: #93c5fd;
+}
+
+@media (max-width: 800px) {
+    .container {
+        margin-top: 6rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .section h2 {
+        font-size: 1.5rem;
+    }
+
+    .contactMethods {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

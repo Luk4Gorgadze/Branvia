@@ -1,0 +1,222 @@
+.pricingSection {
+    color: #fff;
+    width: 84vw;
+    margin: auto;
+    margin-top: 4rem;
+    margin-bottom: 6rem;
+}
+
+.pricingHeadline {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 3rem;
+    color: #fff;
+    letter-spacing: -0.01em;
+    /* text-align: center; */
+}
+
+.pricingContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.pricingCards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+}
+
+.pricingCard {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pricingCard:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.featured {
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.featured:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05) translateY(-4px);
+}
+
+.featuredBadge {
+    font-family: 'Inter', Arial, sans-serif;
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.pricingTitle {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.pricingPrice {
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.currency {
+    font-size: 1.2rem;
+    color: #e5e7eb;
+    font-weight: 500;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.period {
+    font-size: 1rem;
+    color: #9ca3af;
+    font-weight: 400;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.pricingFeatures {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    text-align: left;
+    flex-grow: 1;
+}
+
+.pricingFeatures li {
+    padding: 0.5rem 0;
+    color: #e5e7eb;
+    font-size: 1rem;
+    position: relative;
+    padding-left: 1.5rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.pricingFeatures li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pricingButton {
+    width: 100%;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.pricingButton:hover {
+    background: linear-gradient(135deg, #ffffff, #f5f5f5);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+    color: #000000;
+}
+
+.pricingButton.disabled {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pricingButton.disabled:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
+    box-shadow: none;
+    color: #6b7280;
+}
+
+@media (max-width: 800px) {
+    .pricingSection {
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        padding-left: var(--side-space);
+        padding-right: var(--side-space);
+    }
+
+    .pricingHeadline {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+    }
+
+    .pricingCards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .pricingCard {
+        padding: 1.5rem;
+    }
+
+    .featured {
+        transform: none;
+    }
+
+    .featured:hover {
+        transform: translateY(-4px);
+    }
+
+    .amount {
+        font-size: 2.5rem;
+    }
+
+    .pricingFeatures li {
+        font-size: 0.9rem;
+    }
+}

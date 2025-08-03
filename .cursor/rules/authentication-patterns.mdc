@@ -1,0 +1,31 @@
+# Authentication Patterns
+
+## Better Auth Setup
+- Main auth configuration: [src/_lib/_auth/auth.ts](mdc:src/_lib/_auth/auth.ts)
+- Client-side auth: [src/_lib/_auth/authClient.ts](mdc:src/_lib/_auth/authClient.ts)
+- API routes: [src/app/api/auth/[...all]/route.ts](mdc:src/app/api/auth/[...all]/route.ts)
+
+## User Context
+- User provider: [src/_lib/_providers/UserProvider.tsx](mdc:src/_lib/_providers/UserProvider.tsx)
+- Provider index: [src/_lib/_providers/index.ts](mdc:src/_lib/_providers/index.ts)
+- Use `useUser()` hook to access user data in components
+
+## Database Schema
+- User model: [prisma/schema.prisma](mdc:prisma/schema.prisma) - Users, Sessions, Accounts, Verification tables
+- Prisma client: [src/_lib/_db/prismaClient.ts](mdc:src/_lib/_db/prismaClient.ts)
+
+## Authentication Features
+- Email/password authentication enabled
+- Google OAuth provider enabled
+- Session management with cookies
+- User verification system
+
+## Usage Patterns
+- Server components: Use `auth.api.getSession()` with headers
+- Client components: Use `useUser()` hook from UserProvider
+- Protected routes: Check user authentication status
+- User actions: Access user data via context
+description:
+globs:
+alwaysApply: false
+---

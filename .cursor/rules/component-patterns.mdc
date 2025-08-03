@@ -1,0 +1,68 @@
+# Component Patterns
+
+## Component Structure
+Follow the established pattern from existing components:
+
+### Main Section Components
+- [HeroSection](mdc:src/_components/main/HeroSection/HeroSection.tsx) - Landing page hero with stats
+- [PromptGallery](mdc:src/_components/main/PromptGallery/PromptGallery.tsx) - AI platform showcase + image grid
+- [AboutSection](mdc:src/_components/main/AboutSection/AboutSection.tsx) - About content
+- [PricingSection](mdc:src/_components/main/PricingSection/PricingSection.tsx) - Pricing plans
+- [FooterSection](mdc:src/_components/main/FooterSection/FooterSection.tsx) - Footer
+
+### UI Components
+- [Navbar](mdc:src/_components/ui/Navbar/Navbar.tsx) - Navigation component
+- [WordsPullUp](mdc:src/_components/ui/WordsPullUp.tsx) - Animated text component
+
+## Component Patterns
+
+### Main Section Pattern
+```typescript
+import styles from "./ComponentName.module.css";
+// Other imports...
+
+const ComponentName = () => {
+    return (
+        <section className={styles.sectionName}>
+            {/* Component content */}
+        </section>
+    );
+};
+
+export default ComponentName;
+```
+
+### UI Component Pattern
+```typescript
+import styles from "./ComponentName.module.css";
+// Other imports...
+
+interface ComponentNameProps {
+    // Props interface
+}
+
+const ComponentName = ({ prop1, prop2 }: ComponentNameProps) => {
+    return (
+        <div className={styles.componentName}>
+            {/* Component content */}
+        </div>
+    );
+};
+
+export default ComponentName;
+```
+
+## Styling Patterns
+- Use CSS Modules with camelCase class names
+- Import styles as `styles` from the module file
+- Use semantic class names that describe the component's purpose
+- Follow the existing color scheme and design patterns
+
+## Animation Patterns
+- Use Framer Motion for complex animations
+- Use CSS transitions for simple animations
+- Follow the WordsPullUp pattern for text animations
+description:
+globs:
+alwaysApply: false
+---

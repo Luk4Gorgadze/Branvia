@@ -2,8 +2,10 @@
     color: #fff;
     width: 84vw;
     margin: auto;
-    margin-top: 4rem;
-    margin-bottom: 6rem;
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+    padding-top: 10rem;
+    padding-bottom: 10rem;
 }
 
 .aboutHeadline {
@@ -25,11 +27,31 @@
 
 .aboutText {
     max-width: 600px;
-    opacity: 0.85;
     font-family: 'Arial', sans-serif;
     font-size: 1.2rem;
     line-height: 1.6;
 }
+
+.contactText {
+    margin-top: 2rem;
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+}
+
+.contactEmail {
+    color: #60a5fa;
+    text-decoration: underline;
+    transition: all 0.3s ease;
+}
+
+.contactEmail:hover {
+    color: #93c5fd;
+    text-decoration: none;
+}
+
+
 
 @media (max-width: 800px) {
     .aboutSection {

@@ -1,0 +1,45 @@
+# Coding Standards for TypeScript & React
+
+## Component Structure
+- Use functional components with TypeScript
+- Export components as default exports
+- Use CSS Modules for styling (`.module.css` files)
+- Follow the existing component pattern: component file, CSS module, and index.ts
+
+## File Organization
+- Components should be in their own directories with:
+  - `ComponentName.tsx` - Main component
+  - `ComponentName.module.css` - Styles
+  - `index.ts` - Export file
+- Use absolute imports with `@/` prefix
+- Group related components in appropriate directories (`main/` vs `ui/`)
+
+## Naming Conventions
+- Components: PascalCase (e.g., `HeroSection`, `PromptGallery`)
+- Files: PascalCase for components, camelCase for utilities
+- CSS classes: camelCase (e.g., `heroSection`, `promptCard`)
+- Constants: UPPER_SNAKE_CASE
+- Functions: camelCase
+
+## Import Order
+1. React imports
+2. Next.js imports
+3. Third-party libraries
+4. Internal components (`@/_components/`)
+5. Internal utilities (`@/_lib/`)
+6. Styles
+
+## TypeScript Best Practices
+- Use proper type annotations for props
+- Prefer `interface` over `type` for object shapes
+- Use `Readonly<>` for props when possible
+- Avoid `any` type - use proper typing
+
+## CSS Modules
+- Use camelCase for class names
+- Import styles as `styles` from the module file
+- Use `className={styles.className}` pattern
+description:
+globs:
+alwaysApply: false
+---

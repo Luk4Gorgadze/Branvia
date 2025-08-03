@@ -13,46 +13,48 @@ const Navbar = () => {
     const { user, setUser } = useUser();
 
     return (
-        <nav className={styles.nav}>
-            {/* Mobile: logo + hamburger in a row */}
-            <div className={styles.mobileOnly} style={{ width: '100%', alignItems: 'center' }}>
-                <div className={styles.logo}>Branvia</div>
-                <button
-                    className={styles.hamburger}
-                    aria-label="Open menu"
-                    onClick={() => setMenuOpen(true)}
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-            {/* Desktop: logo, nav links, auth all in a row */}
-            <div className={styles.desktopOnly} style={{ width: '100%', alignItems: 'center', display: 'flex' }}>
-                <div className={styles.logo}><Link href="/">Branvia</Link></div>
-                <div className={styles.navLinks}>
-                    <button onClick={() => router.push('/#prompts')}>Prompts</button>
-                    <button onClick={() => router.push('/#about')}>About</button>
-                    <button onClick={() => router.push('/#pricing')}>Pricing</button>
+        <>
+            <nav className={styles.nav}>
+                {/* Mobile: logo + hamburger in a row */}
+                <div className={styles.mobileOnly} style={{ width: '100%', alignItems: 'center' }}>
+                    <div className={styles.logo}>Branvia</div>
+                    <button
+                        className={styles.hamburger}
+                        aria-label="Open menu"
+                        onClick={() => setMenuOpen(true)}
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
                 </div>
-                <div className={styles.authNav}>
-                    {user ? <button className={styles.ctaNav} onClick={async () => {
-                        await signOut()
-                        setUser(undefined)
-                        // router.refresh()
-                    }}>Sign Out</button> : <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>}
+                {/* Desktop: logo, nav links, auth all in a row */}
+                <div className={styles.desktopOnly} style={{ width: '100%', alignItems: 'center', display: 'flex' }}>
+                    <Link href="/#hero" className={styles.logo}>Branvia</Link>
+                    <div className={styles.navLinks}>
+                        <Link href="/#gallery">Gallery</Link>
+                        <Link href="/#about">About</Link>
+                        <Link href="/#pricing">Pricing</Link>
+                    </div>
+                    <div className={styles.authNav}>
+                        {user ? <button className={styles.ctaNav} onClick={async () => {
+                            await signOut()
+                            setUser(undefined)
+                            // router.refresh()
+                        }}>Sign Out</button> : <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>}
+                    </div>
                 </div>
-            </div>
+            </nav>
+
             {/* Mobile dropdown menu with Framer Motion */}
             <AnimatePresence>
                 {menuOpen && (
                     <motion.div
                         className={styles.mobileDropdownMenu}
-                        initial={{ y: -60, opacity: 0, height: 0 }}
-                        animate={{ y: 0, opacity: 1, height: 'auto' }}
-                        exit={{ y: -60, opacity: 0, height: 0 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-                        style={{ overflow: 'hidden', position: 'fixed', top: 0, left: 0, width: '100vw', zIndex: 1000 }}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
                     >
                         <button
                             className={styles.closeButton}
@@ -61,36 +63,28 @@ const Navbar = () => {
                         >
                             &times;
                         </button>
-                        <div className={styles.logoMenu}><Link href="/" onClick={() => setMenuOpen(false)}>Branvia</Link></div>
+                        <Link href="/#hero" className={styles.logoMenu} onClick={() => setMenuOpen(false)}>
+                            Branvia
+                        </Link>
                         <div className={styles.navLinks}>
-                            <button
-                                onClick={() => {
-                                    setMenuOpen(false);
-                                    router.push('/#prompts');
-                                }}
-                            >
-                                Prompts
-                            </button>
-                            <button onClick={() => {
-                                setMenuOpen(false);
-                                router.push('/#about');
-                            }}>About</button>
-                            <button onClick={() => {
-                                setMenuOpen(false);
-                                router.push('/#pricing');
-                            }}>Pricing</button>
+                            <Link href="/#gallery" onClick={() => setMenuOpen(false)}>Gallery</Link>
+                            <Link href="/#about" onClick={() => setMenuOpen(false)}>About</Link>
+                            <Link href="/#pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
                         </div>
                         <div className={styles.authNav}>
-                            {user ? <button className={styles.ctaNav} onClick={async () => {
-                                await signOut()
-                                setUser(undefined)
-                                // router.refresh()
-                            }}>Sign Out</button> : <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>}
+                            {user ? (
+                                <button className={styles.ctaNav} onClick={async () => {
+                                    await signOut()
+                                    setUser(undefined)
+                                }}>Sign Out</button>
+                            ) : (
+                                <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
+                            )}
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-        </nav>
+        </>
     );
 };
 

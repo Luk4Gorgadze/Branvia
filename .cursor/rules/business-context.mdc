@@ -1,0 +1,38 @@
+# Business Context - AI Product Image Platform
+
+## Platform Purpose
+Branvia is an AI product image generation platform designed for small brands and individuals. The platform provides professional-quality product images through AI generation.
+
+## Key Features
+1. **AI Image Generation** - Generate professional product images instantly
+2. **Multi-Platform Compatibility** - Prompts work across multiple AI platforms:
+   - DALL·E, Midjourney, Stable Diffusion
+   - Adobe Firefly, Leonardo AI, Runway ML
+   - Canva AI, Bing Image Creator, Dream Studio
+   - Artbreeder, NightCafe, Wombo Dream
+
+3. **User Authentication** - Email/password + Google OAuth
+4. **Prompt Gallery** - Showcase of AI-generated images with prompt details
+5. **Pricing Plans** - Different tiers for various user needs
+
+## User Experience
+- Users can generate images directly on the platform
+- Users can copy prompts to use on their preferred AI platforms
+- Platform showcases compatibility with major AI image generation services
+- Focus on professional, brand-ready product images
+
+## Target Audience
+- Small business owners
+- Individual entrepreneurs
+- Marketing professionals
+- Anyone needing professional product visuals
+
+## Content Strategy
+- Emphasize "luxury-level" and "professional" quality
+- Highlight compatibility with popular AI platforms
+- Focus on small business marketing needs
+- Use stats to build credibility (10K+ images, 500+ brand styles)
+description:
+globs:
+alwaysApply: false
+---

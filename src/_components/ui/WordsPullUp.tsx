@@ -1,7 +1,6 @@
 "use client";
-import { motion, useInView } from "framer-motion";
 import * as React from "react";
-import styles from "@/app/page.module.css";
+import styles from "../main/HeroSection/HeroSection.module.css";
 
 export function WordsPullUp({
     text,
@@ -12,19 +11,6 @@ export function WordsPullUp({
 }) {
     // Split into words, but keep track of indices for accent
     const splittedText = text.split(" ");
-
-    const pullupVariant = {
-        initial: { y: 20, opacity: 0 },
-        animate: (i: number) => ({
-            y: 0,
-            opacity: 1,
-            transition: {
-                delay: i * 0.1,
-            },
-        }),
-    };
-    const ref = React.useRef(null);
-    const isInView = useInView(ref, { once: true });
 
     // Find indices for 'visual' and 'identity'
     const accentIndices = splittedText.reduce<number[]>((acc, word, i) => {
@@ -40,18 +26,18 @@ export function WordsPullUp({
     return (
         <div className={className} style={{ display: "flex", flexWrap: "wrap", justifyContent: "flex-start" }}>
             {splittedText.map((current, i) => (
-                <motion.span
+                <span
                     key={i}
-                    ref={ref}
-                    variants={pullupVariant}
-                    initial="initial"
-                    animate={isInView ? "animate" : ""}
-                    custom={i}
-                    style={{ display: "inline-block", marginRight: "0.5ch" }}
+                    style={{
+                        display: "inline-block",
+                        marginRight: "0.5ch",
+                        position: "relative",
+                        animation: `wordPullUp 0.6s ease-out ${i * 0.08}s both`
+                    }}
                     className={accentIndices.includes(i) ? styles.heroTitleAccent : undefined}
                 >
                     {current === "" ? <span>&nbsp;</span> : current}
-                </motion.span>
+                </span>
             ))}
         </div>
     );

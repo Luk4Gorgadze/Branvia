@@ -1,0 +1,292 @@
+/* Main Campaign Page Layout */
+.campaignPage {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 84vw;
+    margin: 0 auto;
+    margin-top: 100px;
+    gap: 3rem;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* Left Side - Images Column */
+.imagesColumn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Input Image Section */
+.inputImageSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.inputImageContainer {
+    position: relative;
+    width: 32%;
+    height: 300px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Generated Images Section - Main focus */
+.generatedImagesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.generatedImagesGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.generatedImageCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.downloadButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.downloadButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.downloadAllButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.downloadAllButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Right Side - Details Column */
+.detailsColumn {
+    flex: 1;
+    max-width: 400px;
+}
+
+.detailsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Product Title */
+.productTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+    font-family: 'Playfair Display', serif;
+}
+
+/* Product Description */
+.productDescription {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #fff;
+    opacity: 0.85;
+    margin: 0;
+}
+
+/* Prompt Section */
+.promptSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.promptHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.promptHeader h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.copyButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.copyButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.promptText {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #fff;
+    opacity: 0.85;
+    margin: 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Info Rows */
+.infoRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.infoIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    color: #fff;
+}
+
+.infoContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.infoLabel {
+    font-size: 0.9rem;
+    color: #fff;
+    opacity: 0.7;
+    font-weight: 500;
+}
+
+.infoValue {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 900px) {
+    .campaignPage {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .imagesColumn {
+        order: 1;
+    }
+
+    .detailsColumn {
+        order: 2;
+        max-width: 100%;
+    }
+
+    .detailsContent {
+        padding: 1.5rem;
+    }
+
+    .productTitle {
+        font-size: 2rem;
+    }
+
+    .inputImageContainer {
+        height: 300px;
+        width: 100%;
+    }
+
+    .generatedImagesGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .imageWrapper {
+        height: 250px;
+    }
+
+    .infoRow {
+        padding: 0.75rem;
+    }
+
+    .infoIcon {
+        width: 35px;
+        height: 35px;
+    }
+}

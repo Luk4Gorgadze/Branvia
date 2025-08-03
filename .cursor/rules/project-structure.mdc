@@ -1,0 +1,47 @@
+# Branvia Project Structure Guide
+
+## Tech Stack
+- **Framework:** Next.js 15 with App Router
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** Better Auth (email/password + Google OAuth)
+- **Styling:** CSS Modules
+- **UI:** Lucide React icons, Framer Motion animations
+
+## Key Files & Directories
+
+### App Router Structure
+- Main layout: [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout with auth & navigation
+- Homepage: [src/app/page.tsx](mdc:src/app/page.tsx) - Main landing page
+- Legal pages: [src/app/(legal)/](mdc:src/app/(legal)/) - Contact, privacy, terms, etc.
+- Auth API: [src/app/api/auth/[...all]/route.ts](mdc:src/app/api/auth/[...all]/route.ts)
+- Prompt cards: [src/app/prompt-card/[id]/page.tsx](mdc:src/app/prompt-card/[id]/page.tsx)
+
+### Components Organization
+- **Main sections:** [src/_components/main/](mdc:src/_components/main/) - Page-specific components
+  - [HeroSection/](mdc:src/_components/main/HeroSection/) - Landing hero with stats
+  - [PromptGallery/](mdc:src/_components/main/PromptGallery/) - AI platform showcase + image grid
+  - [AboutSection/](mdc:src/_components/main/AboutSection/) - About content
+  - [PricingSection/](mdc:src/_components/main/PricingSection/) - Pricing plans
+  - [FooterSection/](mdc:src/_components/main/FooterSection/) - Footer
+- **UI components:** [src/_components/ui/](mdc:src/_components/ui/) - Reusable components
+  - [Navbar/](mdc:src/_components/ui/Navbar/) - Navigation
+  - [WordsPullUp.tsx](mdc:src/_components/ui/WordsPullUp.tsx) - Animated text component
+
+### Core Libraries
+- **Authentication:** [src/_lib/_auth/](mdc:src/_lib/_auth/) - Better Auth setup
+- **Database:** [src/_lib/_db/](mdc:src/_lib/_db/) - Prisma client
+- **Providers:** [src/_lib/_providers/](mdc:src/_lib/_providers/) - React context providers
+
+### Configuration
+- Package config: [package.json](mdc:package.json)
+- Database schema: [prisma/schema.prisma](mdc:prisma/schema.prisma)
+- Next.js config: [next.config.js](mdc:next.config.js)
+- Docker setup: [compose.dev.yaml](mdc:compose.dev.yaml)
+
+## Business Context
+This is an AI product image generation platform for small brands. Users can generate professional product images or use prompts on their preferred AI platforms (DALL-E, Midjourney, etc.).
+description:
+globs:
+alwaysApply: false
+---

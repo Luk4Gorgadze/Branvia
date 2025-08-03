@@ -1,0 +1,36 @@
+# Database Patterns
+
+## Prisma Setup
+- Schema: [prisma/schema.prisma](mdc:prisma/schema.prisma) - Database schema definition
+- Client: [src/_lib/_db/prismaClient.ts](mdc:src/_lib/_db/prismaClient.ts) - Prisma client instance
+- Migrations: [prisma/migrations/](mdc:prisma/migrations/) - Database migration files
+
+## Database Schema
+Current models:
+- **User** - User accounts with email, name, image
+- **Session** - User sessions with tokens and metadata
+- **Account** - OAuth accounts (Google, etc.)
+- **Verification** - Email verification tokens
+
+## Database Operations
+- Use the Prisma client from `@/_lib/_db/prismaClient`
+- Import as: `import { prisma } from "@/_lib/_db/prismaClient"`
+- Use proper error handling for database operations
+- Use transactions for multi-step operations
+
+## Migration Commands
+- `npm run prisma:migrate` - Create and apply migrations
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:studio` - Open Prisma Studio
+- `npm run prisma:reset` - Reset database
+
+## Best Practices
+- Always use migrations for schema changes
+- Use proper relationships between models
+- Include proper indexes for performance
+- Use environment variables for database URLs
+- Test migrations in development before production
+description:
+globs:
+alwaysApply: false
+---

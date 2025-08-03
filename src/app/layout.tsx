@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import Navbar from "@/_components/ui/Navbar";
+import FooterSection from "@/_components/main/FooterSection";
 import { UserProvider } from "@/_lib/_providers";
 import { auth } from "@/_lib/_auth/auth";
 import { headers } from "next/headers";
@@ -25,6 +26,7 @@ export default async function RootLayout({
         <UserProvider initialUser={user}>
           <Navbar />
           {children}
+          <FooterSection />
         </UserProvider>
       </body>
     </html>

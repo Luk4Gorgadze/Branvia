@@ -23,33 +23,46 @@
     justify-content: center;
 }
 
-.platformLogos {
+.scrollingPlatforms {
+    width: 100%;
+    overflow: hidden;
+    margin: 2rem 0 3rem 0;
+    position: relative;
+}
+
+.platformTrack {
     display: flex;
-    gap: 1.5rem;
-    align-items: flex-end;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
+    gap: 2rem;
+    animation: scrollPlatforms 40s linear infinite;
+    white-space: nowrap;
+    width: max-content;
 }
 
-.platformLogo {
+.platformItem {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-width: 50px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
     font-family: 'Inter', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ffffff;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
-.platformLogo img {
-    height: 40px;
-    width: auto;
-    margin-bottom: 0.2rem;
-    filter: brightness(0) invert(1) grayscale(1) opacity(0.85);
-}
+@keyframes scrollPlatforms {
+    0% {
+        transform: translateX(0);
+    }
 
-.platformLogo span {
-    font-size: 1rem;
-    font-family: 'Inter', Arial, sans-serif;
-    opacity: 0.85;
+    100% {
+        transform: translateX(calc(-50% - 1rem));
+    }
 }
 
 .promptCardHolder {
@@ -61,16 +74,21 @@
 
 .promptImageCard {
     height: 30vh;
-    background: rgba(255, 255, 255, 0.07);
-    /* border-radius: 1.2rem; */
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
-    transition: transform 0.25s cubic-bezier(.4, 2, .3, 1), box-shadow 0.25s;
+    transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .promptOverlay {
@@ -82,13 +100,14 @@
     text-align: center;
     color: #fff;
     font-size: 1.2rem;
-    font-weight: 300;
-    background: rgba(20, 20, 20, 0.55);
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
     opacity: 0;
-    transition: opacity 0.25s;
+    transition: all 0.3s ease;
     pointer-events: none;
     font-family: 'Inter', Arial, sans-serif;
-    font-weight: 500;
+    border-radius: 16px;
 }
 
 .promptImageCard:hover .promptOverlay {
@@ -96,13 +115,15 @@
 }
 
 .promptImageCard:hover {
-    transform: scale(1.04) translateY(-4px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+    transform: translateY(-8px);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.15);
     z-index: 2;
 }
 
 .promptImageCard:hover img {
-    filter: brightness(1.08) saturate(1.2) blur(1px);
+    filter: brightness(1.1) saturate(1.1);
 }
 
 .promptImageCard::after {
@@ -111,8 +132,9 @@
     inset: 0;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.25s;
-    background: linear-gradient(120deg, rgba(255, 255, 255, 0.08) 0%, rgba(225, 107, 58, 0.12) 100%);
+    transition: opacity 0.3s ease;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 16px;
 }
 
 .promptImageCard:hover::after {
@@ -124,11 +146,12 @@
     transition: filter 0.25s;
 }
 
-.platformReference {
+.platformShowcase {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    margin-bottom: 3rem;
 }
 
 @media (max-width: 800px) {
@@ -151,12 +174,13 @@
         margin-bottom: 1rem;
     }
 
-    .platformLogos {
-        gap: 1.2rem;
+    .scrollingPlatforms {
+        margin: 1.5rem 0 2rem 0;
     }
 
-    .platformLogo img {
-        height: 28px;
+    .platformItem {
+        padding: 10px 20px;
+        font-size: 0.9rem;
     }
 
     .promptCardHolder {
@@ -169,12 +193,8 @@
         font-size: 0.8rem;
     }
 
-    .platformReference {
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: .5rem;
-        margin-top: 1rem;
+    .platformShowcase {
+        margin-bottom: 2rem;
     }
 }
 
