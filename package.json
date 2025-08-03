@@ -13,7 +13,6 @@
         "build": "pnpm run build:web && pnpm run build:worker",
         "install:all": "pnpm install && pnpm install --filter web && pnpm install --filter worker",
         "clean": "rimraf node_modules web/node_modules worker/node_modules web/.next worker/dist",
-        "copy:env": "cp .env web/.env",
         "prisma:generate": "cd web && pnpm prisma:generate",
         "prisma:migrate": "cd web && pnpm prisma:migrate",
         "prisma:studio": "cd web && pnpm prisma:studio",
