@@ -8,6 +8,7 @@
     overflow: hidden;
     font-family: 'Inter', Arial, sans-serif;
     color: #fff;
+    padding-top: 50px;
 }
 
 .bgImage {
@@ -239,8 +240,8 @@
     }
 
     .bgImage {
-        height: 100vh !important;
-        min-height: 100vh !important;
+        height: 120vh !important;
+        min-height: 120vh !important;
         max-height: 100vh !important;
         width: 100vw !important;
         object-fit: cover;

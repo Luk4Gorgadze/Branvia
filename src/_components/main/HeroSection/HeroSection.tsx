@@ -1,8 +1,8 @@
 import { WordsPullUp } from "@/_components/ui/WordsPullUp";
 import styles from "./HeroSection.module.css";
 import Image from "next/image";
-import { Sparkles, Zap, Palette } from "lucide-react";
-
+import { Sparkles, Zap, Palette, Eye, Link as LinkIcon } from "lucide-react";
+import Link from "next/link";
 const HeroSection = () => {
     return (
         <div className={styles.luxuryPage} id="hero">
@@ -34,6 +34,10 @@ const HeroSection = () => {
                             <Zap size={20} />
                             Start Creating
                         </button>
+                        <Link href="#gallery" className={styles.secondaryCta}>
+                            <Eye size={20} />
+                            See Examples
+                        </Link>
                     </div>
 
                     <div className={styles.statsContainer}>

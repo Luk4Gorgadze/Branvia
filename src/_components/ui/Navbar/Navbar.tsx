@@ -17,7 +17,7 @@ const Navbar = () => {
             <nav className={styles.nav}>
                 {/* Mobile: logo + hamburger in a row */}
                 <div className={styles.mobileOnly} style={{ width: '100%', alignItems: 'center' }}>
-                    <div className={styles.logo}>Branvia</div>
+                    <Link href="/#hero" className={styles.logo}>Branvia</Link>
                     <button
                         className={styles.hamburger}
                         aria-label="Open menu"
