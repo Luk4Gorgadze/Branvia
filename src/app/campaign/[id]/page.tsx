@@ -136,6 +136,17 @@ const CampaignPage = () => {
                         </div>
                     </div>
 
+                    {/* Generation Cost */}
+                    <div className={styles.infoRow}>
+                        <div className={styles.infoIcon}>
+                            <Sparkles size={20} />
+                        </div>
+                        <div className={styles.infoContent}>
+                            <span className={styles.infoLabel}>Generation Cost</span>
+                            <span className={styles.infoValue}>50 credits</span>
+                        </div>
+                    </div>
+
                     {/* AI Platform */}
                     {/* <div className={styles.infoRow}>
                         <div className={styles.infoIcon}>

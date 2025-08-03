@@ -35,6 +35,7 @@ const Navbar = () => {
                         <Link href="/#gallery">Gallery</Link>
                         <Link href="/#about">About</Link>
                         <Link href="/#pricing">Pricing</Link>
+                        {user && <Link href="/campaign/generate">Generate</Link>}
                     </div>
                     <div className={styles.authNav}>
                         {user ? <button className={styles.ctaNav} onClick={async () => {
@@ -70,6 +71,7 @@ const Navbar = () => {
                             <Link href="/#gallery" onClick={() => setMenuOpen(false)}>Gallery</Link>
                             <Link href="/#about" onClick={() => setMenuOpen(false)}>About</Link>
                             <Link href="/#pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>
+                            {user && <Link href="/campaign/generate" onClick={() => setMenuOpen(false)}>Generate</Link>}
                         </div>
                         <div className={styles.authNav}>
                             {user ? (
