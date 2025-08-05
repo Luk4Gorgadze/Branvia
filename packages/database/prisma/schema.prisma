@@ -1,0 +1,106 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id             String          @id
+    name           String
+    email          String
+    emailVerified  Boolean
+    image          String?
+    createdAt      DateTime
+    updatedAt      DateTime
+    sessions       Session[]
+    accounts       Account[]
+    campaigns      Campaign[]
+    productUploads ProductUpload[]
+
+    @@unique([email])
+    @@map("user")
+}
+
+model Session {
+    id        String   @id
+    expiresAt DateTime
+    token     String
+    createdAt DateTime
+    updatedAt DateTime
+    ipAddress String?
+    userAgent String?
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([token])
+    @@map("session")
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime
+    updatedAt             DateTime
+
+    @@map("account")
+}
+
+model Verification {
+    id         String    @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime?
+    updatedAt  DateTime?
+
+    @@map("verification")
+}
+
+model ProductUpload {
+    id          String    @id @default(cuid())
+    userId      String
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    s3Key       String    @unique
+    fileName    String
+    fileSize    Int
+    contentType String
+    status      String    @default("uploaded") // uploaded, linked, deleted
+    campaignId  String? // Links to campaign when created
+    campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    @@map("product_upload")
+}
+
+model Campaign {
+    id                 String          @id @default(cuid())
+    userId             String
+    user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    productTitle       String
+    productDescription String
+    selectedStyle      String?
+    customStyle        String?
+    outputFormat       String
+    productImageS3Key  String? // S3 key for the uploaded product image
+    generatedImages    String[] // Array of S3 keys for generated images
+    status             String          @default("pending") // pending, processing, completed, failed
+    productUploads     ProductUpload[] // Relation to track uploads
+    createdAt          DateTime        @default(now())
+    updatedAt          DateTime        @updatedAt
+
+    @@map("campaign")
+}

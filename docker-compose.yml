@@ -1,21 +1,21 @@
 version: '3.8'
 
 services:
-  # Infrastructure services (from compose.dev.yaml)
   redis:
-    container_name: branvia_redis
-    image: redis:latest
+    container_name: branvia_redis_prod
+    image: redis:alpine
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     restart: always
+    command: redis-server --appendonly yes
 
   postgres:
-    container_name: branvia_postgres
-    image: postgres:latest
+    container_name: branvia_postgres_prod
+    image: postgres:15-alpine
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -26,19 +26,29 @@ services:
 
   # BullMQ Worker service
   worker:
-    container_name: branvia_worker
+    container_name: branvia_worker_prod
     build:
-      context: ./worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: worker/Dockerfile
     environment:
       - REDIS_URL=redis://redis:6379
       - NODE_ENV=production
+      - POSTGRES_URL=${POSTGRES_URL}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     depends_on:
       - redis
+      - postgres
     restart: always
-    volumes:
-      - ./worker:/app
-      - /app/node_modules
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 volumes:
   redis_data:

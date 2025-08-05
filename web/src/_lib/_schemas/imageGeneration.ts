@@ -23,7 +23,7 @@ export const OutputFormat = z.enum([
 
 // Image generation request schema
 export const ImageGenerationRequestSchema = z.object({
-    productImage: z.string().min(1, 'Product image is required'),
+    productImageS3Key: z.string().min(1, 'Product image S3 key is required'),
     productTitle: z.string().min(1, 'Product title is required').max(100, 'Product title too long'),
     productDescription: z.string().min(10, 'Product description must be at least 10 characters').max(500, 'Product description too long'),
     selectedStyle: StylePreset.optional(),

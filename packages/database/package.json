@@ -1,0 +1,25 @@
+{
+    "name": "@branvia/database",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "pnpm generate && tsc",
+        "dev": "tsc --watch",
+        "generate": "dotenv -e ../../.env prisma generate",
+        "migrate": "dotenv -e ../../.env prisma migrate dev",
+        "studio": "dotenv -e ../../.env prisma studio",
+        "db:push": "dotenv -e ../../.env prisma db push"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.22.0"
+    },
+    "devDependencies": {
+        "prisma": "^5.22.0",
+        "typescript": "5.8.2",
+        "dotenv-cli": "^10.0.0",
+        "@types/node": "^22.15.3"
+    }
+}

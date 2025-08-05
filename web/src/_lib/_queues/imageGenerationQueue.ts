@@ -20,7 +20,7 @@ export const imageGenerationQueue = new Queue('image-generation', {
 
 // Function to add an image generation job
 export async function addImageGenerationJob(data: {
-    productImage: string;
+    productImageS3Key: string; // S3 key instead of base64
     productTitle: string;
     productDescription: string;
     selectedStyle: string;

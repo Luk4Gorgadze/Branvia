@@ -1,0 +1,19 @@
+# Shared base image for Branvia monorepo
+FROM node:18-alpine AS base
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Build stage for shared database package
+FROM base AS database-builder
+WORKDIR /app
+COPY packages/database/ ./packages/database/
+WORKDIR /app/packages/database
+RUN pnpm install
+
+# Final base image with database package
+FROM base AS branvia-base
+WORKDIR /app
+
+# Copy database package (no build needed)
+COPY --from=database-builder /app/packages/database ./packages/database 

@@ -2,25 +2,73 @@
 import styles from "@/app/campaign/[id]/campaign.module.css"
 import Image from "next/image";
 import { Copy, Download, Palette, FileImage, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useUser } from '@/_lib/_providers';
+import { useRouter } from 'next/navigation';
 
-const CampaignPage = () => {
-    const [copied, setCopied] = useState(false);
-
-    // Mock data - in real app this would come from props or API
-    const campaignData = {
-        title: "Luxury Brand Photography",
-        description: "Professional product photography with premium lighting and sophisticated styling for high-end marketing campaigns.",
-        promptText: "Create a stunning luxury brand photography image featuring a premium product in an elegant setting. Use soft, professional lighting with a sophisticated color palette. The composition should convey exclusivity and high-end appeal, perfect for premium marketing campaigns.",
-        style: "Luxury Professional",
-        outputFormat: "High Resolution (4K)",
-        inputImage: "/example.png",
-        generatedImages: ["/example.png", "/example.png", "/example.png"]
+interface Campaign {
+    id: string;
+    productTitle: string;
+    productDescription: string;
+    selectedStyle?: string;
+    customStyle?: string;
+    outputFormat: string;
+    productImageS3Key: string;
+    generatedImages: string[];
+    status: string;
+    createdAt: string;
+    user: {
+        id: string;
+        name: string;
+        email: string;
     };
+}
+
+const CampaignPage = ({ params }: { params: { id: string } }) => {
+    const { user } = useUser();
+    const router = useRouter();
+    const [copied, setCopied] = useState(false);
+    const [campaign, setCampaign] = useState<Campaign | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCampaign = async () => {
+            try {
+                const response = await fetch(`/api/campaigns/${params.id}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch campaign');
+                }
+                const data = await response.json();
+                setCampaign(data.campaign);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load campaign');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCampaign();
+    }, [params.id]);
+
+    // Redirect if not logged in
+    if (!user) {
+        router.push('/');
+        return null;
+    }
+
+    if (loading) {
+        return <div className={styles.loading}>Loading campaign...</div>;
+    }
+
+    if (error || !campaign) {
+        return <div className={styles.error}>Error: {error || 'Campaign not found'}</div>;
+    }
 
     const copyToClipboard = async () => {
         try {
-            await navigator.clipboard.writeText(campaignData.promptText);
+            const promptText = `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`;
+            await navigator.clipboard.writeText(promptText);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
@@ -30,7 +78,6 @@ const CampaignPage = () => {
 
     const downloadImage = async (imageUrl: string, index: number) => {
         try {
-            // Option 1: Direct download (lightweight - just triggers browser download)
             const link = document.createElement('a');
             link.href = imageUrl;
             link.download = `generated-image-${index + 1}.png`;
@@ -40,9 +87,13 @@ const CampaignPage = () => {
             document.body.removeChild(link);
         } catch (error) {
             console.error('Error downloading image:', error);
-            // Fallback: open image in new tab for manual download
             window.open(imageUrl, '_blank');
         }
+    };
+
+    // Generate S3 URL for a file
+    const getS3Url = (s3Key: string) => {
+        return `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1'}.amazonaws.com/${s3Key}`;
     };
 
     return (
@@ -53,25 +104,33 @@ const CampaignPage = () => {
                 <div className={styles.generatedImagesSection}>
                     <h3 className={styles.sectionTitle}>Generated Images</h3>
                     <div className={styles.generatedImagesGrid}>
-                        {campaignData.generatedImages.map((image, index) => (
-                            <div key={index} className={styles.generatedImageCard}>
-                                <div className={styles.imageWrapper}>
-                                    <Image
-                                        src={image}
-                                        alt={`Generated Image ${index + 1}`}
-                                        fill
-                                        style={{ objectFit: 'cover' }}
-                                    />
+                        {campaign.generatedImages.length > 0 ? (
+                            campaign.generatedImages.map((s3Key, index) => (
+                                <div key={index} className={styles.generatedImageCard}>
+                                    <div className={styles.imageWrapper}>
+                                        <Image
+                                            src={getS3Url(s3Key)}
+                                            alt={`Generated Image ${index + 1}`}
+                                            fill
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    </div>
+                                    <button
+                                        className={styles.downloadButton}
+                                        onClick={() => downloadImage(getS3Url(s3Key), index)}
+                                    >
+                                        <Download size={16} />
+                                        Download
+                                    </button>
                                 </div>
-                                <button
-                                    className={styles.downloadButton}
-                                    onClick={() => downloadImage(image, index)}
-                                >
-                                    <Download size={16} />
-                                    Download
-                                </button>
+                            ))
+                        ) : (
+                            <div className={styles.noImages}>
+                                <Sparkles size={48} />
+                                <p>Images are being generated...</p>
+                                <p>Status: {campaign.status}</p>
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
 
@@ -80,7 +139,7 @@ const CampaignPage = () => {
                     <h3 className={styles.sectionTitle}>Input Product Image</h3>
                     <div className={styles.inputImageContainer}>
                         <Image
-                            src={campaignData.inputImage}
+                            src={getS3Url(campaign.productImageS3Key)}
                             alt="Input Product Image"
                             fill
                             style={{ objectFit: 'cover' }}
@@ -93,10 +152,10 @@ const CampaignPage = () => {
             <div className={styles.detailsColumn}>
                 <div className={styles.detailsContent}>
                     {/* Product Title */}
-                    <h1 className={styles.productTitle}>{campaignData.title}</h1>
+                    <h1 className={styles.productTitle}>{campaign.productTitle}</h1>
 
                     {/* Product Description */}
-                    <p className={styles.productDescription}>{campaignData.description}</p>
+                    <p className={styles.productDescription}>{campaign.productDescription}</p>
 
                     {/* Prompt Text */}
                     <div className={styles.promptSection}>
@@ -111,7 +170,9 @@ const CampaignPage = () => {
                                 {copied ? 'Copied!' : 'Copy'}
                             </button>
                         </div>
-                        <p className={styles.promptText}>{campaignData.promptText}</p>
+                        <p className={styles.promptText}>
+                            Professional product photography of {campaign.productTitle}. {campaign.productDescription}. Style: {campaign.customStyle || campaign.selectedStyle}. Format: {campaign.outputFormat}. High quality, commercial use.
+                        </p>
                     </div>
 
                     {/* Style Chosen */}
@@ -121,7 +182,7 @@ const CampaignPage = () => {
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Style</span>
-                            <span className={styles.infoValue}>{campaignData.style}</span>
+                            <span className={styles.infoValue}>{campaign.customStyle || campaign.selectedStyle}</span>
                         </div>
                     </div>
 
@@ -132,7 +193,18 @@ const CampaignPage = () => {
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Output Format</span>
-                            <span className={styles.infoValue}>{campaignData.outputFormat}</span>
+                            <span className={styles.infoValue}>{campaign.outputFormat}</span>
+                        </div>
+                    </div>
+
+                    {/* Generation Status */}
+                    <div className={styles.infoRow}>
+                        <div className={styles.infoIcon}>
+                            <Sparkles size={20} />
+                        </div>
+                        <div className={styles.infoContent}>
+                            <span className={styles.infoLabel}>Status</span>
+                            <span className={styles.infoValue}>{campaign.status}</span>
                         </div>
                     </div>
 
@@ -146,17 +218,6 @@ const CampaignPage = () => {
                             <span className={styles.infoValue}>50 credits</span>
                         </div>
                     </div>
-
-                    {/* AI Platform */}
-                    {/* <div className={styles.infoRow}>
-                        <div className={styles.infoIcon}>
-                            <Sparkles size={20} />
-                        </div>
-                        <div className={styles.infoContent}>
-                            <span className={styles.infoLabel}>AI Platform</span>
-                            <span className={styles.infoValue}>Midjourney v6</span>
-                        </div>
-                    </div> */}
                 </div>
             </div>
         </div>

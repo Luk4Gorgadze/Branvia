@@ -1,0 +1,27 @@
+# Development Dockerfile for BullMQ Worker
+FROM branvia-base
+
+# Copy workspace configuration
+COPY package.json ./
+COPY pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
+
+# Copy worker and database packages
+COPY worker/package.json ./worker/
+COPY worker/ ./worker/
+COPY packages/database/ ./packages/database/
+# Copy .env file from root
+COPY .env ./
+
+# Install all dependencies
+WORKDIR /app
+RUN pnpm install
+
+# Set working directory to worker
+WORKDIR /app/worker
+
+# Expose port for debugging (optional)
+EXPOSE 9229
+
+# Start in development mode with hot reload
+CMD ["pnpm", "dev"] 

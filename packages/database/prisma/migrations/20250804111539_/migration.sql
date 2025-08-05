@@ -56,14 +56,60 @@ CREATE TABLE "verification" (
     CONSTRAINT "verification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "product_upload" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "s3Key" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "fileSize" INTEGER NOT NULL,
+    "contentType" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'uploaded',
+    "campaignId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "product_upload_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "campaign" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "productTitle" TEXT NOT NULL,
+    "productDescription" TEXT NOT NULL,
+    "selectedStyle" TEXT,
+    "customStyle" TEXT,
+    "outputFormat" TEXT NOT NULL,
+    "productImageS3Key" TEXT,
+    "generatedImages" TEXT[],
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "campaign_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "product_upload_s3Key_key" ON "product_upload"("s3Key");
+
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "product_upload" ADD CONSTRAINT "product_upload_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "product_upload" ADD CONSTRAINT "product_upload_campaignId_fkey" FOREIGN KEY ("campaignId") REFERENCES "campaign"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "campaign" ADD CONSTRAINT "campaign_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -1,7 +1,7 @@
 import { Job } from 'bullmq';
 
 export interface ImageGenerationJobData {
-    productImage: string; // Base64 encoded image
+    productImageS3Key: string; // S3 key instead of base64
     productTitle: string;
     productDescription: string;
     selectedStyle: string;
@@ -12,7 +12,7 @@ export interface ImageGenerationJobData {
 }
 
 export interface ImageGenerationResult {
-    generatedImages: string[]; // Array of generated image URLs
+    generatedImages: string[]; // Array of generated image S3 keys
     prompt: string; // The prompt used for generation
     metadata: {
         style: string;
@@ -22,21 +22,27 @@ export interface ImageGenerationResult {
 }
 
 export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>): Promise<ImageGenerationResult> {
-    const { productImage, productTitle, productDescription, selectedStyle, customStyle, outputFormat, userId, campaignId } = job.data;
+    const { productImageS3Key, productTitle, productDescription, selectedStyle, customStyle, outputFormat, userId, campaignId } = job.data;
 
     console.log(`🎨 Processing image generation job ${job.id} for user ${userId}`);
+    console.log(`📁 Using product image from S3: ${productImageS3Key}`);
 
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     // TODO: Integrate with actual AI image generation service
     // This is where you'd call OpenAI DALL-E, Midjourney API, etc.
+    // You would:
+    // 1. Download the image from S3 using productImageS3Key
+    // 2. Send to AI service for processing
+    // 3. Upload generated images back to S3
+    // 4. Return the S3 keys of generated images
 
-    // Mock generated images for now
+    // Mock generated images for now (these would be S3 keys)
     const generatedImages = [
-        'https://example.com/generated-image-1.jpg',
-        'https://example.com/generated-image-2.jpg',
-        'https://example.com/generated-image-3.jpg'
+        'generated/user123/campaign456/image1.jpg',
+        'generated/user123/campaign456/image2.jpg',
+        'generated/user123/campaign456/image3.jpg'
     ];
 
     const prompt = `Professional product photography of ${productTitle}. ${productDescription}. Style: ${customStyle || selectedStyle}. Format: ${outputFormat}. High quality, commercial use.`;
