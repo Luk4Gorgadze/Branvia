@@ -20,6 +20,11 @@ export async function POST(request: NextRequest) {
                 `${err.path.join('.')}: ${err.message}`
             ).join(', ');
 
+            console.error('Validation failed:', {
+                receivedBody: body,
+                errors: validationResult.error.errors
+            });
+
             return NextResponse.json(
                 { error: `Validation failed: ${errors}` },
                 { status: 400 }

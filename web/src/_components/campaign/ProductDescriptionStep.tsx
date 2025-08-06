@@ -32,6 +32,14 @@ export const ProductDescriptionStep = ({
                     onChange={(e) => handleInputChange('productTitle', e.target.value)}
                     className={styles.textInput}
                 />
+                <div className={styles.validationInfo}>
+                    <span className={formData.productTitle.length === 0 ? styles.error : styles.success}>
+                        {formData.productTitle.length}/1 characters minimum
+                    </span>
+                    <span className={styles.maxLength}>
+                        Maximum 100 characters
+                    </span>
+                </div>
             </div>
 
             <div className={styles.formGroup}>
@@ -43,6 +51,14 @@ export const ProductDescriptionStep = ({
                     className={styles.textArea}
                     rows={4}
                 />
+                <div className={styles.validationInfo}>
+                    <span className={formData.productDescription.length < 10 ? styles.error : styles.success}>
+                        {formData.productDescription.length}/10 characters minimum
+                    </span>
+                    <span className={styles.maxLength}>
+                        Maximum 500 characters
+                    </span>
+                </div>
             </div>
         </div>
     );

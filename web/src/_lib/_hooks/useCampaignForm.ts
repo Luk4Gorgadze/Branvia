@@ -32,7 +32,9 @@ export const useCampaignForm = () => {
     const canProceed = (currentStep: number) => {
         switch (currentStep) {
             case 1: return !!formData.productImageUrl;
-            case 2: return !!formData.productTitle && !!formData.productDescription;
+            case 2: return !!formData.productTitle &&
+                formData.productDescription.length >= 10 &&
+                formData.productDescription.length <= 500;
             case 3: return !!formData.selectedStyle || !!formData.customStyle;
             case 4: return !!formData.outputFormat;
             default: return true;

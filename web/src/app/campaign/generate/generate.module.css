@@ -261,6 +261,26 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
+.validationInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.validationInfo .error {
+    color: #ff6b6b;
+}
+
+.validationInfo .success {
+    color: #51cf66;
+}
+
+.validationInfo .maxLength {
+    color: rgba(255, 255, 255, 0.5);
+}
+
 /* Style Grid */
 .styleGrid {
     display: grid;

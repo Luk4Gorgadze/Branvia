@@ -16,4 +16,7 @@ FROM base AS branvia-base
 WORKDIR /app
 
 # Copy database package (no build needed)
-COPY --from=database-builder /app/packages/database ./packages/database 
+COPY --from=database-builder /app/packages/database ./packages/database
+
+# Copy environment variables
+COPY .env ./

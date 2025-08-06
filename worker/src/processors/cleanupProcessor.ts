@@ -1,6 +1,10 @@
 import { Job } from 'bullmq';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import dotenv from 'dotenv';
 import { prisma } from '@branvia/database';
+
+// Load environment variables from local .env file
+dotenv.config();
 
 // Initialize S3 client
 const s3Client = new S3Client({

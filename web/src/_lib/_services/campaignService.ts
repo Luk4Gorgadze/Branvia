@@ -26,7 +26,7 @@ export class CampaignService {
                 customStyle: data.customStyle,
                 outputFormat: data.outputFormat,
                 productImageS3Key: data.productImageS3Key,
-                status: 'pending',
+                status: 'processing',
             },
         });
     }

@@ -1,4 +1,5 @@
 import { Job } from 'bullmq';
+import { prisma } from '@branvia/database';
 
 export interface ImageGenerationJobData {
     productImageS3Key: string; // S3 key instead of base64
@@ -38,11 +39,15 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
     // 3. Upload generated images back to S3
     // 4. Return the S3 keys of generated images
 
-    // Mock generated images for now (these would be S3 keys)
+    // Generate placeholder images using Picsum Photos for testing
+    const baseUrl = 'https://picsum.photos';
+    const width = outputFormat === 'instagram-story' ? 1080 : 1200;
+    const height = outputFormat === 'instagram-story' ? 1920 : 1200;
+
     const generatedImages = [
-        'generated/user123/campaign456/image1.jpg',
-        'generated/user123/campaign456/image2.jpg',
-        'generated/user123/campaign456/image3.jpg'
+        `${baseUrl}/${width}/${height}?random=1`,
+        `${baseUrl}/${width}/${height}?random=2`,
+        `${baseUrl}/${width}/${height}?random=3`
     ];
 
     const prompt = `Professional product photography of ${productTitle}. ${productDescription}. Style: ${customStyle || selectedStyle}. Format: ${outputFormat}. High quality, commercial use.`;
@@ -58,6 +63,21 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
     };
 
     console.log(`✅ Generated ${generatedImages.length} images for job ${job.id}`);
+
+    // Update the campaign with generated images and mark as completed
+    try {
+        await prisma.campaign.update({
+            where: { id: campaignId },
+            data: {
+                generatedImages: generatedImages,
+                status: 'completed'
+            }
+        });
+        console.log(`💾 Updated campaign ${campaignId} with generated images`);
+    } catch (error) {
+        console.error(`❌ Failed to update campaign ${campaignId}:`, error);
+        throw error;
+    }
 
     return result;
 } 

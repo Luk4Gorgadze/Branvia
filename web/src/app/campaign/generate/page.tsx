@@ -93,10 +93,11 @@ const CampaignGeneratePage = () => {
                     productImageS3Key: formData.productImageS3Key,
                     productTitle: formData.productTitle,
                     productDescription: formData.productDescription,
-                    selectedStyle: formData.selectedStyle,
-                    customStyle: formData.customStyle,
+                    ...(formData.selectedStyle && { selectedStyle: formData.selectedStyle }),
+                    ...(formData.customStyle && { customStyle: formData.customStyle }),
                     outputFormat: formData.outputFormat,
                     campaignId,
+                    userId: user.id,
                 }),
             });
 

@@ -16,10 +16,7 @@
         "ioredis": "^5.3.2",
         "dotenv": "^16.3.1",
         "@aws-sdk/client-s3": "^3.540.0",
-        "@branvia/database": "workspace:*",
-        "@bull-board/api": "^6.12.0",
-        "@bull-board/express": "^6.12.0",
-        "express": "^5.1.0"
+        "@branvia/database": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^22.15.3",

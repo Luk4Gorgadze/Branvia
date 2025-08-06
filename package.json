@@ -2,12 +2,15 @@
     "name": "branvia-monorepo",
     "version": "0.1.0",
     "private": true,
+    "type": "module",
     "scripts": {
         "docker:dev": "docker compose --env-file .env -f compose.dev.yaml up -d",
         "docker:prod": "docker compose --env-file .env up -d",
         "docker:down": "docker compose down",
         "dev": "pnpm prisma:build && concurrently --kill-others --names \"web,worker\" --prefix-colors \"blue,green\" \"pnpm dev:web\" \"pnpm dev:worker\"",
         "dev:with-dashboard": "pnpm prisma:build && concurrently --kill-others --names \"web,worker,dashboard\" --prefix-colors \"blue,green,cyan\" \"pnpm dev:web\" \"pnpm dev:worker\" \"pnpm dev:dashboard\"",
+        "copy-env": "node scripts/copy-env.js",
+        "cleanup-queue": "node scripts/cleanup-queue.js",
         "dev:web": "cd web && pnpm dev",
         "dev:worker": "cd worker && pnpm dev",
         "dev:dashboard": "cd worker && pnpm bull-board",
@@ -24,6 +27,12 @@
         "concurrently": "^8.2.2",
         "dotenv-cli": "^10.0.0",
         "rimraf": "^5.0.5",
-        "typescript": "5.8.2"
+        "typescript": "5.8.2",
+        "@bull-board/api": "^6.12.0",
+        "@bull-board/express": "^6.12.0",
+        "express": "^5.1.0",
+        "dotenv": "^16.3.1",
+        "bullmq": "^5.56.9",
+        "ioredis": "^5.7.0"
     }
 }

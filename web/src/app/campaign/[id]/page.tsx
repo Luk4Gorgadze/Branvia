@@ -1,8 +1,8 @@
 "use client"
 import styles from "@/app/campaign/[id]/campaign.module.css"
 import Image from "next/image";
-import { Copy, Download, Palette, FileImage, Sparkles } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw } from 'lucide-react';
+import { useState, useEffect, use } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
 
@@ -24,32 +24,49 @@ interface Campaign {
     };
 }
 
-const CampaignPage = ({ params }: { params: { id: string } }) => {
+const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const { user } = useUser();
     const router = useRouter();
     const [copied, setCopied] = useState(false);
     const [campaign, setCampaign] = useState<Campaign | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [refreshing, setRefreshing] = useState(false);
+
+    const { id: campaignId } = use(params);
+
+    const fetchCampaign = async () => {
+        try {
+            const response = await fetch(`/api/campaigns/${campaignId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch campaign');
+            }
+            const data = await response.json();
+            setCampaign(data.campaign);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load campaign');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCampaign = async () => {
-            try {
-                const response = await fetch(`/api/campaigns/${params.id}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch campaign');
-                }
-                const data = await response.json();
-                setCampaign(data.campaign);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load campaign');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCampaign();
-    }, [params.id]);
+    }, [campaignId]);
+
+    // Auto-refresh if status is processing
+    useEffect(() => {
+        if (campaign?.status === 'processing') {
+            const interval = setInterval(fetchCampaign, 5000); // Check every 5 seconds
+            return () => clearInterval(interval);
+        }
+    }, [campaign?.status]);
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchCampaign();
+        setRefreshing(false);
+    };
 
     // Redirect if not logged in
     if (!user) {
@@ -102,14 +119,23 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
             <div className={styles.imagesColumn}>
                 {/* Generated Images */}
                 <div className={styles.generatedImagesSection}>
-                    <h3 className={styles.sectionTitle}>Generated Images</h3>
+                    <div className={styles.sectionHeader}>
+                        <h3 className={styles.sectionTitle}>Generated Images</h3>
+                        <button
+                            onClick={handleRefresh}
+                            className={styles.refreshButton}
+                            disabled={refreshing}
+                        >
+                            <RefreshCw size={16} className={refreshing ? styles.spinning : ''} />
+                        </button>
+                    </div>
                     <div className={styles.generatedImagesGrid}>
                         {campaign.generatedImages.length > 0 ? (
-                            campaign.generatedImages.map((s3Key, index) => (
+                            campaign.generatedImages.map((imageUrl, index) => (
                                 <div key={index} className={styles.generatedImageCard}>
                                     <div className={styles.imageWrapper}>
                                         <Image
-                                            src={getS3Url(s3Key)}
+                                            src={imageUrl}
                                             alt={`Generated Image ${index + 1}`}
                                             fill
                                             style={{ objectFit: 'cover' }}
@@ -117,7 +143,7 @@ const CampaignPage = ({ params }: { params: { id: string } }) => {
                                     </div>
                                     <button
                                         className={styles.downloadButton}
-                                        onClick={() => downloadImage(getS3Url(s3Key), index)}
+                                        onClick={() => downloadImage(imageUrl, index)}
                                     >
                                         <Download size={16} />
                                         Download

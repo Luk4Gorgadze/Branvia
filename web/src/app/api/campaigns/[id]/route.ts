@@ -5,7 +5,7 @@ import { CampaignService } from '@/_lib/_services/campaignService';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -20,7 +20,7 @@ export async function GET(
             );
         }
 
-        const campaignId = params.id;
+        const { id: campaignId } = await params;
 
         // Get campaign
         const campaign = await CampaignService.getCampaign(campaignId);
@@ -56,7 +56,7 @@ export async function GET(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -71,7 +71,7 @@ export async function PATCH(
             );
         }
 
-        const campaignId = params.id;
+        const { id: campaignId } = await params;
         const body = await request.json();
 
         // Update campaign
@@ -93,7 +93,7 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get user session
@@ -108,7 +108,7 @@ export async function DELETE(
             );
         }
 
-        const campaignId = params.id;
+        const { id: campaignId } = await params;
 
         // Delete campaign
         await CampaignService.deleteCampaign(campaignId);

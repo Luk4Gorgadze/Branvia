@@ -4,11 +4,10 @@ import dotenv from 'dotenv';
 import { imageGenerationProcessor } from './processors/imageGenerationProcessor.js';
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
 
-// Load environment variables from root directory
-dotenv.config({ path: '../.env' });
-
 // Redis connection
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    maxRetriesPerRequest: null
+});
 
 // Create workers for different job types
 const imageGenerationWorker = new Worker('image-generation', imageGenerationProcessor, {
