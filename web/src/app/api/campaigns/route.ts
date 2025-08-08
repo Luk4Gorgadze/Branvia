@@ -3,6 +3,12 @@ import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { CampaignService } from '@/_lib/_services/campaignService';
 import { ProductUploadService } from '@/_lib/_services/productUploadService';
+import {
+    CampaignCreationRequestSchema,
+    CampaignResponseSchema,
+    CampaignsListResponseSchema,
+    ErrorResponseSchema
+} from '@/_lib/_schemas/imageGeneration';
 
 export async function POST(request: NextRequest) {
     try {
@@ -19,6 +25,16 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
+
+        // Validate request body with Zod
+        const validationResult = CampaignCreationRequestSchema.safeParse(body);
+        if (!validationResult.success) {
+            const errorResponse = ErrorResponseSchema.parse({
+                error: `Validation failed: ${validationResult.error.errors.map((e: any) => e.message).join(', ')}`
+            });
+            return NextResponse.json(errorResponse, { status: 400 });
+        }
+
         const {
             productTitle,
             productDescription,
@@ -26,15 +42,7 @@ export async function POST(request: NextRequest) {
             customStyle,
             outputFormat,
             productImageS3Key,
-        } = body;
-
-        // Validate required fields
-        if (!productTitle || !productDescription || !outputFormat || !productImageS3Key) {
-            return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
-            );
-        }
+        } = validationResult.data;
 
         // Create campaign
         const campaign = await CampaignService.createCampaign({
@@ -50,11 +58,14 @@ export async function POST(request: NextRequest) {
         // Link the upload to the campaign
         await ProductUploadService.linkToCampaign(productImageS3Key, campaign.id);
 
-        return NextResponse.json({
+        // Validate response with Zod
+        const response = CampaignResponseSchema.parse({
             success: true,
             campaignId: campaign.id,
             message: 'Campaign created successfully'
         });
+
+        return NextResponse.json(response);
 
     } catch (error) {
         console.error('Error creating campaign:', error);
@@ -82,10 +93,13 @@ export async function GET(request: NextRequest) {
         // Get user campaigns
         const campaigns = await CampaignService.getUserCampaigns(session.user.id);
 
-        return NextResponse.json({
+        // Validate response with Zod
+        const response = CampaignsListResponseSchema.parse({
             success: true,
             campaigns
         });
+
+        return NextResponse.json(response);
 
     } catch (error) {
         console.error('Error fetching campaigns:', error);

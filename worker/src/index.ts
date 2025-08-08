@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import { imageGenerationProcessor } from './processors/imageGenerationProcessor.js';
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
 
+// Load environment variables
+dotenv.config();
+
 // Redis connection
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
     maxRetriesPerRequest: null

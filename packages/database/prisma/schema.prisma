@@ -70,18 +70,19 @@ model Verification {
 }
 
 model ProductUpload {
-    id          String    @id @default(cuid())
+    id          String @id @default(cuid())
     userId      String
-    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    s3Key       String    @unique
+    user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    s3Key       String @unique
     fileName    String
     fileSize    Int
     contentType String
-    status      String    @default("uploaded") // uploaded, linked, deleted
-    campaignId  String? // Links to campaign when created
-    campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
+
+    status     String    @default("uploaded") // uploaded, linked, deleted
+    campaignId String? // Links to campaign when created
+    campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
 
     @@map("product_upload")
 }
@@ -97,7 +98,9 @@ model Campaign {
     outputFormat       String
     productImageS3Key  String? // S3 key for the uploaded product image
     generatedImages    String[] // Array of S3 keys for generated images
+    prompt             String? // The AI-generated prompt used for image generation
     status             String          @default("pending") // pending, processing, completed, failed
+    public             Boolean         @default(false) // Whether the campaign is publicly accessible
     productUploads     ProductUpload[] // Relation to track uploads
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt

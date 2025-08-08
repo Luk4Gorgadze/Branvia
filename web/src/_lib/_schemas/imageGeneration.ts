@@ -12,7 +12,7 @@ export const StylePreset = z.enum([
     'soft-dreamy'
 ]);
 
-// Output format enum
+// Output format enum with resolution mapping
 export const OutputFormat = z.enum([
     'instagram-post',
     'instagram-story',
@@ -21,7 +21,40 @@ export const OutputFormat = z.enum([
     'website-hero'
 ]);
 
-// Image generation request schema
+// Resolution mapping for each output format
+export const OUTPUT_FORMAT_RESOLUTIONS = {
+    'instagram-post': { width: 1080, height: 1080 }, // Square 1:1
+    'instagram-story': { width: 1080, height: 1920 }, // Portrait 9:16
+    'facebook-ad': { width: 1200, height: 628 }, // Landscape 1.91:1
+    'pinterest-pin': { width: 1000, height: 1500 }, // Portrait 2:3
+    'website-hero': { width: 1920, height: 1080 } // Landscape 16:9
+} as const;
+
+// Type for resolution mapping
+export type OutputFormatResolution = typeof OUTPUT_FORMAT_RESOLUTIONS[keyof typeof OUTPUT_FORMAT_RESOLUTIONS];
+
+// Helper function to get resolution for an output format
+export function getOutputFormatResolution(format: z.infer<typeof OutputFormat>): OutputFormatResolution {
+    return OUTPUT_FORMAT_RESOLUTIONS[format];
+}
+
+// Campaign creation request schema (for creating campaigns)
+export const CampaignCreationRequestSchema = z.object({
+    productImageS3Key: z.string().min(1, 'Product image S3 key is required'),
+    productTitle: z.string().min(1, 'Product title is required').max(100, 'Product title too long'),
+    productDescription: z.string().min(10, 'Product description must be at least 10 characters').max(500, 'Product description too long'),
+    selectedStyle: StylePreset.optional(),
+    customStyle: z.string().max(200, 'Custom style description too long').optional(),
+    outputFormat: OutputFormat
+}).refine(
+    (data: { selectedStyle?: string; customStyle?: string }) => data.selectedStyle || data.customStyle,
+    {
+        message: 'Either selectedStyle or customStyle must be provided',
+        path: ['selectedStyle']
+    }
+);
+
+// Image generation request schema (for image generation jobs)
 export const ImageGenerationRequestSchema = z.object({
     productImageS3Key: z.string().min(1, 'Product image S3 key is required'),
     productTitle: z.string().min(1, 'Product title is required').max(100, 'Product title too long'),
@@ -60,8 +93,26 @@ export const ErrorResponseSchema = z.object({
     error: z.string()
 });
 
+
+
+// Campaign response schema
+export const CampaignResponseSchema = z.object({
+    success: z.boolean(),
+    campaignId: z.string(),
+    message: z.string()
+});
+
+// Campaigns list response schema
+export const CampaignsListResponseSchema = z.object({
+    success: z.boolean(),
+    campaigns: z.array(z.any()) // You can define a more specific campaign schema if needed
+});
+
 // Type exports
+export type CampaignCreationRequest = z.infer<typeof CampaignCreationRequestSchema>;
 export type ImageGenerationRequest = z.infer<typeof ImageGenerationRequestSchema>;
 export type JobStatusResponse = z.infer<typeof JobStatusResponseSchema>;
 export type ImageGenerationResponse = z.infer<typeof ImageGenerationResponseSchema>;
-export type ErrorResponse = z.infer<typeof ErrorResponseSchema>; 
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+export type CampaignResponse = z.infer<typeof CampaignResponseSchema>;
+export type CampaignsListResponse = z.infer<typeof CampaignsListResponseSchema>; 

@@ -1,13 +1,15 @@
 "use client"
 import styles from "@/app/campaign/[id]/campaign.module.css"
 import Image from "next/image";
-import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw } from 'lucide-react';
+import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw, Globe, Lock } from 'lucide-react';
 import { useState, useEffect, use } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
+import { getOutputFormatResolution } from '@/_lib/_schemas/imageGeneration';
 
 interface Campaign {
     id: string;
+    userId: string;
     productTitle: string;
     productDescription: string;
     selectedStyle?: string;
@@ -15,13 +17,16 @@ interface Campaign {
     outputFormat: string;
     productImageS3Key: string;
     generatedImages: string[];
+    prompt?: string; // The AI-generated prompt used for image generation
     status: string;
+    public: boolean;
     createdAt: string;
     user: {
         id: string;
         name: string;
         email: string;
     };
+
 }
 
 const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -32,8 +37,28 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState(false);
+    const [inputImageAspectRatio, setInputImageAspectRatio] = useState<number>(1);
 
     const { id: campaignId } = use(params);
+
+    // Generate S3 URL for a file
+    const getS3Url = (s3Key: string) => {
+        const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
+        const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
+
+        if (!bucketName) {
+            console.error('NEXT_PUBLIC_AWS_S3_BUCKET_NAME is not defined');
+            return '';
+        }
+
+        if (!s3Key || s3Key.trim() === '') {
+            console.error('S3 key is empty or invalid:', s3Key);
+            return '';
+        }
+
+        const url = `https://${bucketName}.s3.${region}.amazonaws.com/${s3Key}`;
+        return url;
+    };
 
     const fetchCampaign = async () => {
         try {
@@ -43,6 +68,20 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
             }
             const data = await response.json();
             setCampaign(data.campaign);
+
+            // Calculate aspect ratio for input image
+            if (data.campaign?.productImageS3Key) {
+                const imageUrl = getS3Url(data.campaign.productImageS3Key);
+                const img = new window.Image();
+                img.onload = () => {
+                    const aspectRatio = img.width / img.height;
+                    setInputImageAspectRatio(aspectRatio);
+                };
+                img.onerror = () => {
+                    setInputImageAspectRatio(1); // Default to square if failed
+                };
+                img.src = imageUrl;
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load campaign');
         } finally {
@@ -68,12 +107,6 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         setRefreshing(false);
     };
 
-    // Redirect if not logged in
-    if (!user) {
-        router.push('/');
-        return null;
-    }
-
     if (loading) {
         return <div className={styles.loading}>Loading campaign...</div>;
     }
@@ -82,9 +115,15 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return <div className={styles.error}>Error: {error || 'Campaign not found'}</div>;
     }
 
+    // Check access control: redirect if user doesn't have access
+    if (!campaign.public && (!user || campaign.userId !== user.id)) {
+        router.push('/');
+        return null;
+    }
+
     const copyToClipboard = async () => {
         try {
-            const promptText = `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`;
+            const promptText = campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`;
             await navigator.clipboard.writeText(promptText);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -108,9 +147,16 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     };
 
-    // Generate S3 URL for a file
-    const getS3Url = (s3Key: string) => {
-        return `https://${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1'}.amazonaws.com/${s3Key}`;
+    // Get aspect ratio for the output format
+    const getAspectRatio = () => {
+        const resolution = getOutputFormatResolution(campaign.outputFormat as any);
+        return resolution.width / resolution.height;
+    };
+
+    // Get resolution info for display
+    const getResolutionInfo = () => {
+        const resolution = getOutputFormatResolution(campaign.outputFormat as any);
+        return `${resolution.width}×${resolution.height}`;
     };
 
     return (
@@ -131,19 +177,27 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     </div>
                     <div className={styles.generatedImagesGrid}>
                         {campaign.generatedImages.length > 0 ? (
-                            campaign.generatedImages.map((imageUrl, index) => (
+                            campaign.generatedImages.filter(imageUrl => imageUrl && imageUrl.trim() !== '').map((imageUrl, index) => (
                                 <div key={index} className={styles.generatedImageCard}>
-                                    <div className={styles.imageWrapper}>
-                                        <Image
-                                            src={imageUrl}
-                                            alt={`Generated Image ${index + 1}`}
-                                            fill
-                                            style={{ objectFit: 'cover' }}
-                                        />
+                                    <div
+                                        className={styles.imageWrapper}
+                                        style={{
+                                            aspectRatio: getAspectRatio(),
+                                            maxWidth: '100%'
+                                        }}
+                                    >
+                                        {imageUrl && (
+                                            <Image
+                                                src={getS3Url(imageUrl)}
+                                                alt={`Generated Image ${index + 1}`}
+                                                fill
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                        )}
                                     </div>
                                     <button
                                         className={styles.downloadButton}
-                                        onClick={() => downloadImage(imageUrl, index)}
+                                        onClick={() => downloadImage(getS3Url(imageUrl), index)}
                                     >
                                         <Download size={16} />
                                         Download
@@ -163,13 +217,21 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 {/* Input Product Image */}
                 <div className={styles.inputImageSection}>
                     <h3 className={styles.sectionTitle}>Input Product Image</h3>
-                    <div className={styles.inputImageContainer}>
-                        <Image
-                            src={getS3Url(campaign.productImageS3Key)}
-                            alt="Input Product Image"
-                            fill
-                            style={{ objectFit: 'cover' }}
-                        />
+                    <div
+                        className={styles.inputImageContainer}
+                        style={{
+                            aspectRatio: inputImageAspectRatio,
+                            width: '32%'
+                        }}
+                    >
+                        {getS3Url(campaign.productImageS3Key) && (
+                            <Image
+                                src={getS3Url(campaign.productImageS3Key)}
+                                alt="Input Product Image"
+                                fill
+                                style={{ objectFit: 'cover' }}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -197,7 +259,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </button>
                         </div>
                         <p className={styles.promptText}>
-                            Professional product photography of {campaign.productTitle}. {campaign.productDescription}. Style: {campaign.customStyle || campaign.selectedStyle}. Format: {campaign.outputFormat}. High quality, commercial use.
+                            {campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`}
                         </p>
                     </div>
 
@@ -219,7 +281,9 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         </div>
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Output Format</span>
-                            <span className={styles.infoValue}>{campaign.outputFormat}</span>
+                            <span className={styles.infoValue}>
+                                {campaign.outputFormat} ({getResolutionInfo()})
+                            </span>
                         </div>
                     </div>
 
@@ -242,6 +306,19 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Generation Cost</span>
                             <span className={styles.infoValue}>50 credits</span>
+                        </div>
+                    </div>
+
+                    {/* Campaign Visibility */}
+                    <div className={styles.infoRow}>
+                        <div className={styles.infoIcon}>
+                            {campaign.public ? <Globe size={20} /> : <Lock size={20} />}
+                        </div>
+                        <div className={styles.infoContent}>
+                            <span className={styles.infoLabel}>Visibility</span>
+                            <span className={styles.infoValue}>
+                                {campaign.public ? 'Public' : 'Private'}
+                            </span>
                         </div>
                     </div>
                 </div>

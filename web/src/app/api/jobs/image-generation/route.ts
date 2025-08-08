@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         const validationResult = ImageGenerationRequestSchema.safeParse(body);
 
         if (!validationResult.success) {
-            const errors = validationResult.error.errors.map(err =>
+            const errors = validationResult.error.errors.map((err: any) =>
                 `${err.path.join('.')}: ${err.message}`
             ).join(', ');
 

@@ -8,35 +8,20 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        // Get user session
+        // Get user session (optional for public campaigns)
         const session = await auth.api.getSession({
             headers: await headers()
         });
 
-        if (!session?.user) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 }
-            );
-        }
-
         const { id: campaignId } = await params;
 
-        // Get campaign
-        const campaign = await CampaignService.getCampaign(campaignId);
+        // Get campaign with access control
+        const campaign = await CampaignService.getCampaign(campaignId, session?.user?.id);
 
         if (!campaign) {
             return NextResponse.json(
-                { error: 'Campaign not found' },
+                { error: 'Campaign not found or access denied' },
                 { status: 404 }
-            );
-        }
-
-        // Check if user owns this campaign
-        if (campaign.userId !== session.user.id) {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 403 }
             );
         }
 
