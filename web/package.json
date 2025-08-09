@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "docker:dev": "docker compose --env-file .env -f compose.dev.yaml up -d",
-    "dev": "next dev --port 3000",
+    "dev": "dotenv -e .env next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 0",

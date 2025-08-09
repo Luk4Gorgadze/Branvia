@@ -1,5 +1,5 @@
-import { config } from 'dotenv';
-import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

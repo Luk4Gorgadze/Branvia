@@ -3,6 +3,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Getting Started
 
 First, run the development server:
+```
+docker build -f Dockerfile.base -t branvia-base:latest .
+```
 
 ```bash
 npm run dev

@@ -11,7 +11,7 @@ services:
     container_name: branvia_postgres
     image: postgres:latest
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -19,30 +19,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
-
-  # BullMQ Worker service
-  worker:
-    container_name: branvia_worker
-    build:
-      context: .
-      dockerfile: worker/Dockerfile.dev
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - NODE_ENV=development
-      - POSTGRES_URL=${POSTGRES_URL}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-    depends_on:
-      - redis
-      - postgres
-    restart: always
-    volumes:
-      - ./worker:/app/worker
-      - ./packages:/app/packages
-      - /app/worker/node_modules
-      - /app/packages/database/node_modules
 
 volumes:
   redis_data:

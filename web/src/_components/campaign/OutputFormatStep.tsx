@@ -3,11 +3,9 @@ import { CampaignFormData } from '@/_lib/_hooks/useCampaignForm';
 import styles from '@/app/campaign/generate/generate.module.css';
 
 const outputFormats = [
-    { id: 'instagram-post', name: 'Instagram Post', dimensions: '1080x1080 px' },
-    { id: 'instagram-story', name: 'Instagram Story', dimensions: '1080x1920 px' },
-    { id: 'facebook-ad', name: 'Facebook Ad Banner', dimensions: '1200x628 px' },
-    { id: 'pinterest-pin', name: 'Pinterest Pin', dimensions: '1000x1500 px' },
-    { id: 'website-hero', name: 'Website Hero Image', dimensions: '1920x600 px' }
+    { id: 'square', name: 'Instagram Square', dimensions: '1024x1024 px' },
+    { id: 'portrait', name: 'Story / Tall', dimensions: '1024x1792 px' },
+    { id: 'landscape', name: 'Wide Banner', dimensions: '1792x1024 px' }
 ];
 
 interface OutputFormatStepProps {

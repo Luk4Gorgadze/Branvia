@@ -15,11 +15,9 @@ const stylePresets = [
 ];
 
 const outputFormats = [
-    { id: 'instagram-post', name: 'Instagram Post' },
-    { id: 'instagram-story', name: 'Instagram Story' },
-    { id: 'facebook-ad', name: 'Facebook Ad Banner' },
-    { id: 'pinterest-pin', name: 'Pinterest Pin' },
-    { id: 'website-hero', name: 'Website Hero Image' }
+    { id: 'square', name: 'Instagram Square' },
+    { id: 'portrait', name: 'Story / Tall' },
+    { id: 'landscape', name: 'Wide Banner' }
 ];
 
 interface ReviewStepProps {

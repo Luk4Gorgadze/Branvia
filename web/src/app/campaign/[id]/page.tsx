@@ -5,7 +5,7 @@ import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw, Globe, Lock } 
 import { useState, useEffect, use } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
-import { getOutputFormatResolution } from '@/_lib/_schemas/imageGeneration';
+import { getOutputFormatResolution, getOutputFormatLabel } from '@/_lib/_schemas/imageGeneration';
 
 interface Campaign {
     id: string;
@@ -123,7 +123,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const copyToClipboard = async () => {
         try {
-            const promptText = campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`;
+            const promptText = campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${getOutputFormatLabel(campaign.outputFormat as any)}. High quality, commercial use.`;
             await navigator.clipboard.writeText(promptText);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -259,7 +259,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             </button>
                         </div>
                         <p className={styles.promptText}>
-                            {campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${campaign.outputFormat}. High quality, commercial use.`}
+                            {campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${getOutputFormatLabel(campaign.outputFormat as any)}. High quality, commercial use.`}
                         </p>
                     </div>
 
@@ -282,7 +282,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Output Format</span>
                             <span className={styles.infoValue}>
-                                {campaign.outputFormat} ({getResolutionInfo()})
+                                {getOutputFormatLabel(campaign.outputFormat as any)} ({getResolutionInfo()})
                             </span>
                         </div>
                     </div>

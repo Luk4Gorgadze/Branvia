@@ -12,30 +12,40 @@ export const StylePreset = z.enum([
     'soft-dreamy'
 ]);
 
-// Output format enum with resolution mapping
+// Output format enum with fixed DALL·E-compatible resolutions
 export const OutputFormat = z.enum([
-    'instagram-post',
-    'instagram-story',
-    'facebook-ad',
-    'pinterest-pin',
-    'website-hero'
+    'square',
+    'portrait',
+    'landscape'
 ]);
 
-// Resolution mapping for each output format
+// Resolution mapping for each output format (fixed sizes)
 export const OUTPUT_FORMAT_RESOLUTIONS = {
-    'instagram-post': { width: 1080, height: 1080 }, // Square 1:1
-    'instagram-story': { width: 1080, height: 1920 }, // Portrait 9:16
-    'facebook-ad': { width: 1200, height: 628 }, // Landscape 1.91:1
-    'pinterest-pin': { width: 1000, height: 1500 }, // Portrait 2:3
-    'website-hero': { width: 1920, height: 1080 } // Landscape 16:9
+    square: { width: 1024, height: 1024 }, // 1:1
+    portrait: { width: 1024, height: 1792 }, // 9:16 style
+    landscape: { width: 1792, height: 1024 } // 16:9 style (wide)
+} as const;
+
+// Friendly display labels for formats
+export const OUTPUT_FORMAT_LABELS = {
+    square: 'Instagram Square',
+    portrait: 'Story / Tall',
+    landscape: 'Wide Banner'
 } as const;
 
 // Type for resolution mapping
 export type OutputFormatResolution = typeof OUTPUT_FORMAT_RESOLUTIONS[keyof typeof OUTPUT_FORMAT_RESOLUTIONS];
 
 // Helper function to get resolution for an output format
-export function getOutputFormatResolution(format: z.infer<typeof OutputFormat>): OutputFormatResolution {
-    return OUTPUT_FORMAT_RESOLUTIONS[format];
+export function getOutputFormatResolution(format: z.infer<typeof OutputFormat> | string): OutputFormatResolution {
+    const key = format as keyof typeof OUTPUT_FORMAT_RESOLUTIONS;
+    return OUTPUT_FORMAT_RESOLUTIONS[key] ?? OUTPUT_FORMAT_RESOLUTIONS.square;
+}
+
+// Helper to get a friendly label for an output format
+export function getOutputFormatLabel(format: z.infer<typeof OutputFormat> | string): string {
+    const key = format as keyof typeof OUTPUT_FORMAT_LABELS;
+    return OUTPUT_FORMAT_LABELS[key] ?? String(format);
 }
 
 // Campaign creation request schema (for creating campaigns)

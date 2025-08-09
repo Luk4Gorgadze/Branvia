@@ -5,6 +5,7 @@ import FooterSection from "@/_components/main/FooterSection";
 import { UserProvider } from "@/_lib/_providers";
 import { auth } from "@/_lib/_auth/auth";
 import { headers } from "next/headers";
+import SessionRepair from "@/_lib/_auth/SessionRepair";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,13 +17,22 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers()
-  })
-  const user = session?.user
+  let user: any = null;
+  let sessionErrored = false;
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    user = session?.user ?? null;
+  } catch (error) {
+    console.error("Failed to resolve session, continuing as logged out.", error);
+    sessionErrored = true;
+  }
   return (
     <html lang="en">
       <body>
+        {/* If session lookup failed, trigger a client-side signOut to clear bad cookies */}
+        <SessionRepair shouldSignOut={sessionErrored} />
         <UserProvider initialUser={user}>
           <Navbar />
           {children}
