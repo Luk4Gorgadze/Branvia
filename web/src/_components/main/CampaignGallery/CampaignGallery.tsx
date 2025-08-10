@@ -3,6 +3,7 @@ import { useUser } from "@/_lib/_providers";
 import styles from "./CampaignGallery.module.css";
 import Image from "next/image";
 import Link from "next/link";
+import { CampaignDiv } from "@/_components/ui/CampaignDiv";
 
 // Platform data
 const AI_PLATFORMS = [
@@ -30,16 +31,7 @@ const CampaignGallery = () => {
     );
 
     const renderCampaignCard = (index: number) => (
-        <Link key={index} href={`/campaign/${index}`} className={styles.promptImageCard}>
-            <Image
-                src="/example.png"
-                alt="AI Generated Image"
-                fill
-                sizes="(max-width: 400px) 50vw, (max-width: 900px) 33vw, 20vw"
-                className={styles.promptImage}
-            />
-            <div className={styles.promptOverlay}>View Prompt</div>
-        </Link>
+        <CampaignDiv key={index} href={`/campaign/${index}`} imageUrl="/example.png" overlayText="See details" />
     );
 
     return (

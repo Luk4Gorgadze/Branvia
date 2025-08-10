@@ -28,7 +28,7 @@ const FooterSection = () => {
                             <ul className={styles.footerList}>
                                 <li><Link href="/contact">Contact Us</Link></li>
                                 <li><Link href="/help">Help Center</Link></li>
-                                <li><a href="#docs">Documentation</a></li>
+                                <li><Link href="/documentation">Documentation</Link></li>
                             </ul>
                         </div>
 

@@ -32,7 +32,7 @@ const Navbar = () => {
                 <div className={styles.desktopOnly} style={{ width: '100%', alignItems: 'center', display: 'flex' }}>
                     <Link href="/#hero" className={styles.logo}>Branvia</Link>
                     <div className={styles.navLinks}>
-                        {user && <Link href="/#gallery">Gallery</Link>}
+                        {user && <Link href="/gallery">Gallery</Link>}
                         {!user && <Link href="/#gallery" onClick={() => setMenuOpen(false)}>Examples</Link>}
                         <Link href="/#about">About</Link>
                         <Link href="/#pricing">Pricing</Link>
@@ -69,7 +69,7 @@ const Navbar = () => {
                             Branvia
                         </Link>
                         <div className={styles.navLinks}>
-                            {user && <Link href="/#gallery" onClick={() => setMenuOpen(false)}>Gallery</Link>}
+                            {user && <Link href="/gallery" onClick={() => setMenuOpen(false)}>Gallery</Link>}
                             {!user && <Link href="/#gallery" onClick={() => setMenuOpen(false)}>Examples</Link>}
                             <Link href="/#about" onClick={() => setMenuOpen(false)}>About</Link>
                             <Link href="/#pricing" onClick={() => setMenuOpen(false)}>Pricing</Link>

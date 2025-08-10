@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { CampaignService } from '@/_lib/_services/campaignService';
+import { spendCredits } from '@/_lib/_services/subscriptionService';
 import { ProductUploadService } from '@/_lib/_services/productUploadService';
 import {
     CampaignCreationRequestSchema,
@@ -43,6 +44,12 @@ export async function POST(request: NextRequest) {
             outputFormat,
             productImageS3Key,
         } = validationResult.data;
+
+        // Spend credits before creating (1 campaign = 50 credits)
+        await spendCredits(session.user.id, 50, 'campaign_creation', {
+            productTitle,
+            outputFormat,
+        });
 
         // Create campaign
         const campaign = await CampaignService.createCampaign({

@@ -3,6 +3,7 @@ import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 import { imageGenerationProcessor } from './processors/imageGenerationProcessor.js';
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
+import { subscriptionRenewalProcessor } from './processors/subscriptionRenewalProcessor.js';
 
 // Load environment variables
 dotenv.config();
@@ -27,8 +28,16 @@ const cleanupWorker = new Worker('cleanup', cleanupProcessor, {
     removeOnFail: 25, // Keep last 25 failed jobs
 });
 
-// Create queue for scheduled cleanup jobs
+const subscriptionWorker = new Worker('subscription-renewal', subscriptionRenewalProcessor as any, {
+    connection: redis,
+    concurrency: 1,
+    removeOnComplete: 50,
+    removeOnFail: 25,
+});
+
+// Create queues for scheduled jobs
 const cleanupQueue = new Queue('cleanup', { connection: redis });
+const subscriptionRenewalQueue = new Queue('subscription-renewal', { connection: redis });
 
 // Handle worker events
 imageGenerationWorker.on('completed', (job) => {
@@ -47,6 +56,14 @@ cleanupWorker.on('failed', (job, err) => {
     console.error(`❌ Cleanup job ${job?.id} failed:`, err.message);
 });
 
+subscriptionWorker.on('completed', (job) => {
+    console.log(`✅ Subscription renewal job ${job.id} completed successfully`);
+});
+
+subscriptionWorker.on('failed', (job, err) => {
+    console.error(`❌ Subscription renewal job ${job?.id} failed:`, err.message);
+});
+
 imageGenerationWorker.on('error', (err) => {
     console.error('Image generation worker error:', err);
 });
@@ -57,6 +74,7 @@ cleanupWorker.on('error', (err) => {
 
 console.log('🚀 BullMQ Worker started successfully');
 console.log('📊 Listening for image generation and cleanup jobs...');
+console.log('📊 Listening for subscription renewal jobs...');
 
 // Schedule cleanup job to run every 2 hours
 const scheduleCleanupJob = async () => {
@@ -80,12 +98,36 @@ const scheduleCleanupJob = async () => {
 // Schedule the cleanup job
 scheduleCleanupJob();
 
+// Schedule subscription renewal job to run daily at 00:10
+const scheduleSubscriptionRenewalJob = async () => {
+    try {
+        await subscriptionRenewalQueue.add(
+            'subscription-monthly-renewal',
+            {},
+            {
+                repeat: {
+                    pattern: '10 0 * * *' // 00:10 every day; job itself tops up only on the 1st
+                },
+                removeOnComplete: 10,
+                removeOnFail: 5
+            }
+        );
+        console.log('⏰ Scheduled subscription renewal job (daily 00:10)');
+    } catch (error) {
+        console.error('Failed to schedule subscription renewal job:', error);
+    }
+};
+
+scheduleSubscriptionRenewalJob();
+
 // Graceful shutdown
 process.on('SIGTERM', async () => {
     console.log('🛑 Shutting down worker...');
     await imageGenerationWorker.close();
     await cleanupWorker.close();
+    await subscriptionWorker.close();
     await cleanupQueue.close();
+    await subscriptionRenewalQueue.close();
     await redis.quit();
     process.exit(0);
 });
@@ -94,7 +136,9 @@ process.on('SIGINT', async () => {
     console.log('🛑 Shutting down worker...');
     await imageGenerationWorker.close();
     await cleanupWorker.close();
+    await subscriptionWorker.close();
     await cleanupQueue.close();
+    await subscriptionRenewalQueue.close();
     await redis.quit();
     process.exit(0);
 }); 

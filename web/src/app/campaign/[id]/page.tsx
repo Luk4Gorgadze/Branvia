@@ -1,6 +1,7 @@
 "use client"
 import styles from "@/app/campaign/[id]/campaign.module.css"
 import Image from "next/image";
+import { Skeleton, SkeletonText } from "@/_components/ui/Skeleton";
 import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw, Globe, Lock } from 'lucide-react';
 import { useState, useEffect, use } from 'react';
 import { useUser } from '@/_lib/_providers';
@@ -108,7 +109,45 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     };
 
     if (loading) {
-        return <div className={styles.loading}>Loading campaign...</div>;
+        return (
+            <div className={styles.campaignPage}>
+                <div className={styles.imagesColumn}>
+                    <div className={styles.generatedImagesSection}>
+                        <div className={styles.sectionHeader}>
+                            <h3 className={styles.sectionTitle}>Generated Images</h3>
+                        </div>
+                        <div className={styles.generatedImagesGrid}>
+                            {Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className={styles.generatedImageCard}>
+                                    <div className={styles.imageWrapper} style={{ aspectRatio: 1 }}>
+                                        <Skeleton />
+                                    </div>
+                                    <div>
+                                        <Skeleton style={{ height: 36 }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className={styles.inputImageSection}>
+                        <h3 className={styles.sectionTitle}>Input Product Image</h3>
+                        <div className={styles.inputImageContainer} style={{ aspectRatio: 1, width: '32%' }}>
+                            <Skeleton />
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.detailsColumn}>
+                    <div className={styles.detailsContent}>
+                        <div className={styles.promptSection}>
+                            <div className={styles.promptHeader}>
+                                <h3>Prompt Text</h3>
+                            </div>
+                            <SkeletonText lines={4} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     if (error || !campaign) {
@@ -205,11 +244,20 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                 </div>
                             ))
                         ) : (
-                            <div className={styles.noImages}>
-                                <Sparkles size={48} />
-                                <p>Images are being generated...</p>
-                                <p>Status: {campaign.status}</p>
-                            </div>
+                            // Skeletons while processing
+                            Array.from({ length: 3 }).map((_, i) => (
+                                <div key={i} className={styles.generatedImageCard}>
+                                    <div
+                                        className={styles.imageWrapper}
+                                        style={{ aspectRatio: getAspectRatio(), maxWidth: '100%' }}
+                                    >
+                                        <Skeleton />
+                                    </div>
+                                    <div>
+                                        <Skeleton style={{ height: 36 }} />
+                                    </div>
+                                </div>
+                            ))
                         )}
                     </div>
                 </div>
@@ -258,9 +306,13 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                 {copied ? 'Copied!' : 'Copy'}
                             </button>
                         </div>
-                        <p className={styles.promptText}>
-                            {campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${getOutputFormatLabel(campaign.outputFormat as any)}. High quality, commercial use.`}
-                        </p>
+                        {campaign.prompt ? (
+                            <p className={styles.promptText}>{campaign.prompt}</p>
+                        ) : (
+                            <div className={styles.promptText}>
+                                <SkeletonText lines={4} />
+                            </div>
+                        )}
                     </div>
 
                     {/* Style Chosen */}

@@ -42,11 +42,11 @@ const HeroSection = () => {
 
                     <div className={styles.statsContainer}>
                         <div className={styles.stat}>
-                            <span className={styles.statNumber}>10K+</span>
+                            <span className={styles.statNumber}>1K+</span>
                             <span className={styles.statLabel}>Images Generated</span>
                         </div>
                         <div className={styles.stat}>
-                            <span className={styles.statNumber}>500+</span>
+                            <span className={styles.statNumber}>8+</span>
                             <span className={styles.statLabel}>Brand Styles</span>
                         </div>
                         <div className={styles.stat}>

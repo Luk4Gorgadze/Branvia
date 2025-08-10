@@ -29,15 +29,46 @@
 }
 
 .section {
-    margin-bottom: 4rem;
+    margin-bottom: 3rem;
 }
 
 .section h2 {
     font-family: 'Inter', Arial, sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: #fff;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
+}
+
+.section p {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin-bottom: 1rem;
+}
+
+.section ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.section li {
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+
+.section a {
+    color: #60a5fa;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.section a:hover {
+    color: #93c5fd;
 }
 
 .faqItem {

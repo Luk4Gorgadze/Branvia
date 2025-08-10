@@ -5,7 +5,7 @@ export default function CookiePolicy() {
         <div className={styles.container}>
             <div className={styles.content}>
                 <h1 className={styles.title}>Cookie Policy</h1>
-                <p className={styles.lastUpdated}>Last updated: January 2024</p>
+                <p className={styles.lastUpdated}>Last updated: August 2025</p>
 
                 <section className={styles.section}>
                     <h2>What Are Cookies</h2>
