@@ -1,3 +1,4 @@
+// Added subscription renewal worker initialization - commit marker
 import { Worker, Queue } from 'bullmq';
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';

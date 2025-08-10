@@ -1,3 +1,4 @@
+// New subscription service for managing user subscriptions and credits - commit marker
 import { prisma } from '@/_lib/_db/prismaClient';
 
 export type SubscriptionPlan = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';

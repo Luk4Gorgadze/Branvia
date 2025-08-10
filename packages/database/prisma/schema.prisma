@@ -1,3 +1,4 @@
+// Added subscription and credit management models - commit marker
 generator client {
     provider = "prisma-client-js"
 }

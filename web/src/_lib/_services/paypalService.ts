@@ -1,3 +1,4 @@
+// New PayPal service for API integration - commit marker
 interface PayPalAccessTokenResponse {
     access_token: string;
     token_type: string;

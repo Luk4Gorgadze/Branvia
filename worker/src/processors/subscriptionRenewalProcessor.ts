@@ -1,3 +1,4 @@
+// New worker processor for monthly subscription credit renewals - commit marker
 import { Job } from 'bullmq';
 import { prisma } from '@branvia/database';
 import { getMonthlyCreditsForPlan } from '../web-shim/subscriptionCredits.js';

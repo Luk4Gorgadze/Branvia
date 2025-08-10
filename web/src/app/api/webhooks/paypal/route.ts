@@ -1,3 +1,4 @@
+// New PayPal webhook handler for subscription events - commit marker
 import { NextRequest, NextResponse } from 'next/server';
 import { activateOrUpsertSubscription, cancelSubscription, getMonthlyCreditsForPlan, mapPayPalPlanIdToInternal, topUpCredits } from '@/_lib/_services/subscriptionService';
 

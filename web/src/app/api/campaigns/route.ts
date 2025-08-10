@@ -1,3 +1,4 @@
+// Modified to enforce credit consumption for campaigns - commit marker
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';

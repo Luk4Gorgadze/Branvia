@@ -1,3 +1,4 @@
+// Shared types and functions for subscription credits - commit marker
 // A tiny shim because worker cannot import web code due to path alias differences.
 export type SubscriptionPlan = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
 
