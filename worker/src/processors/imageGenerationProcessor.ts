@@ -44,6 +44,41 @@ export interface ImageGenerationResult {
     };
 }
 
+async function deductCreditsOnceForCampaign(params: { userId: string; campaignId: string; jobId: string | number; amount: number }) {
+    const { userId, campaignId, jobId, amount } = params;
+    // Idempotency: if a transaction for this campaign already exists, skip
+    const existing = await prisma.creditTransaction.findFirst({
+        where: {
+            userId,
+            reason: 'image_generation',
+            // Metadata equality match; stores campaignId for detection
+            metadata: {
+                equals: { campaignId },
+            } as any,
+        },
+    });
+    if (existing) {
+        console.log(`ℹ️ Credits already deducted for campaign ${campaignId}, skipping.`);
+        return;
+    }
+
+    await prisma.$transaction([
+        prisma.user.update({
+            where: { id: userId },
+            data: { availableCredits: { decrement: amount } },
+        }),
+        prisma.creditTransaction.create({
+            data: {
+                userId,
+                change: -amount,
+                reason: 'image_generation',
+                metadata: { campaignId, jobId },
+            },
+        }),
+    ]);
+    console.log(`💳 Deducted ${amount} credits from user ${userId} for campaign ${campaignId}`);
+}
+
 async function generatePromptWithGemini(productTitle: string, productDescription: string, style: string, format: string): Promise<string> {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -213,6 +248,12 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
                 data: { generatedImages, prompt, status: 'completed' }
             });
             console.log(`✅ [TEST] Mock images stored for campaign ${campaignId}`);
+            // Deduct credits after successful completion (test mode too)
+            try {
+                await deductCreditsOnceForCampaign({ userId, campaignId, jobId: job.id!, amount: 50 });
+            } catch (e) {
+                console.error('❌ Failed to deduct credits (test mode):', e);
+            }
             return result;
         }
         // Step 1: Generate prompt using Gemini
@@ -272,7 +313,12 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
             }
         });
         console.log(`💾 Updated campaign ${campaignId} with generated images`);
-
+        // Deduct credits after successful completion
+        try {
+            await deductCreditsOnceForCampaign({ userId, campaignId, jobId: job.id!, amount: 50 });
+        } catch (e) {
+            console.error('❌ Failed to deduct credits:', e);
+        }
         return result;
     } catch (error) {
         console.error(`❌ Error in image generation job ${job.id}:`, error);

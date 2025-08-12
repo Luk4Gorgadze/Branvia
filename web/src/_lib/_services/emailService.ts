@@ -25,7 +25,21 @@ export interface CreditTopUpEmailData {
     reason: string;
 }
 
-export type EmailJobData = SubscriptionConfirmationEmailData | WelcomeEmailData | CreditTopUpEmailData;
+export interface PaymentFailureEmailData {
+    type: 'payment_failure';
+    to: string;
+    userName: string;
+    subscriptionId: string;
+}
+
+export interface SubscriptionSuspendedEmailData {
+    type: 'subscription_suspended';
+    to: string;
+    userName: string;
+    subscriptionId: string;
+}
+
+export type EmailJobData = SubscriptionConfirmationEmailData | WelcomeEmailData | CreditTopUpEmailData | PaymentFailureEmailData | SubscriptionSuspendedEmailData;
 
 // Create queue instance pointing to the same Redis as the worker
 const emailQueue = new Queue('email', {
@@ -84,6 +98,32 @@ export async function sendCreditTopUpEmail(
         userName,
         credits,
         reason,
+    });
+}
+
+export async function sendPaymentFailureEmail(
+    to: string,
+    userName: string,
+    subscriptionId: string
+) {
+    return queueEmailJob({
+        type: 'payment_failure',
+        to,
+        userName,
+        subscriptionId,
+    });
+}
+
+export async function sendSubscriptionSuspendedEmail(
+    to: string,
+    userName: string,
+    subscriptionId: string
+) {
+    return queueEmailJob({
+        type: 'subscription_suspended',
+        to,
+        userName,
+        subscriptionId,
     });
 }
 

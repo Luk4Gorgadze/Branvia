@@ -7,6 +7,26 @@ export const useImageUpload = () => {
         setIsUploading(true);
 
         try {
+            // Check user credits before allowing upload (requires 50)
+            try {
+                const creditsRes = await fetch('/api/users/me/credits');
+                if (creditsRes.ok) {
+                    const { availableCredits } = await creditsRes.json();
+                    if (typeof availableCredits === 'number' && availableCredits < 50) {
+                        throw new Error('INSUFFICIENT_CREDITS');
+                    }
+                }
+            } catch (checkErr) {
+                if ((checkErr as Error).message === 'INSUFFICIENT_CREDITS') {
+                    alert('You need at least 50 credits to start a generation. Please top up your credits.');
+                    throw checkErr;
+                }
+                // If credit check fails for other reasons, surface it to the user but proceed
+                console.warn('Credit check failed, proceeding with caution:', checkErr);
+                const message = (checkErr as Error)?.message || String(checkErr);
+                alert(`We couldn't verify your credits right now. Proceeding, but generation may fail.\nDetails: ${message}`);
+            }
+
             console.log('Starting upload process...');
 
             // Get presigned URL from backend

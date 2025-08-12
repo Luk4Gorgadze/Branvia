@@ -43,7 +43,21 @@ export interface CreditTopUpEmailData {
     reason: string;
 }
 
-export type EmailJobData = SubscriptionConfirmationEmailData | WelcomeEmailData | CreditTopUpEmailData;
+export interface PaymentFailureEmailData {
+    type: 'payment_failure';
+    to: string;
+    userName: string;
+    subscriptionId: string;
+}
+
+export interface SubscriptionSuspendedEmailData {
+    type: 'subscription_suspended';
+    to: string;
+    userName: string;
+    subscriptionId: string;
+}
+
+export type EmailJobData = SubscriptionConfirmationEmailData | WelcomeEmailData | CreditTopUpEmailData | PaymentFailureEmailData | SubscriptionSuspendedEmailData;
 
 // Function to add an email job
 export async function addEmailJob(data: EmailJobData) {

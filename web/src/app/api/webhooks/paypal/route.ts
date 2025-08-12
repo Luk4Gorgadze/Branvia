@@ -1,7 +1,7 @@
 // New PayPal webhook handler for subscription events - commit marker
 import { NextRequest, NextResponse } from 'next/server';
 import { activateOrUpsertSubscription, cancelSubscription, getMonthlyCreditsForPlan, mapPayPalPlanIdToInternal, topUpCredits } from '@/_lib/_services/subscriptionService';
-import { sendSubscriptionConfirmationEmail, sendCreditTopUpEmail } from '@/_lib/_services/emailService';
+import { sendSubscriptionConfirmationEmail, sendCreditTopUpEmail, sendPaymentFailureEmail, sendSubscriptionSuspendedEmail } from '@/_lib/_services/emailService';
 import { prisma } from '@/_lib/_db/prismaClient';
 
 // Basic webhook handler (IPN/Webhook). In production, verify signature using PayPal's Webhook verification API.
@@ -149,6 +149,96 @@ export async function POST(request: NextRequest) {
                 } catch (emailError) {
                     console.error('❌ Failed to send credit top-up email:', emailError);
                     // Don't fail the webhook if email fails
+                }
+            }
+            return NextResponse.json({ success: true });
+        }
+
+        if (eventType === 'BILLING.SUBSCRIPTION.PAYMENT.FAILED') {
+            console.log('❌ Processing subscription payment failed');
+
+            const resource = body.resource;
+            const subscriptionId: string = resource?.id;
+            const userId: string | undefined = resource?.custom_id;
+
+            if (userId) {
+                // Update subscription status to PAST_DUE
+                await prisma.subscription.updateMany({
+                    where: {
+                        paypalSubscriptionId: subscriptionId,
+                        userId: userId
+                    },
+                    data: { status: 'PAST_DUE' }
+                });
+                console.log('⚠️ Subscription marked as PAST_DUE for user:', userId);
+
+                // Send payment failure notification email
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: { id: userId },
+                        select: { name: true, email: true }
+                    });
+
+                    if (user) {
+                        console.log('📧 Sending payment failure email to:', user.email);
+
+                        await sendPaymentFailureEmail(
+                            user.email,
+                            user.name,
+                            subscriptionId
+                        );
+
+                        console.log('✅ Payment failure email sent successfully');
+                    } else {
+                        console.log('❌ User not found for payment failure email:', userId);
+                    }
+                } catch (emailError) {
+                    console.error('❌ Failed to send payment failure email:', emailError);
+                }
+            }
+            return NextResponse.json({ success: true });
+        }
+
+        if (eventType === 'BILLING.SUBSCRIPTION.SUSPENDED') {
+            console.log('🚫 Processing subscription suspended');
+
+            const resource = body.resource;
+            const subscriptionId: string = resource?.id;
+            const userId: string | undefined = resource?.custom_id;
+
+            if (userId) {
+                // Update subscription status to SUSPENDED
+                await prisma.subscription.updateMany({
+                    where: {
+                        paypalSubscriptionId: subscriptionId,
+                        userId: userId
+                    },
+                    data: { status: 'SUSPENDED' }
+                });
+                console.log('🚫 Subscription marked as SUSPENDED for user:', userId);
+
+                // Send subscription suspended email
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: { id: userId },
+                        select: { name: true, email: true }
+                    });
+
+                    if (user) {
+                        console.log('📧 Sending subscription suspended email to:', user.email);
+
+                        await sendSubscriptionSuspendedEmail(
+                            user.email,
+                            user.name,
+                            subscriptionId
+                        );
+
+                        console.log('✅ Subscription suspended email sent successfully');
+                    } else {
+                        console.log('❌ User not found for suspended email:', userId);
+                    }
+                } catch (emailError) {
+                    console.error('❌ Failed to send subscription suspended email:', emailError);
                 }
             }
             return NextResponse.json({ success: true });
