@@ -14,6 +14,7 @@ const CampaignGeneratePage = () => {
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const { formData, updateFormData, canProceed } = useCampaignForm();
     const { uploadImage, deleteImage, isUploading } = useImageUpload();
@@ -105,7 +106,13 @@ const CampaignGeneratePage = () => {
                 throw new Error('Failed to start image generation');
             }
 
-            router.push(`/campaign/${campaignId}`);
+            // Mark as submitted to prevent duplicate submissions
+            setIsSubmitted(true);
+
+            // Small delay to show the submitted state before redirecting
+            setTimeout(() => {
+                router.push(`/campaign/${campaignId}`);
+            }, 1500);
         } catch (error) {
             console.error('Campaign generation failed:', error);
             alert('Failed to generate campaign. Please try again.');
@@ -129,6 +136,7 @@ const CampaignGeneratePage = () => {
                     onImageDelete={handleImageDelete}
                     isUploading={isUploading}
                     isGenerating={isGenerating}
+                    isSubmitted={isSubmitted}
                     onGenerate={generateCampaign}
                 />
 

@@ -14,6 +14,7 @@ interface CampaignFormProps {
     onImageDelete: () => Promise<void>;
     isUploading: boolean;
     isGenerating: boolean;
+    isSubmitted: boolean;
     onGenerate: () => Promise<void>;
 }
 
@@ -25,6 +26,7 @@ export const CampaignForm = ({
     onImageDelete,
     isUploading,
     isGenerating,
+    isSubmitted,
     onGenerate
 }: CampaignFormProps) => {
     const renderStepContent = () => {
@@ -64,6 +66,7 @@ export const CampaignForm = ({
                     <ReviewStep
                         formData={formData}
                         isGenerating={isGenerating}
+                        isSubmitted={isSubmitted}
                         onGenerate={onGenerate}
                     />
                 );

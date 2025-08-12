@@ -23,12 +23,14 @@ const outputFormats = [
 interface ReviewStepProps {
     formData: CampaignFormData;
     isGenerating: boolean;
+    isSubmitted: boolean;
     onGenerate: () => Promise<void>;
 }
 
 export const ReviewStep = ({
     formData,
     isGenerating,
+    isSubmitted,
     onGenerate
 }: ReviewStepProps) => {
     const selectedStyleName = formData.selectedStyle
@@ -64,14 +66,19 @@ export const ReviewStep = ({
             </div>
 
             <button
-                className={styles.generateButton}
+                className={`${styles.generateButton} ${isSubmitted ? styles.submitted : ''}`}
                 onClick={onGenerate}
-                disabled={isGenerating}
+                disabled={isGenerating || isSubmitted}
             >
                 {isGenerating ? (
                     <>
                         <div className={styles.spinner}></div>
                         Generating...
+                    </>
+                ) : isSubmitted ? (
+                    <>
+                        <Sparkles size={20} />
+                        Campaign Submitted!
                     </>
                 ) : (
                     <>

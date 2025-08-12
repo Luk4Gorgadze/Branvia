@@ -10,6 +10,8 @@ interface PriceCardProps {
     featuredBadge?: string;
     onButtonClick?: () => void;
     disabled?: boolean;
+    hasActiveSubscription?: boolean;
+    subscriptionStatus?: 'current' | 'upgrade' | 'downgrade' | null;
 }
 
 const PriceCard = ({
@@ -21,8 +23,35 @@ const PriceCard = ({
     isFeatured = false,
     featuredBadge = "Most Popular",
     onButtonClick,
-    disabled = false
+    disabled = false,
+    hasActiveSubscription = false,
+    subscriptionStatus
 }: PriceCardProps) => {
+    const getButtonText = () => {
+        switch (subscriptionStatus) {
+            case 'current':
+                return 'Current Plan';
+            case 'upgrade':
+                return 'Upgrade';
+            case 'downgrade':
+                return 'Downgrade';
+            default:
+                return 'Get Started';
+        }
+    };
+
+    const getButtonClassName = () => {
+        let className = styles.pricingButton;
+
+        if (hasActiveSubscription) {
+            className += ` ${styles.currentPlan}`;
+        } else if (disabled) {
+            className += ` ${styles.disabled}`;
+        }
+
+        return className;
+    };
+
     return (
         <div className={`${styles.pricingCard} ${isFeatured ? styles.featured : ''}`}>
             {isFeatured && (
@@ -40,11 +69,11 @@ const PriceCard = ({
                 ))}
             </ul>
             <button
-                className={`${styles.pricingButton} ${disabled ? styles.disabled : ''}`}
+                className={getButtonClassName()}
                 onClick={disabled ? undefined : onButtonClick}
-                disabled={disabled}
+                disabled={disabled || (hasActiveSubscription && subscriptionStatus === 'current')}
             >
-                {buttonText}
+                {getButtonText()}
             </button>
         </div>
     );

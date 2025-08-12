@@ -5,43 +5,98 @@ interface PayPalAccessTokenResponse {
     expires_in: number;
 }
 
-export async function getPayPalAccessToken(): Promise<string> {
-    const clientId = process.env.PAYPAL_CLIENT_ID!;
-    const secret = process.env.PAYPAL_CLIENT_SECRET!;
-    const base = process.env.PAYPAL_BASE_URL || 'https://api-m.paypal.com'; // use sandbox in dev
+export async function getPayPalAccessToken(): Promise<string | null> {
+    try {
+        const base = process.env.PAYPAL_BASE_URL || 'https://api-m.sandbox.paypal.com'; // use sandbox in dev
+        const clientId = process.env.PAYPAL_CLIENT_ID;
+        const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
-    const res = await fetch(`${base}/v1/oauth2/token`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json',
-            'Accept-Language': 'en_US',
-            'Authorization': 'Basic ' + Buffer.from(`${clientId}:${secret}`).toString('base64'),
-        },
-        body: new URLSearchParams({ grant_type: 'client_credentials' }).toString(),
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`PayPal token error: ${res.status} ${text}`);
+        if (!clientId || !clientSecret) {
+            console.error('PayPal credentials not configured');
+            return null;
+        }
+
+        const response = await fetch(`${base}/v1/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'grant_type=client_credentials'
+        });
+
+        if (!response.ok) {
+            console.error('Failed to get PayPal access token');
+            return null;
+        }
+
+        const data: PayPalAccessTokenResponse = await response.json();
+        return data.access_token;
+    } catch (error) {
+        console.error('Error getting PayPal access token:', error);
+        return null;
     }
-    const data = (await res.json()) as PayPalAccessTokenResponse;
-    return data.access_token;
 }
 
-export async function getPayPalSubscription(paypalSubscriptionId: string) {
-    const base = process.env.PAYPAL_BASE_URL || 'https://api-m.paypal.com';
-    const token = await getPayPalAccessToken();
-    const res = await fetch(`${base}/v1/billing/subscriptions/${paypalSubscriptionId}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+export async function getPayPalSubscriptionStatus(subscriptionId: string): Promise<any> {
+    try {
+        const base = process.env.PAYPAL_BASE_URL || 'https://api-m.sandbox.paypal.com'; // use sandbox in dev
+        const accessToken = await getPayPalAccessToken();
+
+        if (!accessToken) {
+            throw new Error('Failed to get access token');
         }
-    });
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`PayPal subscription fetch error: ${res.status} ${text}`);
+
+        const response = await fetch(`${base}/v1/billing/subscriptions/${subscriptionId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to get subscription status');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error getting PayPal subscription status:', error);
+        throw error;
     }
-    return await res.json();
+}
+
+export async function cancelPayPalSubscription(subscriptionId: string): Promise<boolean> {
+    try {
+        const base = process.env.PAYPAL_BASE_URL || 'https://api-m.sandbox.paypal.com';
+        const accessToken = await getPayPalAccessToken();
+
+        if (!accessToken) {
+            throw new Error('Failed to get access token');
+        }
+
+        const response = await fetch(`${base}/v1/billing/subscriptions/${subscriptionId}/cancel`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                reason: 'User upgraded to new plan'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Failed to cancel PayPal subscription:', errorData);
+            throw new Error(`Failed to cancel subscription: ${response.status}`);
+        }
+
+        console.log(`PayPal subscription ${subscriptionId} canceled successfully`);
+        return true;
+    } catch (error) {
+        console.error('Error canceling PayPal subscription:', error);
+        throw error;
+    }
 }
 
 

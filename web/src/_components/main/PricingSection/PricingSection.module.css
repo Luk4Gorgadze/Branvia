@@ -182,6 +182,35 @@
     color: #6b7280;
 }
 
+.pricingButton.currentPlan {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #f59e0b;
+    color: #000000;
+    cursor: default;
+    font-weight: 600;
+}
+
+.pricingButton.currentPlan:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border-color: #f59e0b;
+    transform: none;
+    box-shadow: none;
+    color: #000000;
+}
+
+.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    margin-top: 2rem;
+    font-family: 'Inter', Arial, sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+    max-width: 600px;
+}
+
 @media (max-width: 800px) {
     .pricingSection {
         margin-top: 2.5rem;

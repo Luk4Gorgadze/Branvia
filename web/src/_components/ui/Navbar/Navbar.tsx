@@ -42,7 +42,7 @@ const Navbar = () => {
                         {user ? <button className={styles.ctaNav} onClick={async () => {
                             await signOut()
                             setUser(undefined)
-                            // router.refresh()
+                            window.location.reload()
                         }}>Sign Out</button> : <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>}
                     </div>
                 </div>
@@ -80,6 +80,7 @@ const Navbar = () => {
                                 <button className={styles.ctaNav} onClick={async () => {
                                     await signOut()
                                     setUser(undefined)
+                                    window.location.reload()
                                 }}>Sign Out</button>
                             ) : (
                                 <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
