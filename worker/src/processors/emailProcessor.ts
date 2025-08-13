@@ -1,6 +1,18 @@
 import { Job } from 'bullmq';
 import { Resend } from 'resend';
-import { EmailJobData } from '../queues/emailQueue.js';
+
+// Define EmailJobData interface here since we removed the separate queue file
+export interface EmailJobData {
+    type: 'subscription_confirmation' | 'welcome' | 'credit_topup' | 'payment_failure' | 'subscription_suspended';
+    to: string;
+    userName: string;
+    subscriptionId?: string;
+    plan?: string;
+    amount?: number;
+    nextBillingDate?: string;
+    credits?: number;
+    reason?: string;
+}
 
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY || 'random_key');

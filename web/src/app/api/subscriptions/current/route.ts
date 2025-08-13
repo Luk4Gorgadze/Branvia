@@ -13,18 +13,22 @@ export async function GET(request: NextRequest) {
 
         const userId = session.user.id;
 
-        // Find the user's active subscription
+        // Find the user's active subscription (including cancelled ones for display purposes)
         const subscription = await prisma.subscription.findFirst({
             where: {
                 userId,
-                status: 'ACTIVE'
+                status: { in: ['ACTIVE', 'CANCELED', 'PAST_DUE', 'SUSPENDED'] }
             },
             select: {
                 id: true,
                 plan: true,
                 status: true,
+                paypalSubscriptionId: true,
                 currentPeriodStart: true,
                 currentPeriodEnd: true
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
 

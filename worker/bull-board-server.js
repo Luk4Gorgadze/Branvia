@@ -10,10 +10,11 @@ const app = express();
 // Create Redis connection
 const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 
-// Create queues
+// Create queues for monitoring (these connect to the same Redis as the worker)
 const imageGenerationQueue = new Queue('image-generation', { connection: redis });
 const cleanupQueue = new Queue('cleanup', { connection: redis });
 const emailQueue = new Queue('email', { connection: redis });
+const discordNotificationQueue = new Queue('discord-notifications', { connection: redis });
 
 // Create Bull Board
 const serverAdapter = new ExpressAdapter();
@@ -24,6 +25,7 @@ createBullBoard({
         new BullMQAdapter(imageGenerationQueue),
         new BullMQAdapter(cleanupQueue),
         new BullMQAdapter(emailQueue),
+        new BullMQAdapter(discordNotificationQueue),
     ],
     serverAdapter,
 });

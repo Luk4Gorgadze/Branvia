@@ -1,0 +1,47 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH client
+        run: sudo apt-get update && sudo apt-get install openssh-client
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+
+      - name: Deploy to Production
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          ssh branvia@$SSH_HOST "cd Project && 
+          git pull origin main"
+
+      - name: Notify Discord on success
+        if: success()
+        uses: discord/action-webhook@v1
+        with:
+          webhook-url: ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK_URL }}
+          content: "✅ Deployment succeeded! <@&1405120563025809458>\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"
+
+      - name: Notify Discord on failure
+        if: failure()
+        uses: discord/action-webhook@v1
+        with:
+          webhook-url: ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK_URL }}
+          content: "❌ Deployment failed! <@&1405120563025809458>\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"

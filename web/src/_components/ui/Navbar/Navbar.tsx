@@ -6,6 +6,7 @@ import { signInGoogle, signOut } from "@/_lib/_auth/authClient";
 import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/_lib/_providers";
 import Link from "next/link";
+import { Settings } from "lucide-react";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -39,11 +40,20 @@ const Navbar = () => {
                         {user && <Link href="/campaign/generate">Generate</Link>}
                     </div>
                     <div className={styles.authNav}>
-                        {user ? <button className={styles.ctaNav} onClick={async () => {
-                            await signOut()
-                            setUser(undefined)
-                            window.location.reload()
-                        }}>Sign Out</button> : <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>}
+                        {user ? (
+                            <>
+                                <Link href="/settings" className={styles.settingsIcon} title="Settings">
+                                    <Settings size={20} />
+                                </Link>
+                                <button className={styles.ctaNav} onClick={async () => {
+                                    await signOut()
+                                    setUser(undefined)
+                                    window.location.reload()
+                                }}>Sign Out</button>
+                            </>
+                        ) : (
+                            <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -77,11 +87,17 @@ const Navbar = () => {
                         </div>
                         <div className={styles.authNav}>
                             {user ? (
-                                <button className={styles.ctaNav} onClick={async () => {
-                                    await signOut()
-                                    setUser(undefined)
-                                    window.location.reload()
-                                }}>Sign Out</button>
+                                <>
+                                    <Link href="/settings" className={styles.settingsIcon} onClick={() => setMenuOpen(false)} title="Settings">
+                                        <Settings size={20} />
+                                        <span>Settings</span>
+                                    </Link>
+                                    <button className={styles.ctaNav} onClick={async () => {
+                                        await signOut()
+                                        setUser(undefined)
+                                        window.location.reload()
+                                    }}>Sign Out</button>
+                                </>
                             ) : (
                                 <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
                             )}

@@ -1,0 +1,378 @@
+.container {
+    min-height: 100vh;
+    background: #000000;
+    padding: 120px 20px 40px;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 60px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    color: #888888;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.section {
+    background: #111111;
+    border: 1px solid #333333;
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s ease;
+}
+
+.section:hover {
+    background: #1a1a1a;
+    border-color: #444444;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #333333;
+}
+
+.sectionHeader h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.sectionContent {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid #222222;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 500;
+    color: #888888;
+    font-size: 0.95rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.value {
+    font-weight: 600;
+    color: #fff;
+    font-size: 0.95rem;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-all;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    background: #222222;
+    border-radius: 20px;
+    border: 1px solid currentColor;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.statusExplanation {
+    padding: 16px;
+    background: #222222;
+    border-radius: 8px;
+    border: 1px solid #333333;
+    margin-top: 8px;
+}
+
+.statusExplanation p {
+    margin: 0;
+    color: #888888;
+    font-size: 0.9rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.creditsDisplay {
+    text-align: center;
+    padding: 32px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #333333;
+}
+
+.creditsAmount {
+    display: block;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #10b981;
+    margin-bottom: 8px;
+}
+
+.creditsLabel {
+    font-size: 1.1rem;
+    color: #888888;
+    font-weight: 500;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.creditsInfo {
+    text-align: center;
+    color: #888888;
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 16px;
+    background: #222222;
+    border-radius: 8px;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.cancelButton {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-top: 16px;
+}
+
+.cancelButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+.subscribeButton,
+.resubscribeButton {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    margin-top: 16px;
+}
+
+.subscribeButton:hover,
+.resubscribeButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+}
+
+.noSubscription,
+.cancelledInfo,
+.suspendedInfo,
+.pastDueInfo {
+    text-align: center;
+    padding: 32px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #333333;
+}
+
+.noSubscription p,
+.cancelledInfo p,
+.suspendedInfo p,
+.pastDueInfo p {
+    color: #888888;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.modal {
+    background: #111111;
+    border: 1px solid #333333;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal h3 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: #fff;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.modal p {
+    color: #888888;
+    margin-bottom: 24px;
+    line-height: 1.6;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.modalActions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cancelModalButton {
+    background: #222222;
+    color: #fff;
+    border: 1px solid #444444;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.cancelModalButton:hover {
+    background: #333333;
+    transform: translateY(-2px);
+}
+
+.confirmCancelButton {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+.confirmCancelButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+.confirmCancelButton:disabled,
+.cancelModalButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888888;
+    padding: 60px 20px;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 100px 16px 32px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .section {
+        padding: 24px;
+    }
+
+    .infoRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .value {
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .modalActions {
+        flex-direction: column;
+    }
+
+    .creditsAmount {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.8rem;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .creditsDisplay {
+        padding: 24px;
+    }
+}

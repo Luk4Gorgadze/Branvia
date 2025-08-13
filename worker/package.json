@@ -20,7 +20,8 @@
         "@branvia/database": "workspace:*",
         "@google/generative-ai": "^0.23.0",
         "openai": "^4.0.0",
-        "resend": "^3.1.0"
+        "resend": "^3.1.0",
+        "discord.js": "^14.14.1"
     },
     "devDependencies": {
         "@types/node": "^22.15.3",

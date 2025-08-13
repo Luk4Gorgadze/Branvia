@@ -124,6 +124,39 @@
     color: #000000;
 }
 
+.settingsIcon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    font-family: 'Inter', Arial, sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settingsIcon:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+}
+
+.settingsIcon span {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .settingsIcon span {
+        display: inline;
+    }
+}
+
 /* Hamburger button (hidden on large screens) */
 .hamburger {
     display: none;

@@ -9,7 +9,12 @@ services:
     volumes:
       - redis_data:/data
     restart: always
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   postgres:
     container_name: branvia_postgres_prod
@@ -20,9 +25,17 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_MAX_CONNECTIONS: 200  # Increased connection limit
+      POSTGRES_SHARED_BUFFERS: 256MB  # Better memory management
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 1GB  # Optimize cache
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # BullMQ Worker service
   worker:
@@ -39,16 +52,18 @@ services:
       - AWS_REGION=${AWS_REGION}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     depends_on:
-      - redis
-      - postgres
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     restart: always
     deploy:
-      replicas: 2
+      replicas: 4  # Increased from 2 to 4 for better capacity
       resources:
         limits:
-          memory: 1G
+          memory: 2G  # Increased from 1G to 2G
         reservations:
-          memory: 512M
+          memory: 1G  # Increased from 512M to 1G
 
 volumes:
   redis_data:

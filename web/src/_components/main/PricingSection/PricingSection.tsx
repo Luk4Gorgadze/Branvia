@@ -24,15 +24,16 @@ const PricingSection = () => {
                 const data = await response.json();
                 if (data.subscription) {
                     setCurrentSubscription(data.subscription);
+                    console.log('Current subscription:', data.subscription);
                 }
             }
         } catch (error) {
-            console.log('No active subscription found');
+            console.log('No subscription found');
         }
     };
 
     const getSubscriptionStatus = (planId: string) => {
-        if (!currentSubscription) return null;
+        if (!currentSubscription || currentSubscription.status !== 'ACTIVE') return null;
 
         if (currentSubscription.plan === planId) {
             return 'current';
@@ -124,7 +125,7 @@ const PricingSection = () => {
                         buttonText={loading === 'STARTER' ? 'Loading...' : 'Get Started'}
                         onButtonClick={() => handleGetStarted('STARTER')}
                         disabled={loading === 'STARTER'}
-                        hasActiveSubscription={currentSubscription?.plan === 'STARTER'}
+                        hasActiveSubscription={currentSubscription?.plan === 'STARTER' && currentSubscription?.status === 'ACTIVE'}
                         subscriptionStatus={getSubscriptionStatus('STARTER')}
                     />
 
@@ -140,7 +141,7 @@ const PricingSection = () => {
                         isFeatured={true}
                         onButtonClick={() => handleGetStarted('PROFESSIONAL')}
                         disabled={loading === 'PROFESSIONAL'}
-                        hasActiveSubscription={currentSubscription?.plan === 'PROFESSIONAL'}
+                        hasActiveSubscription={currentSubscription?.plan === 'PROFESSIONAL' && currentSubscription?.status === 'ACTIVE'}
                         subscriptionStatus={getSubscriptionStatus('PROFESSIONAL')}
                     />
 
@@ -157,7 +158,7 @@ const PricingSection = () => {
                         buttonText="Coming Soon"
                         onButtonClick={() => console.log("Enterprise coming soon")}
                         disabled={true}
-                        hasActiveSubscription={currentSubscription?.plan === 'ENTERPRISE'}
+                        hasActiveSubscription={currentSubscription?.plan === 'ENTERPRISE' && currentSubscription?.status === 'ACTIVE'}
                         subscriptionStatus={getSubscriptionStatus('ENTERPRISE')}
                     />
                 </div>

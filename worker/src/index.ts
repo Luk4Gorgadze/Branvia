@@ -1,10 +1,12 @@
 // Added subscription renewal worker initialization - commit marker
-import { Worker, Queue } from 'bullmq';
+import { Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 import { imageGenerationProcessor } from './processors/imageGenerationProcessor.js';
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
 import { processEmailJob } from './processors/emailProcessor.js';
+import { discordNotificationProcessor } from './processors/discordNotificationProcessor.js';
+import { imageGenerationQueue, cleanupQueue, emailQueue, discordNotificationQueue, closeAllQueues } from './queues/sharedQueues.js';
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +19,7 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
 // Create workers for different job types
 const imageGenerationWorker = new Worker('image-generation', imageGenerationProcessor, {
     connection: redis,
-    concurrency: 2, // Process 2 jobs at a time
+    concurrency: 10, // Process 5 jobs at a time (increased from 2)
     removeOnComplete: { count: 100 }, // Keep last 100 completed jobs
     removeOnFail: { count: 50 }, // Keep last 50 failed jobs
 });
@@ -38,9 +40,14 @@ const emailWorker = new Worker('email', processEmailJob, {
     removeOnFail: { count: 50 }, // Keep last 50 failed emails
 });
 
-// Create queues for scheduled jobs
-const cleanupQueue = new Queue('cleanup', { connection: redis });
-const emailQueue = new Queue('email', { connection: redis });
+const discordNotificationWorker = new Worker('discord-notifications', discordNotificationProcessor, {
+    connection: redis,
+    concurrency: 3, // Process 3 Discord notifications at a time
+    removeOnComplete: { count: 100 }, // Keep last 100 completed notifications
+    removeOnFail: { count: 50 }, // Keep last 50 failed notifications
+});
+
+// Queues are now imported from sharedQueues.js
 
 // Handle worker events
 imageGenerationWorker.on('completed', (job) => {
@@ -69,6 +76,14 @@ emailWorker.on('failed', (job, err) => {
     console.error(`❌ Email job ${job?.id} failed:`, err.message);
 });
 
+discordNotificationWorker.on('completed', (job) => {
+    console.log(`✅ Discord notification job ${job.id} completed successfully`);
+});
+
+discordNotificationWorker.on('failed', (job, err) => {
+    console.error(`❌ Discord notification job ${job?.id} failed:`, err.message);
+});
+
 imageGenerationWorker.on('error', (err) => {
     console.error('Image generation worker error:', err);
 });
@@ -83,10 +98,15 @@ emailWorker.on('error', (err) => {
     console.error('Email worker error:', err);
 });
 
+discordNotificationWorker.on('error', (err) => {
+    console.error('Discord notification worker error:', err);
+});
+
 console.log('🚀 BullMQ Worker started successfully');
 console.log('📊 Listening for image generation and cleanup jobs...');
 
 console.log('📧 Listening for email jobs...');
+console.log('📢 Listening for Discord notification jobs...');
 
 // Schedule cleanup job to run every 2 hours
 const scheduleCleanupJob = async () => {
@@ -118,9 +138,8 @@ process.on('SIGTERM', async () => {
     await imageGenerationWorker.close();
     await cleanupWorker.close();
     await emailWorker.close();
-    await cleanupQueue.close();
-    await emailQueue.close();
-    await redis.quit();
+    await discordNotificationWorker.close();
+    await closeAllQueues();
     process.exit(0);
 });
 
@@ -129,8 +148,7 @@ process.on('SIGINT', async () => {
     await imageGenerationWorker.close();
     await cleanupWorker.close();
     await emailWorker.close();
-    await cleanupQueue.close();
-    await emailQueue.close();
-    await redis.quit();
+    await discordNotificationWorker.close();
+    await closeAllQueues();
     process.exit(0);
 }); 
