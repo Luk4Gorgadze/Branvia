@@ -1,9 +1,8 @@
 'use client'
-import { useUser } from "@/_lib/_providers";
-import styles from "./CampaignGallery.module.css";
-import Image from "next/image";
-import Link from "next/link";
+import React from 'react';
+import styles from './CampaignGallery.module.css';
 import { CampaignDiv } from "@/_components/ui/CampaignDiv";
+import { useUser } from '@/_lib/_providers';
 
 // Platform data
 const AI_PLATFORMS = [

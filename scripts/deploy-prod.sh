@@ -12,8 +12,8 @@ pnpm --filter branvia-app check-types
 pnpm --filter branvia-worker check-types
 
 # Build database package first (generates Prisma client)
-echo "📦 Building database package..."
-pnpm build:db
+# echo "📦 Building database package..."
+# pnpm build:db
 
 # Build base image
 echo "🐳 Building base Docker image..."

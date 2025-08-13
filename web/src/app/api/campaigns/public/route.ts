@@ -1,8 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { CampaignService } from '@/_lib/_services/campaignService';
 
-export async function GET(request: NextRequest) {
+// Force dynamic rendering - prevents build-time execution
+export const dynamic = "force-dynamic";
+
+export async function GET() {
     try {
+        // Additional build-time safety check
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return NextResponse.json({
+                success: true,
+                campaigns: [],
+                message: 'Build time - using mock data'
+            });
+        }
+
         // Get public campaigns (no authentication required)
         const campaigns = await CampaignService.getPublicCampaigns();
 

@@ -3,14 +3,13 @@ import React, { useState } from "react";
 import styles from "./Navbar.module.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { signInGoogle, signOut } from "@/_lib/_auth/authClient";
-import { useRouter, usePathname } from "next/navigation";
+
 import { useUser } from "@/_lib/_providers";
 import Link from "next/link";
 import { Settings } from "lucide-react";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
-    const router = useRouter()
     const { user, setUser } = useUser();
 
     return (

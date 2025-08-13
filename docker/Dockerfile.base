@@ -15,11 +15,10 @@ COPY pnpm-workspace.yaml ./
 COPY packages/database/ ./packages/database/
 
 # Install database dependencies and generate Prisma client
+# Add build args for Prisma
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 WORKDIR /app/packages/database
 RUN pnpm install
 RUN pnpm run generate
-
-# Go back to root and verify workspace structure
-WORKDIR /app
-RUN ls -la packages/database/
-RUN pnpm list --depth=0

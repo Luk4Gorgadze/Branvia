@@ -1,8 +1,9 @@
-import { WordsPullUp } from "@/_components/ui/WordsPullUp";
-import styles from "./HeroSection.module.css";
+import React from 'react';
+import { Sparkles, Zap, Eye } from 'lucide-react';
+import styles from './HeroSection.module.css';
 import Image from "next/image";
-import { Sparkles, Zap, Palette, Eye, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
+import { WordsPullUp } from '@/_components/ui/WordsPullUp';
 const HeroSection = () => {
     return (
         <div className={styles.luxuryPage} id="hero">

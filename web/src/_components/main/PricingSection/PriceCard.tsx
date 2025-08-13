@@ -5,7 +5,6 @@ interface PriceCardProps {
     price: number;
     period?: string;
     features: string[];
-    buttonText: string;
     isFeatured?: boolean;
     featuredBadge?: string;
     onButtonClick?: () => void;
@@ -19,7 +18,6 @@ const PriceCard = ({
     price,
     period = "/month",
     features,
-    buttonText,
     isFeatured = false,
     featuredBadge = "Most Popular",
     onButtonClick,

@@ -4,6 +4,8 @@ import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { getPayPalAccessToken } from '@/_lib/_services/paypalService';
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
     try {
         const session = await auth.api.getSession({ headers: await headers() });
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
         const subscription = await response.json();
 
         // Find the approval link
-        const approveLink = subscription.links?.find((link: any) => link.rel === 'approve');
+        const approveLink = subscription.links?.find((link: { rel: string; href: string }) => link.rel === 'approve');
         if (!approveLink) {
             return NextResponse.json({ error: 'No approval link found' }, { status: 500 });
         }

@@ -4,6 +4,8 @@ import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { ProductUploadService } from '@/_lib/_services/productUploadService';
 
+export const dynamic = "force-dynamic";
+
 export async function DELETE(request: NextRequest) {
     try {
         // Get user session

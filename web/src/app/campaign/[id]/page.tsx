@@ -3,7 +3,7 @@ import styles from "@/app/campaign/[id]/campaign.module.css"
 import Image from "next/image";
 import { Skeleton, SkeletonText } from "@/_components/ui/Skeleton";
 import { Copy, Download, Palette, FileImage, Sparkles, RefreshCw, Globe, Lock } from 'lucide-react';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
 import { getOutputFormatResolution, getOutputFormatLabel } from '@/_lib/_schemas/imageGeneration';
@@ -61,7 +61,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         return url;
     };
 
-    const fetchCampaign = async () => {
+    const fetchCampaign = useCallback(async () => {
         try {
             const response = await fetch(`/api/campaigns/${campaignId}`);
             if (!response.ok) {
@@ -88,11 +88,11 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [campaignId]);
 
     useEffect(() => {
         fetchCampaign();
-    }, [campaignId]);
+    }, [campaignId, fetchCampaign]);
 
     // Auto-refresh if status is processing
     useEffect(() => {
@@ -100,7 +100,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
             const interval = setInterval(fetchCampaign, 5000); // Check every 5 seconds
             return () => clearInterval(interval);
         }
-    }, [campaign?.status]);
+    }, [campaign?.status, fetchCampaign]);
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -162,7 +162,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const copyToClipboard = async () => {
         try {
-            const promptText = campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${getOutputFormatLabel(campaign.outputFormat as any)}. High quality, commercial use.`;
+            const promptText = campaign.prompt || `Professional product photography of ${campaign.productTitle}. ${campaign.productDescription}. Style: ${campaign.customStyle || campaign.selectedStyle}. Format: ${getOutputFormatLabel(campaign.outputFormat as string)}. High quality, commercial use.`;
             await navigator.clipboard.writeText(promptText);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
@@ -188,13 +188,13 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     // Get aspect ratio for the output format
     const getAspectRatio = () => {
-        const resolution = getOutputFormatResolution(campaign.outputFormat as any);
+        const resolution = getOutputFormatResolution(campaign.outputFormat as string);
         return resolution.width / resolution.height;
     };
 
     // Get resolution info for display
     const getResolutionInfo = () => {
-        const resolution = getOutputFormatResolution(campaign.outputFormat as any);
+        const resolution = getOutputFormatResolution(campaign.outputFormat as string);
         return `${resolution.width}×${resolution.height}`;
     };
 
@@ -334,7 +334,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                         <div className={styles.infoContent}>
                             <span className={styles.infoLabel}>Output Format</span>
                             <span className={styles.infoValue}>
-                                {getOutputFormatLabel(campaign.outputFormat as any)} ({getResolutionInfo()})
+                                {getOutputFormatLabel(campaign.outputFormat as string)} ({getResolutionInfo()})
                             </span>
                         </div>
                     </div>

@@ -12,8 +12,17 @@ export default function TermsOfService() {
                     <p>By using our service, you agree to:</p>
                     <ul>
                         <li>Use the service only for legal purposes</li>
+                        <li>Respect other users&apos; rights and privacy</li>
+                        <li>Not attempt to gain unauthorized access to our systems</li>
+                        <li>Not use the service for spam or harassment</li>
+                    </ul>
+                    
+                    <h2>1. Acceptance of Terms</h2>
+                    <p>These terms constitute a legally binding agreement between you and Branvia (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).</p>
+                    <ul>
+                        <li>Use the service only for legal purposes</li>
                         <li>Respect intellectual property rights and copyright laws</li>
-                        <li>Not upload or generate content that is harmful, offensive, or violates others' rights</li>
+                        <li>Not upload or generate content that is harmful, offensive, or violates others&apos; rights</li>
                         <li>Not attempt to reverse engineer or hack our platform</li>
                         <li>Not share your account credentials with others</li>
                         <li>Credit Branvia when using generated images commercially (Starter plan)</li>
@@ -34,7 +43,7 @@ export default function TermsOfService() {
 
                 <section className={styles.section}>
                     <h2>Liability Disclaimer</h2>
-                    <p>Branvia provides this service "as is" and makes no warranties about:</p>
+                    <p>Branvia provides this service &quot;as is&quot; and makes no warranties about:</p>
                     <ul>
                         <li>The accuracy or quality of generated images</li>
                         <li>Service availability or uptime</li>

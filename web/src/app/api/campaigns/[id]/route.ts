@@ -3,6 +3,8 @@ import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { CampaignService } from '@/_lib/_services/campaignService';
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }

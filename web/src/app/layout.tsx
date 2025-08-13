@@ -23,13 +23,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let user: any = null;
+  let user: { id: string; name?: string; email?: string; emailVerified?: boolean; createdAt?: Date; updatedAt?: Date; image?: string | null } | undefined = undefined;
   let sessionErrored = false;
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
-    user = session?.user ?? null;
+    user = session?.user ?? undefined;
   } catch (error) {
     console.error("Failed to resolve session, continuing as logged out.", error);
     sessionErrored = true;

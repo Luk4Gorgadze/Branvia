@@ -8,6 +8,8 @@ import {
     type ImageGenerationRequest
 } from '@/_lib/_schemas/imageGeneration';
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -16,7 +18,7 @@ export async function POST(request: NextRequest) {
         const validationResult = ImageGenerationRequestSchema.safeParse(body);
 
         if (!validationResult.success) {
-            const errors = validationResult.error.errors.map((err: any) =>
+            const errors = validationResult.error.errors.map((err: { path: (string | number)[]; message: string }) =>
                 `${err.path.join('.')}: ${err.message}`
             ).join(', ');
 

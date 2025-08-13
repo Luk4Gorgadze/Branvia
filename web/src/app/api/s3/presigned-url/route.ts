@@ -4,6 +4,8 @@ import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { ProductUploadService } from '@/_lib/_services/productUploadService';
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
     try {
         // Get user session
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
         const s3Key = generateS3Key(session.user.id, fileName);
 
         // Create database record for tracking
-        const uploadRecord = await ProductUploadService.createProductUpload({
+        await ProductUploadService.createProductUpload({
             userId: session.user.id,
             s3Key,
             fileName,

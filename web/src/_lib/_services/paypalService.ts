@@ -38,7 +38,22 @@ export async function getPayPalAccessToken(): Promise<string | null> {
     }
 }
 
-export async function getPayPalSubscriptionStatus(subscriptionId: string): Promise<any> {
+export async function getPayPalSubscriptionStatus(subscriptionId: string): Promise<{
+    id: string;
+    status: string;
+    plan_id: string;
+    custom_id: string;
+    billing_info?: {
+        next_billing_time?: string;
+        cycle_executions?: Array<{
+            cycle_start_time?: string;
+        }>;
+    };
+    links?: Array<{
+        rel: string;
+        href: string;
+    }>;
+}> {
     try {
         const base = process.env.PAYPAL_BASE_URL || 'https://api-m.sandbox.paypal.com'; // use sandbox in dev
         const accessToken = await getPayPalAccessToken();

@@ -81,7 +81,7 @@ const PricingSection = () => {
             } else {
                 setError(data.error || 'Failed to create subscription');
             }
-        } catch (err) {
+        } catch {
             setError('Network error occurred');
         } finally {
             setLoading(null);
@@ -104,10 +104,10 @@ const PricingSection = () => {
         }
     };
 
-    const handleContactSales = () => {
-        // Handle contact sales action
-        console.log("Contact Sales clicked");
-    };
+    // const handleContactSales = () => {
+    //     // Handle contact sales action
+    //     console.log("Contact Sales clicked");
+    // };
 
     return (
         <section className={styles.pricingSection} id="pricing">
@@ -122,7 +122,6 @@ const PricingSection = () => {
                             "Standard resolution",
                             "Limited commercial use (must credit us)"
                         ]}
-                        buttonText={loading === 'STARTER' ? 'Loading...' : 'Get Started'}
                         onButtonClick={() => handleGetStarted('STARTER')}
                         disabled={loading === 'STARTER'}
                         hasActiveSubscription={currentSubscription?.plan === 'STARTER' && currentSubscription?.status === 'ACTIVE'}
@@ -137,7 +136,6 @@ const PricingSection = () => {
                             "High resolution",
                             "Commercial usage rights",
                         ]}
-                        buttonText={loading === 'PROFESSIONAL' ? 'Loading...' : 'Get Started'}
                         isFeatured={true}
                         onButtonClick={() => handleGetStarted('PROFESSIONAL')}
                         disabled={loading === 'PROFESSIONAL'}
@@ -155,7 +153,6 @@ const PricingSection = () => {
                             "API access",
                             "White-label options"
                         ]}
-                        buttonText="Coming Soon"
                         onButtonClick={() => console.log("Enterprise coming soon")}
                         disabled={true}
                         hasActiveSubscription={currentSubscription?.plan === 'ENTERPRISE' && currentSubscription?.status === 'ACTIVE'}

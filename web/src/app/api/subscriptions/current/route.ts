@@ -1,9 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/_lib/_auth/auth';
 import { headers } from 'next/headers';
 import { prisma } from '@/_lib/_db/prismaClient';
 
-export async function GET(request: NextRequest) {
+export const dynamic = "force-dynamic";
+
+export async function GET() {
     try {
         const session = await auth.api.getSession({ headers: await headers() });
 

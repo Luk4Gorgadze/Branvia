@@ -3,6 +3,9 @@ import { auth } from '@/_lib/_auth/auth';
 import { prisma } from '@/_lib/_db/prismaClient';
 import { cancelPayPalSubscription } from '@/_lib/_services/paypalService';
 
+// Force dynamic rendering - prevents build-time execution
+export const dynamic = "force-dynamic";
+
 export async function POST(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }

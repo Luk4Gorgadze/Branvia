@@ -12,6 +12,9 @@ import {
     ErrorResponseSchema
 } from '@/_lib/_schemas/imageGeneration';
 
+// Force dynamic rendering - prevents build-time execution
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
     try {
         // Get user session
@@ -32,7 +35,7 @@ export async function POST(request: NextRequest) {
         const validationResult = CampaignCreationRequestSchema.safeParse(body);
         if (!validationResult.success) {
             const errorResponse = ErrorResponseSchema.parse({
-                error: `Validation failed: ${validationResult.error.errors.map((e: any) => e.message).join(', ')}`
+                error: `Validation failed: ${validationResult.error.errors.map((e: { message: string }) => e.message).join(', ')}`
             });
             return NextResponse.json(errorResponse, { status: 400 });
         }
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Get user session
         const session = await auth.api.getSession({

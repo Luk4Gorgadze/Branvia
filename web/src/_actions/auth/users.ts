@@ -1,6 +1,5 @@
 "use server"
 import { auth } from "@/_lib/_auth/auth"
-import { authClient } from "@/_lib/_auth/authClient"
 
 export const signIn = async (email: string, password: string) => {
     await auth.api.signInEmail({

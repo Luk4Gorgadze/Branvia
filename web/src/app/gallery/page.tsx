@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import styles from './page.module.css'
 import { useUser } from '@/_lib/_providers'
 import { Skeleton } from '@/_components/ui/Skeleton'
@@ -82,6 +81,12 @@ export default function GalleryPage() {
             <div className={styles.header}>
                 <h1 className={styles.title}>Your Gallery</h1>
             </div>
+
+            {error && (
+                <div className={styles.error} style={{ color: '#ff6b6b', marginBottom: '20px', textAlign: 'center' }}>
+                    {error}
+                </div>
+            )}
 
             <div className={styles.grid}>
                 {loading

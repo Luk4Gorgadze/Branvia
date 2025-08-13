@@ -254,7 +254,7 @@ export default function SettingsPage() {
                             </>
                         ) : (
                             <div className={styles.noSubscription}>
-                                <p>You don't have an active subscription.</p>
+                                <p>You&apos;re currently on the free plan.</p>
                                 <button
                                     className={styles.subscribeButton}
                                     onClick={() => router.push('/#pricing')}

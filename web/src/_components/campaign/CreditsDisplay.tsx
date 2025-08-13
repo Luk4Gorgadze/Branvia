@@ -15,7 +15,7 @@ export const CreditsDisplay = () => {
                 }
                 const data = await res.json();
                 if (isMounted) setCredits(typeof data.availableCredits === 'number' ? data.availableCredits : 0);
-            } catch (e) {
+            } catch {
                 if (isMounted) setError('Unable to load credits');
             }
         };

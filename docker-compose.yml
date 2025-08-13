@@ -18,7 +18,7 @@ services:
 
   postgres:
     container_name: branvia_postgres_prod
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     ports:
       - "5432:5432"
     environment:
@@ -42,14 +42,9 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - NODE_ENV=production
-      - POSTGRES_URL=${POSTGRES_URL}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      target: production
+    command: pnpm start
+    env_file: .env
     depends_on:
       redis:
         condition: service_healthy
@@ -70,22 +65,11 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
+      target: production
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - REDIS_URL=redis://redis:6379
-      - POSTGRES_URL=${POSTGRES_URL}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_REGION=${AWS_REGION}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-      - DATABASE_URL=${DATABASE_URL}
-      - AUTH_SECRET=${AUTH_SECRET}
-      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
-      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
-      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
-      - RESEND_API_KEY=${RESEND_API_KEY}
+    command: pnpm start
+    env_file: .env
     depends_on:
       redis:
         condition: service_healthy

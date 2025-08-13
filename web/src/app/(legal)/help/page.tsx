@@ -67,7 +67,7 @@ export default function HelpCenter() {
 
                 <section className={styles.section}>
                     <h2>Contact Support</h2>
-                    <p>Can't find what you're looking for? Our support team is here to help!</p>
+                    <p>Don&apos;t see what you&apos;re looking for?</p>
 
                     <div className={styles.contactMethods}>
                         <div className={styles.contactMethod}>

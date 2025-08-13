@@ -5,6 +5,8 @@ import { sendSubscriptionConfirmationEmail, sendCreditTopUpEmail, sendPaymentFai
 import { sendPaymentSuccessNotification, sendPaymentFailureNotification, sendSubscriptionSuspendedNotification, sendSubscriptionActivatedNotification } from '@/_lib/_services/discordNotificationService';
 import { prisma } from '@/_lib/_db/prismaClient';
 
+export const dynamic = "force-dynamic";
+
 // Basic webhook handler (IPN/Webhook). In production, verify signature using PayPal's Webhook verification API.
 export async function POST(request: NextRequest) {
     try {
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ success: true });
             }
 
-            const subscription = await activateOrUpsertSubscription({
+            await activateOrUpsertSubscription({
                 userId: customId,
                 plan: internalPlan,
                 paypalSubscriptionId: subscriptionId,
