@@ -31,7 +31,8 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           ssh branvia@$SSH_HOST "cd Project && 
-          git pull origin main"
+          echo '📥 Pulling latest changes...' && 
+          git pull"
 
       - name: Notify Discord on success
         if: success()
