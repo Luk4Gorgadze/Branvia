@@ -1,0 +1,25 @@
+# Multi-stage build for shared base image
+FROM node:18-alpine AS base
+
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Final base image
+FROM base AS branvia-base
+WORKDIR /app
+
+# Copy workspace configuration
+COPY pnpm-workspace.yaml ./
+
+# Copy the complete database package (including Prisma schema)
+COPY packages/database/ ./packages/database/
+
+# Install database dependencies and generate Prisma client
+WORKDIR /app/packages/database
+RUN pnpm install
+RUN pnpm run generate
+
+# Go back to root and verify workspace structure
+WORKDIR /app
+RUN ls -la packages/database/
+RUN pnpm list --depth=0

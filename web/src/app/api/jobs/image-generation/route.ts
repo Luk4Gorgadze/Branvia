@@ -33,8 +33,14 @@ export async function POST(request: NextRequest) {
 
         const validatedData: ImageGenerationRequest = validationResult.data;
 
+        // Ensure selectedStyle is provided (either from validation or default)
+        const jobData = {
+            ...validatedData,
+            selectedStyle: validatedData.selectedStyle || 'clean-minimal' // Provide default if not selected
+        };
+
         // Add job to queue
-        const job = await addImageGenerationJob(validatedData);
+        const job = await addImageGenerationJob(jobData);
 
         const response = {
             success: true,

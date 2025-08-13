@@ -8,10 +8,10 @@
     "scripts": {
         "build": "pnpm generate && tsc",
         "dev": "tsc --watch",
-        "generate": "dotenv -e ../../.env prisma generate",
-        "migrate": "dotenv -e ../../.env prisma migrate dev",
-        "studio": "dotenv -e ../../.env prisma studio",
-        "db:push": "dotenv -e ../../.env prisma db push"
+        "generate": "dotenv -e .env prisma generate",
+        "migrate": "dotenv -e .env prisma migrate dev",
+        "studio": "dotenv -e .env prisma studio",
+        "db:push": "dotenv -e .env prisma db push"
     },
     "dependencies": {
         "@prisma/client": "^5.22.0"

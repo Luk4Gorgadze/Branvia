@@ -1,0 +1,21 @@
+# Use shared base image with built database package
+FROM branvia-base
+
+# Copy workspace files to ensure @branvia/database is found
+COPY pnpm-workspace.yaml ./
+COPY packages/database/ ./packages/database/
+
+# Set working directory to web
+WORKDIR /app/web
+
+# Copy the web directory contents directly to working directory
+COPY web/ ./
+
+# Install web dependencies from the web directory
+RUN pnpm install
+
+# Build the web app
+RUN pnpm run build
+
+# Start the web app
+CMD ["pnpm", "start"]

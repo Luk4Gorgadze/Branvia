@@ -6,7 +6,7 @@ import { imageGenerationProcessor } from './processors/imageGenerationProcessor.
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
 import { processEmailJob } from './processors/emailProcessor.js';
 import { discordNotificationProcessor } from './processors/discordNotificationProcessor.js';
-import { imageGenerationQueue, cleanupQueue, emailQueue, discordNotificationQueue, closeAllQueues } from './queues/sharedQueues.js';
+import { cleanupQueue, closeAllQueues } from './queues/sharedQueues.js';
 
 // Load environment variables
 dotenv.config();

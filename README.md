@@ -23,6 +23,89 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
 
+## Type Checking & Auto-Fixing
+
+This project includes several tools to catch and fix issues early in development:
+
+### TypeScript Type Checking
+
+Check for type errors without building:
+```bash
+# Check web package types
+pnpm --filter branvia-app check-types
+
+# Check worker package types
+pnpm --filter branvia-worker check-types
+
+# Check database package types
+pnpm --filter @branvia/database check-types
+
+# Check all packages at once
+pnpm check-types
+```
+
+### ESLint Auto-Fixing
+
+Automatically fix many code issues:
+```bash
+# Fix web package linting issues
+pnpm --filter branvia-app lint --fix
+
+# Fix worker package linting issues
+pnpm --filter branvia-worker lint --fix
+
+# Fix all packages
+pnpm lint --fix
+```
+
+### Next.js 15+ API Route Auto-Fix
+
+For Next.js 15+ API routes with dynamic parameters, the project includes an auto-fix script:
+
+```bash
+# Automatically fix API route type signatures
+node scripts/fix-api-routes.js
+```
+
+This script:
+- Finds all `route.ts` files in the web app
+- Updates `{ params }` to `context` parameter
+- Changes `params.id` to `context.params.id`
+- Handles the new async `params` Promise pattern
+
+### Pre-Build Validation
+
+The deployment script automatically runs type checks before building Docker images:
+```bash
+./scripts/deploy-prod.sh
+```
+
+This ensures:
+- TypeScript compilation errors are caught early
+- No time is wasted on Docker builds with type errors
+- Faster feedback loop for developers
+
+### Common Type Issues & Fixes
+
+**Next.js 15+ API Routes:**
+```typescript
+// ❌ Old pattern (Next.js 14)
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+    const id = params.id;
+}
+
+// ✅ New pattern (Next.js 15+)
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+    const params = await context.params;
+    const id = params.id;
+}
+```
+
+**Workspace Dependencies:**
+- Use `workspace:*` in package.json for monorepo dependencies
+- Ensure packages are built before Docker builds
+- Run type checks from the root directory
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

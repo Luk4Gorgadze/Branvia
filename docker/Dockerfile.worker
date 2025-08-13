@@ -1,0 +1,19 @@
+# Use shared base image with built database package
+FROM branvia-base
+
+# Create worker directory and copy worker files
+RUN mkdir -p worker
+COPY worker/package.json ./worker/
+COPY worker/ ./worker/
+
+# Set working directory to worker
+WORKDIR /app/worker
+
+# Install ALL dependencies (including dev dependencies for building)
+RUN pnpm install
+
+# Build the worker
+RUN pnpm run build
+
+# Start the worker
+CMD ["pnpm", "start"]

@@ -5,6 +5,7 @@ const rootEnvPath = path.join(process.cwd(), '.env');
 const webEnvPath = path.join(process.cwd(), 'web', '.env');
 const workerEnvPath = path.join(process.cwd(), 'worker', '.env');
 const scriptsEnvPath = path.join(process.cwd(), 'scripts', '.env');
+const databaseEnvPath = path.join(process.cwd(), 'packages', 'database', '.env');
 
 try {
     // Check if root .env exists
@@ -24,6 +25,10 @@ try {
     // Copy to scripts folder
     fs.copyFileSync(rootEnvPath, scriptsEnvPath);
     console.log('✅ Copied .env to scripts/.env');
+
+    // Copy to database package
+    fs.copyFileSync(rootEnvPath, databaseEnvPath);
+    console.log('✅ Copied .env to packages/database/.env');
 
     console.log('🎉 Environment files copied successfully!');
 } catch (error) {

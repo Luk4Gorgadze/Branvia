@@ -5,7 +5,7 @@ import { cancelPayPalSubscription } from '@/_lib/_services/paypalService';
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         // Get the authenticated user
@@ -14,6 +14,7 @@ export async function POST(
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const params = await context.params;
         const subscriptionId = params.id;
 
         // Get the subscription and verify ownership

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ],
+            "@branvia/database": [
+                "../packages/database/src/*"
+            ]
+        }
+    }
+}
