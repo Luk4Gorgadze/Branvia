@@ -31,10 +31,12 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
           ssh -o StrictHostKeyChecking=no branvia@$SSH_HOST '
-            GIT_SSH_COMMAND="ssh -i ~/.ssh/github-key" \
-            cd Project && 
-            echo "📥 Pulling latest changes..." && 
-            git pull'
+            eval "$(ssh-agent -s)"
+            ssh-add ~/.ssh/github-key
+            cd Project
+            echo "📥 Pulling latest changes..."
+            git pull
+          '
 
       - name: Notify Discord on success
         if: success()
