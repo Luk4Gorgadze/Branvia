@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: "Branvia env"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -35,7 +36,7 @@ jobs:
       - name: Notify Discord on success
         if: success()
         run: |
-          curl -X POST ${{ secrets.DISCORD_DEPLOY_WEBHOOK }} \
+          curl -X POST ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
             -d '{"content": "✅ Deployment succeeded! <@&1405120563025809458>\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"}'
 
