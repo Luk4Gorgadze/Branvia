@@ -30,7 +30,7 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
         run: |
-          ssh -o StrictHostKeyChecking=no branvia@$SSH_HOST '
+          ssh branvia@$SSH_HOST '
             eval "$(ssh-agent -s)"
             ssh-add ~/.ssh/github-key
             cd Project
@@ -43,11 +43,11 @@ jobs:
         run: |
           curl -X POST ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d '{"content": "✅ Deployment succeeded! <@&1405120563025809458>\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"}'
+            -d '{"embeds": [{"title": "🚀 Deployment Successful", "description": "Your Branvia app has been successfully deployed!", "color": 3066993, "fields": [{"name": "Repository", "value": "${{ github.repository }}", "inline": true}, {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true}, {"name": "Commit", "value": "${{ github.sha }}", "inline": true}], "footer": {"text": "Deployed by GitHub Actions"}, "timestamp": "${{ github.event.head_commit.timestamp }}"}]}'
 
       - name: Notify Discord on failure
         if: failure()
         run: |
           curl -X POST ${{ secrets.DISCORD_DEPLOYMENT_WEBHOOK_URL }} \
             -H "Content-Type: application/json" \
-            -d '{"content": "❌ Deployment failed! <@&1405120563025809458>\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}>"}'
+            -d '{"embeds": [{"title": "❌ Deployment Failed", "description": "Deployment failed! Check the logs for details.", "color": 3066993, "fields": [{"name": "Repository", "value": "${{ github.repository }}", "inline": true}, {"name": "Branch", "value": "${{ github.ref_name }}", "inline": true}, {"name": "Commit", "value": "${{ github.sha }}", "inline": true}], "footer": {"text": "GitHub Actions"}, "timestamp": "${{ github.event.head_commit.timestamp }}"}]}'
