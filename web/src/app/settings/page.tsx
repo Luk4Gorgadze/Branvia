@@ -1,106 +1,45 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
-import { Settings, CreditCard, User, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { Settings, CreditCard, User, CheckCircle, AlertTriangle, X } from 'lucide-react';
+import { useSettings } from '@/_lib/_hooks/useSettings';
+import {
+    getStatusColor,
+    getStatusIconName,
+    getStatusExplanation,
+    shouldShowCancelButton,
+    shouldShowResubscribeButton
+} from '@/_lib/_utils/subscriptionUtils';
 import styles from './page.module.css';
 
-interface Subscription {
-    id: string;
-    plan: string;
-    status: string;
-    paypalSubscriptionId: string;
-    currentPeriodStart: string;
-    currentPeriodEnd: string;
-}
-
-interface UserCredits {
-    availableCredits: number;
-}
+const getStatusIcon = (status: string) => {
+    switch (status) {
+        case 'ACTIVE': return <CheckCircle size={16} />;
+        case 'PAST_DUE': return <AlertTriangle size={16} />;
+        case 'SUSPENDED': return <X size={16} />;
+        case 'CANCELED': return <X size={16} />;
+        default: return <AlertTriangle size={16} />;
+    }
+};
 
 export default function SettingsPage() {
     const { user } = useUser();
     const router = useRouter();
-    const [subscription, setSubscription] = useState<Subscription | null>(null);
-    const [credits, setCredits] = useState<UserCredits | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [showCancelModal, setShowCancelModal] = useState(false);
-    const [cancelling, setCancelling] = useState(false);
+    const {
+        subscription,
+        credits,
+        loading,
+        cancelling,
+        showCancelModal,
+        setShowCancelModal,
+        handleCancelSubscription
+    } = useSettings(user?.id);
 
-    useEffect(() => {
-        if (!user) {
-            router.push('/');
-            return;
-        }
-
-        const fetchUserData = async () => {
-            try {
-                const [subscriptionRes, creditsRes] = await Promise.all([
-                    fetch('/api/subscriptions/current'),
-                    fetch('/api/users/me/credits')
-                ]);
-
-                if (subscriptionRes.ok) {
-                    const subscriptionData = await subscriptionRes.json();
-                    setSubscription(subscriptionData.subscription);
-                }
-
-                if (creditsRes.ok) {
-                    const creditsData = await creditsRes.json();
-                    setCredits(creditsData);
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, [user, router]);
-
-    const handleCancelSubscription = async () => {
-        if (!subscription) return;
-
-        setCancelling(true);
-        try {
-            const response = await fetch(`/api/subscriptions/${subscription.id}/cancel`, {
-                method: 'POST'
-            });
-
-            if (response.ok) {
-                setSubscription(prev => prev ? { ...prev, status: 'CANCELED' } : null);
-                setShowCancelModal(false);
-            } else {
-                throw new Error('Failed to cancel subscription');
-            }
-        } catch (error) {
-            console.error('Error cancelling subscription:', error);
-            alert('Failed to cancel subscription. Please try again.');
-        } finally {
-            setCancelling(false);
-        }
-    };
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'ACTIVE': return '#10b981';
-            case 'PAST_DUE': return '#f59e0b';
-            case 'SUSPENDED': return '#ef4444';
-            case 'CANCELED': return '#6b7280';
-            default: return '#6b7280';
-        }
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'ACTIVE': return <CheckCircle size={16} />;
-            case 'PAST_DUE': return <AlertTriangle size={16} />;
-            case 'SUSPENDED': return <X size={16} />;
-            case 'CANCELED': return <X size={16} />;
-            default: return <AlertTriangle size={16} />;
-        }
-    };
+    if (!user) {
+        router.push('/');
+        return null;
+    }
 
     if (loading) {
         return (
@@ -183,19 +122,9 @@ export default function SettingsPage() {
 
                                 {/* Status explanation */}
                                 <div className={styles.statusExplanation}>
-                                    {subscription.status === 'ACTIVE' && (
-                                        <p>✅ Your subscription is active and billing normally.</p>
-                                    )}
-                                    {subscription.status === 'PAST_DUE' && (
-                                        <p>⚠️ Your payment is overdue. Please update your payment method to avoid suspension.</p>
-                                    )}
-                                    {subscription.status === 'SUSPENDED' && (
-                                        <p>❌ Your subscription is suspended due to payment issues. Please update your payment method to reactivate.</p>
-                                    )}
-                                    {subscription.status === 'CANCELED' && (
-                                        <p>⏹️ Your subscription has been cancelled. You can still use your remaining credits.</p>
-                                    )}
+                                    <p>{getStatusExplanation(subscription.status)}</p>
                                 </div>
+
                                 <div className={styles.infoRow}>
                                     <span className={styles.label}>Subscription ID:</span>
                                     <span className={styles.value}>{subscription.paypalSubscriptionId || 'N/A'}</span>
@@ -207,7 +136,7 @@ export default function SettingsPage() {
                                     </span>
                                 </div>
 
-                                {subscription.status === 'ACTIVE' && (
+                                {shouldShowCancelButton(subscription.status) && (
                                     <button
                                         className={styles.cancelButton}
                                         onClick={() => setShowCancelModal(true)}
@@ -216,38 +145,15 @@ export default function SettingsPage() {
                                     </button>
                                 )}
 
-                                {subscription.status === 'CANCELED' && (
-                                    <div className={styles.cancelledInfo}>
-                                        <p>Your subscription has been cancelled. You can still use your remaining credits.</p>
+                                {shouldShowResubscribeButton(subscription.status) && (
+                                    <div className={styles.resubscribeInfo}>
+                                        <p>{getStatusExplanation(subscription.status)}</p>
                                         <button
                                             className={styles.resubscribeButton}
                                             onClick={() => router.push('/#pricing')}
                                         >
-                                            Resubscribe
-                                        </button>
-                                    </div>
-                                )}
-
-                                {subscription.status === 'SUSPENDED' && (
-                                    <div className={styles.suspendedInfo}>
-                                        <p>Your subscription has been suspended due to payment issues. Please update your payment method to reactivate.</p>
-                                        <button
-                                            className={styles.resubscribeButton}
-                                            onClick={() => router.push('/#pricing')}
-                                        >
-                                            Update Payment & Reactivate
-                                        </button>
-                                    </div>
-                                )}
-
-                                {subscription.status === 'PAST_DUE' && (
-                                    <div className={styles.pastDueInfo}>
-                                        <p>Your subscription payment is past due. Please update your payment method to avoid suspension.</p>
-                                        <button
-                                            className={styles.resubscribeButton}
-                                            onClick={() => router.push('/#pricing')}
-                                        >
-                                            Update Payment
+                                            {subscription.status === 'PAST_DUE' ? 'Update Payment' :
+                                                subscription.status === 'SUSPENDED' ? 'Update Payment & Reactivate' : 'Resubscribe'}
                                         </button>
                                     </div>
                                 )}

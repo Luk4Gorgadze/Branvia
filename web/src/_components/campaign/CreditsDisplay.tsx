@@ -1,27 +1,32 @@
 import { useEffect, useState } from 'react';
+import { getUserCredits } from '@/_actions/users';
+import { useUser } from '@/_lib/_providers/UserProvider';
 import styles from '@/app/campaign/generate/generate.module.css';
 
 export const CreditsDisplay = () => {
     const [credits, setCredits] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const { user } = useUser();
 
     useEffect(() => {
         let isMounted = true;
         const fetchCredits = async () => {
+            if (!user?.id) return;
+
             try {
-                const res = await fetch('/api/users/me/credits');
-                if (!res.ok) {
-                    throw new Error('Failed to fetch credits');
+                const result = await getUserCredits({ userId: user.id }, user.id);
+                if (result.success && result.data) {
+                    if (isMounted) setCredits(result.data.credits);
+                } else {
+                    if (isMounted) setError(result.error || 'Failed to fetch credits');
                 }
-                const data = await res.json();
-                if (isMounted) setCredits(typeof data.availableCredits === 'number' ? data.availableCredits : 0);
-            } catch {
+            } catch (err) {
                 if (isMounted) setError('Unable to load credits');
             }
         };
         fetchCredits();
         return () => { isMounted = false; };
-    }, []);
+    }, [user?.id]);
 
     return (
         <div className={styles.creditsDisplay}>

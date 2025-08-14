@@ -7,6 +7,7 @@ import { useState, useEffect, use, useCallback } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
 import { getOutputFormatResolution, getOutputFormatLabel } from '@/_lib/_schemas/imageGeneration';
+import { getCampaignById } from '@/_actions/campaigns';
 
 interface Campaign {
     id: string;
@@ -63,32 +64,32 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const fetchCampaign = useCallback(async () => {
         try {
-            const response = await fetch(`/api/campaigns/${campaignId}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch campaign');
-            }
-            const data = await response.json();
-            setCampaign(data.campaign);
+            const result = await getCampaignById({ campaignId }, user?.id);
+            if (result.success && result.data) {
+                setCampaign(result.data);
 
-            // Calculate aspect ratio for input image
-            if (data.campaign?.productImageS3Key) {
-                const imageUrl = getS3Url(data.campaign.productImageS3Key);
-                const img = new window.Image();
-                img.onload = () => {
-                    const aspectRatio = img.width / img.height;
-                    setInputImageAspectRatio(aspectRatio);
-                };
-                img.onerror = () => {
-                    setInputImageAspectRatio(1); // Default to square if failed
-                };
-                img.src = imageUrl;
+                // Calculate aspect ratio for input image
+                if (result.data?.productImageS3Key) {
+                    const imageUrl = getS3Url(result.data.productImageS3Key);
+                    const img = new window.Image();
+                    img.onload = () => {
+                        const aspectRatio = img.width / img.height;
+                        setInputImageAspectRatio(aspectRatio);
+                    };
+                    img.onerror = () => {
+                        setInputImageAspectRatio(1); // Default to square if failed
+                    };
+                    img.src = imageUrl;
+                }
+            } else {
+                throw new Error(result.error || 'Failed to fetch campaign');
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to load campaign');
         } finally {
             setLoading(false);
         }
-    }, [campaignId]);
+    }, [campaignId, user?.id]);
 
     useEffect(() => {
         fetchCampaign();

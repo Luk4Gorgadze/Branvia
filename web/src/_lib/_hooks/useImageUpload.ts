@@ -1,20 +1,23 @@
 import { useState } from 'react';
+import { getUserCredits } from '@/_actions/users';
 
 export const useImageUpload = () => {
     const [isUploading, setIsUploading] = useState(false);
 
-    const uploadImage = async (file: File): Promise<{ s3Key: string; url: string }> => {
+    const uploadImage = async (file: File, userId: string): Promise<{ s3Key: string; url: string }> => {
         setIsUploading(true);
 
         try {
             // Check user credits before allowing upload (requires 50)
             try {
-                const creditsRes = await fetch('/api/users/me/credits');
-                if (creditsRes.ok) {
-                    const { availableCredits } = await creditsRes.json();
-                    if (typeof availableCredits === 'number' && availableCredits < 50) {
+                const result = await getUserCredits({ userId }, userId);
+                if (result.success && result.data) {
+                    const { credits } = result.data;
+                    if (credits < 50) {
                         throw new Error('INSUFFICIENT_CREDITS');
                     }
+                } else {
+                    throw new Error('CREDIT_CHECK_FAILED');
                 }
             } catch (checkErr) {
                 if ((checkErr as Error).message === 'INSUFFICIENT_CREDITS') {

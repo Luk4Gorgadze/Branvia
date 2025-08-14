@@ -7,17 +7,17 @@ import { ProgressBar } from '@/_components/campaign/ProgressBar';
 import { CreditsDisplay } from '@/_components/campaign/CreditsDisplay';
 import { useCampaignForm } from '@/_lib/_hooks/useCampaignForm';
 import { useImageUpload } from '@/_lib/_hooks/useImageUpload';
+import { useCampaignGeneration } from '@/_lib/_hooks/useCampaignGeneration';
 import styles from './generate.module.css';
 
 const CampaignGeneratePage = () => {
     const { user } = useUser();
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const { formData, updateFormData, canProceed } = useCampaignForm();
     const { uploadImage, deleteImage, isUploading } = useImageUpload();
+    const { generateCampaign, isGenerating, isSubmitted } = useCampaignGeneration();
 
     // Redirect if not logged in
     if (!user) {
@@ -27,7 +27,7 @@ const CampaignGeneratePage = () => {
 
     const handleImageUpload = async (file: File) => {
         try {
-            const { s3Key, url } = await uploadImage(file);
+            const { s3Key, url } = await uploadImage(file, user.id);
             updateFormData({
                 productImage: file,
                 productImageS3Key: s3Key,
@@ -62,62 +62,16 @@ const CampaignGeneratePage = () => {
         }
     };
 
-    const generateCampaign = async () => {
-        setIsGenerating(true);
+    const handleGenerate = async () => {
+        const result = await generateCampaign(formData, user.id);
 
-        try {
-            // Create campaign in database
-            const campaignResponse = await fetch('/api/campaigns', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productTitle: formData.productTitle,
-                    productDescription: formData.productDescription,
-                    selectedStyle: formData.selectedStyle,
-                    customStyle: formData.customStyle,
-                    outputFormat: formData.outputFormat,
-                    productImageS3Key: formData.productImageS3Key,
-                }),
-            });
-
-            if (!campaignResponse.ok) {
-                throw new Error('Failed to create campaign');
-            }
-
-            const { campaignId } = await campaignResponse.json();
-
-            // Start image generation job
-            const generationResponse = await fetch('/api/jobs/image-generation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    productImageS3Key: formData.productImageS3Key,
-                    productTitle: formData.productTitle,
-                    productDescription: formData.productDescription,
-                    ...(formData.selectedStyle && { selectedStyle: formData.selectedStyle }),
-                    ...(formData.customStyle && { customStyle: formData.customStyle }),
-                    outputFormat: formData.outputFormat,
-                    campaignId,
-                    userId: user.id,
-                }),
-            });
-
-            if (!generationResponse.ok) {
-                throw new Error('Failed to start image generation');
-            }
-
-            // Mark as submitted to prevent duplicate submissions
-            setIsSubmitted(true);
-
+        if (result.success && result.campaignId) {
             // Small delay to show the submitted state before redirecting
             setTimeout(() => {
-                router.push(`/campaign/${campaignId}`);
+                router.push(`/campaign/${result.campaignId}`);
             }, 1500);
-        } catch (error) {
-            console.error('Campaign generation failed:', error);
-            alert('Failed to generate campaign. Please try again.');
-        } finally {
-            setIsGenerating(false);
+        } else {
+            alert(result.error || 'Failed to generate campaign. Please try again.');
         }
     };
 
@@ -137,7 +91,7 @@ const CampaignGeneratePage = () => {
                     isUploading={isUploading}
                     isGenerating={isGenerating}
                     isSubmitted={isSubmitted}
-                    onGenerate={generateCampaign}
+                    onGenerate={handleGenerate}
                 />
 
                 <div className={styles.navigation}>

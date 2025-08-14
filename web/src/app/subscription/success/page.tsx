@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
 
-export default function SubscriptionSuccessPage() {
+// Separate component that uses useSearchParams
+function SubscriptionSuccessContent() {
     const searchParams = useSearchParams();
     const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -75,5 +76,28 @@ export default function SubscriptionSuccessPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+// Loading fallback component
+function SubscriptionSuccessLoading() {
+    return (
+        <div className={styles.successPage}>
+            <div className={styles.successContainer}>
+                <div className={styles.successIcon}>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+                <p>Loading subscription details...</p>
+            </div>
+        </div>
+    );
+}
+
+// Main page component with Suspense boundary
+export default function SubscriptionSuccessPage() {
+    return (
+        <Suspense fallback={<SubscriptionSuccessLoading />}>
+            <SubscriptionSuccessContent />
+        </Suspense>
     );
 }
