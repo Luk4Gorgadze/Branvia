@@ -25,7 +25,8 @@
         "prisma:build": "cd packages/database && pnpm build",
         "prisma:migrate": "cd packages/database && pnpm migrate",
         "prisma:studio": "cd packages/database && pnpm studio",
-        "prisma:reset": "cd packages/database && pnpm migrate reset"
+        "prisma:reset": "cd packages/database && pnpm migrate reset",
+        "prisma:push": "cd packages/database && pnpm db:push"
     },
     "devDependencies": {
         "@bull-board/api": "^6.12.0",
