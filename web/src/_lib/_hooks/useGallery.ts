@@ -29,7 +29,7 @@ interface UseGalleryReturn {
     isLoading: boolean;
 }
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 16;
 
 export const useGallery = (userId: string | undefined): UseGalleryReturn => {
     const [campaigns, setCampaigns] = useState<TransformedCampaign[]>([]);
@@ -46,7 +46,7 @@ export const useGallery = (userId: string | undefined): UseGalleryReturn => {
                 setLoading(true);
                 setError(null);
 
-                const result = await getUserCampaigns({ userId }, userId);
+                const result = await getUserCampaigns({});
 
                 if (result.success && result.data) {
                     const transformedCampaigns = result.data.map(campaign => ({

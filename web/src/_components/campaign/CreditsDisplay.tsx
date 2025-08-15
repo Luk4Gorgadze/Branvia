@@ -14,7 +14,7 @@ export const CreditsDisplay = () => {
             if (!user?.id) return;
 
             try {
-                const result = await getUserCredits({ userId: user.id }, user.id);
+                const result = await getUserCredits({});
                 if (result.success && result.data) {
                     if (isMounted) setCredits(result.data.credits);
                 } else {

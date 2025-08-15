@@ -6,7 +6,7 @@ import { Skeleton } from '@/_components/ui/Skeleton';
 import { CampaignDiv } from '@/_components/ui/CampaignDiv';
 import styles from './page.module.css';
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 16;
 
 export default function GalleryPage() {
     const { user } = useUser();

@@ -10,7 +10,7 @@ export const useImageUpload = () => {
         try {
             // Check user credits before allowing upload (requires 50)
             try {
-                const result = await getUserCredits({ userId }, userId);
+                const result = await getUserCredits({});
                 if (result.success && result.data) {
                     const { credits } = result.data;
                     if (credits < 50) {

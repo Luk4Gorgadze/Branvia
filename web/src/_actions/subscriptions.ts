@@ -8,48 +8,65 @@ import {
     type GetCurrentSubscriptionData,
     type CancelSubscriptionData
 } from '@/_lib/_schemas/subscriptions';
-import { createProtectedServerAction } from '@/_lib/_utils/createServerAction';
+import { createServerAction } from '@/_lib/_utils/createServerAction';
 import { cancelPayPalSubscription } from '@/_lib/_services/paypalService';
+import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
 
-export const createSubscription = createProtectedServerAction(
+export const createSubscription = createServerAction(
     CreateSubscriptionSchema,
     async (data, prisma) => {
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
         const subscription = await prisma.subscription.create({
-            data: data,
+            data: {
+                ...data,
+                userId: user.id,
+            },
         });
 
         return subscription;
     },
-    { maxRequests: 3, windowMs: 60 * 1000 } // 3 subscriptions per minute
+    { rateLimit: { maxRequests: 3, windowMs: 60 * 1000 }, requireAuth: true } // 3 subscriptions per minute
 );
 
-export const getCurrentSubscription = createProtectedServerAction(
+export const getCurrentSubscription = createServerAction(
     GetCurrentSubscriptionSchema,
     async (data, prisma) => {
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
         const subscription = await prisma.subscription.findFirst({
             where: {
-                userId: data.userId,
+                userId: user.id,
             },
             orderBy: { createdAt: 'desc' },
         });
 
         return subscription;
     },
-    { maxRequests: 20, windowMs: 60 * 1000 } // 20 requests per minute
+    { rateLimit: { maxRequests: 20, windowMs: 60 * 1000 }, requireAuth: true } // 20 requests per minute
 );
 
-export const cancelSubscription = createProtectedServerAction(
+export const cancelSubscription = createServerAction(
     CancelSubscriptionSchema,
     async (data, prisma) => {
-        // First, get the subscription to find the PayPal subscription ID
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // First, get the subscription to find the PayPal subscription ID and verify ownership
         const subscription = await prisma.subscription.findUnique({
             where: { id: data.subscriptionId },
-            select: { paypalSubscriptionId: true }
+            select: { paypalSubscriptionId: true, userId: true }
         });
 
         if (!subscription) {
             throw new Error('Subscription not found');
+        }
+
+        if (subscription.userId !== user.id) {
+            throw new Error('Access denied');
         }
 
         if (!subscription.paypalSubscriptionId) {
@@ -75,6 +92,6 @@ export const cancelSubscription = createProtectedServerAction(
 
         return updatedSubscription;
     },
-    { maxRequests: 5, windowMs: 60 * 1000 } // 5 cancellations per minute
+    { rateLimit: { maxRequests: 5, windowMs: 60 * 1000 }, requireAuth: true } // 5 cancellations per minute
 );
 

@@ -1,5 +1,6 @@
 // Discord notification service for queuing notifications via BullMQ worker
 import { Queue } from 'bullmq';
+import redis from '@/_lib/_db/redisClient';
 
 export interface DiscordNotificationData {
     type: 'payment_success' | 'payment_failure' | 'subscription_suspended' | 'subscription_activated';
@@ -15,7 +16,7 @@ export interface DiscordNotificationData {
 // Create queue instance pointing to the same Redis as the worker
 // This creates a separate instance but connects to the same Redis database
 const discordQueue = new Queue('discord-notifications', {
-    connection: process.env.REDIS_URL || 'redis://localhost:6379'
+    connection: redis
 } as any);
 
 // Direct queue access - no API endpoint needed

@@ -1,8 +1,5 @@
 import { Queue } from 'bullmq';
-import { Redis } from 'ioredis';
-
-// Single Redis connection shared across all queues
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import redis from '../_lib/redisClient.js';
 
 // Shared queue instances
 export const imageGenerationQueue = new Queue('image-generation', {

@@ -1,13 +1,10 @@
 import { z } from 'zod';
 
-// Schema for getting user credits
-export const GetUserCreditsSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
-});
+// Schema for getting user credits - no userId needed, comes from server-side auth
+export const GetUserCreditsSchema = z.object({});
 
-// Schema for updating user credits
+// Schema for updating user credits - no userId needed, comes from server-side auth
 export const UpdateUserCreditsSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
     change: z.number().int('Credit change must be an integer'),
 });
 

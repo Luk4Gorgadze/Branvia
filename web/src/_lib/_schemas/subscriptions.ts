@@ -6,18 +6,15 @@ export const SubscriptionPlan = z.enum(['STARTER', 'PROFESSIONAL', 'ENTERPRISE']
 // Subscription status enum
 export const SubscriptionStatus = z.enum(['ACTIVE', 'CANCELED', 'PAST_DUE', 'SUSPENDED', 'EXPIRED']);
 
-// Schema for creating subscriptions
+// Schema for creating subscriptions - userId comes from server-side auth
 export const CreateSubscriptionSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
     plan: SubscriptionPlan,
     paypalSubscriptionId: z.string().min(1, 'PayPal subscription ID is required'),
     status: SubscriptionStatus.default('ACTIVE'),
 });
 
-// Schema for getting current subscription
-export const GetCurrentSubscriptionSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
-});
+// Schema for getting current subscription - no userId needed, comes from server-side auth
+export const GetCurrentSubscriptionSchema = z.object({});
 
 // Schema for canceling subscription
 export const CancelSubscriptionSchema = z.object({

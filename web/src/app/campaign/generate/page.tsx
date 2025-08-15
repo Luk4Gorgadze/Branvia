@@ -63,7 +63,7 @@ const CampaignGeneratePage = () => {
     };
 
     const handleGenerate = async () => {
-        const result = await generateCampaign(formData, user.id);
+        const result = await generateCampaign(formData);
 
         if (result.success && result.campaignId) {
             // Small delay to show the submitted state before redirecting

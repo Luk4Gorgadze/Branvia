@@ -1,20 +1,15 @@
 // Added subscription renewal worker initialization - commit marker
 import { Worker } from 'bullmq';
-import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 import { imageGenerationProcessor } from './processors/imageGenerationProcessor.js';
 import { cleanupProcessor } from './processors/cleanupProcessor.js';
 import { processEmailJob } from './processors/emailProcessor.js';
 import { discordNotificationProcessor } from './processors/discordNotificationProcessor.js';
 import { cleanupQueue, closeAllQueues } from './queues/sharedQueues.js';
+import redis from './_lib/redisClient.js';
 
 // Load environment variables
 dotenv.config();
-
-// Redis connection
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: null
-});
 
 // Create workers for different job types
 const imageGenerationWorker = new Worker('image-generation', imageGenerationProcessor, {

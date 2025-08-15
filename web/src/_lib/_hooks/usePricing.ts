@@ -34,7 +34,7 @@ export const usePricing = (userId: string | undefined): UsePricingReturn => {
         if (!userId) return;
 
         try {
-            const result = await getCurrentSubscription({ userId }, userId);
+            const result = await getCurrentSubscription({});
             if (result.success && result.data) {
                 setCurrentSubscription(result.data);
                 console.log('Current subscription:', result.data);

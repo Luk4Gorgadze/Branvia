@@ -22,8 +22,8 @@ export const OutputFormat = z.enum([
 // Resolution mapping for each output format (fixed sizes)
 export const OUTPUT_FORMAT_RESOLUTIONS = {
     square: { width: 1024, height: 1024 }, // 1:1
-    portrait: { width: 1024, height: 1792 }, // 9:16 style
-    landscape: { width: 1792, height: 1024 } // 16:9 style (wide)
+    portrait: { width: 1024, height: 1536 }, // 9:16 style
+    landscape: { width: 1536, height: 1024 } // 16:9 style (wide)
 } as const;
 
 // Friendly display labels for formats
@@ -72,7 +72,6 @@ export const ImageGenerationRequestSchema = z.object({
     selectedStyle: StylePreset.optional(),
     customStyle: z.string().max(200, 'Custom style description too long').optional(),
     outputFormat: OutputFormat,
-    userId: z.string().min(1, 'User ID is required'),
     campaignId: z.string().min(1, 'Campaign ID is required')
 }).refine(
     (data: { selectedStyle?: string; customStyle?: string }) => data.selectedStyle || data.customStyle,

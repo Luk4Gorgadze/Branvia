@@ -18,7 +18,7 @@ interface CampaignFormData {
 interface UseCampaignGenerationReturn {
     isGenerating: boolean;
     isSubmitted: boolean;
-    generateCampaign: (formData: CampaignFormData, userId: string) => Promise<{
+    generateCampaign: (formData: CampaignFormData) => Promise<{
         success: boolean;
         campaignId?: string;
         error?: string;
@@ -30,8 +30,7 @@ export const useCampaignGeneration = (): UseCampaignGenerationReturn => {
     const [isSubmitted, setIsSubmitted] = useState(false);
 
     const generateCampaign = async (
-        formData: CampaignFormData,
-        userId: string
+        formData: CampaignFormData
     ): Promise<{ success: boolean; campaignId?: string; error?: string }> => {
         setIsGenerating(true);
 
@@ -43,14 +42,13 @@ export const useCampaignGeneration = (): UseCampaignGenerationReturn => {
 
             // Create campaign using Server Action
             const campaignResult = await createCampaign({
-                userId: userId,
                 productTitle: formData.productTitle,
                 productDescription: formData.productDescription,
                 selectedStyle: formData.selectedStyle as z.infer<typeof StylePreset> | undefined,
                 customStyle: formData.customStyle,
                 outputFormat: formData.outputFormat as z.infer<typeof OutputFormat>,
                 productImageS3Key: formData.productImageS3Key,
-            }, userId);
+            });
 
             if (!campaignResult.success) {
                 throw new Error(campaignResult.error || 'Failed to create campaign');
@@ -71,8 +69,7 @@ export const useCampaignGeneration = (): UseCampaignGenerationReturn => {
                 customStyle: formData.customStyle,
                 outputFormat: formData.outputFormat as z.infer<typeof OutputFormat>,
                 campaignId,
-                userId: userId,
-            }, userId);
+            });
 
             if (!jobResult.success) {
                 throw new Error(jobResult.error || 'Failed to start image generation');

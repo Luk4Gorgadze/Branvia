@@ -1,9 +1,8 @@
 import { z } from 'zod';
 import { StylePreset, OutputFormat } from './imageGeneration';
 
-// Create campaign schema that includes userId
+// Create campaign schema - userId comes from server-side auth
 export const CreateCampaignSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
     productImageS3Key: z.string().min(1, 'Product image S3 key is required'),
     productTitle: z.string().min(1, 'Product title is required').max(100, 'Product title too long'),
     productDescription: z.string().min(10, 'Product description must be at least 10 characters').max(500, 'Product description too long'),
@@ -18,10 +17,8 @@ export const CreateCampaignSchema = z.object({
     }
 );
 
-// Get user campaigns schema
-export const GetUserCampaignsSchema = z.object({
-    userId: z.string().min(1, 'User ID is required'),
-});
+// Get user campaigns schema - no userId needed, comes from server-side auth
+export const GetUserCampaignsSchema = z.object({});
 
 // Campaign response schema
 export const CampaignResponseSchema = z.object({

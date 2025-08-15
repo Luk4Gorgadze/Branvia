@@ -6,31 +6,38 @@ import {
     type GetUserCreditsData,
     type UpdateUserCreditsData
 } from '@/_lib/_schemas/users';
-import { createProtectedServerAction } from '@/_lib/_utils/createServerAction';
+import { createServerAction } from '@/_lib/_utils/createServerAction';
+import { getServerUser } from '@/_lib/_auth/auth';
 
-export const getUserCredits = createProtectedServerAction(
+export const getUserCredits = createServerAction(
     GetUserCreditsSchema,
     async (data, prisma) => {
-        const user = await prisma.user.findUnique({
-            where: { id: data.userId },
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const userRecord = await prisma.user.findUnique({
+            where: { id: user.id },
             select: { availableCredits: true },
         });
 
-        return { credits: user?.availableCredits || 0 };
+        return { credits: userRecord?.availableCredits || 0 };
     },
-    { maxRequests: 30, windowMs: 60 * 1000 } // 30 requests per minute
+    { rateLimit: { maxRequests: 30, windowMs: 60 * 1000 }, requireAuth: true } // 30 requests per minute
 );
 
-export const updateUserCredits = createProtectedServerAction(
+export const updateUserCredits = createServerAction(
     UpdateUserCreditsSchema,
     async (data, prisma) => {
-        const user = await prisma.user.update({
-            where: { id: data.userId },
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const userRecord = await prisma.user.update({
+            where: { id: user.id },
             data: { availableCredits: { increment: data.change } },
         });
 
-        return { credits: user.availableCredits };
+        return { credits: userRecord.availableCredits };
     },
-    { maxRequests: 10, windowMs: 60 * 1000 } // 10 updates per minute
+    { rateLimit: { maxRequests: 10, windowMs: 60 * 1000 }, requireAuth: true } // 10 updates per minute
 );
 

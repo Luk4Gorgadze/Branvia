@@ -29,7 +29,7 @@ export interface ImageGenerationJobData {
     productDescription: string;
     selectedStyle: string;
     customStyle?: string;
-    outputFormat: string;
+    outputFormat: 'square' | 'portrait' | 'landscape';
     userId: string;
     campaignId: string;
 }
@@ -79,7 +79,7 @@ async function deductCreditsOnceForCampaign(params: { userId: string; campaignId
     console.log(`💳 Deducted ${amount} credits from user ${userId} for campaign ${campaignId}`);
 }
 
-async function generatePromptWithGemini(productTitle: string, productDescription: string, style: string, format: string): Promise<string> {
+async function generatePromptWithGemini(productTitle: string, productDescription: string, style: string, format: 'square' | 'portrait' | 'landscape'): Promise<string> {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const promptTemplate = `You are an expert commercial product photographer. 
@@ -108,12 +108,24 @@ async function generateImageWithOpenAIUsingReference(
     prompt: string,
     referenceImageBase64: string,
     mime: string,
-    options?: { model?: string; maxRetries?: number }
+    options?: {
+        model?: string;
+        maxRetries?: number;
+        outputFormat?: 'square' | 'portrait' | 'landscape';
+    }
 ): Promise<Buffer> {
     console.log('🔑 OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? `${process.env.OPENAI_API_KEY.substring(0, 10)}...` : 'NOT FOUND');
 
     const model = options?.model ?? 'gpt-4.1-mini';
     const maxRetries = options?.maxRetries ?? 2;
+    const outputFormat = options?.outputFormat ?? 'square';
+
+    // Get resolution based on output format
+    const resolution = {
+        square: { width: 1024, height: 1024 },
+        portrait: { width: 1024, height: 1536 },
+        landscape: { width: 1536, height: 1024 }
+    }[outputFormat];
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
@@ -128,8 +140,15 @@ async function generateImageWithOpenAIUsingReference(
                         ],
                     },
                 ],
-                tools: [{ type: 'image_generation' }],
-                tool_choice: { type: 'image_generation' } as any,
+                tools: [
+                    {
+                        type: 'image_generation',
+                        size: `${resolution.width}x${resolution.height}`
+                    }
+                ],
+                tool_choice: {
+                    type: 'image_generation'
+                } as any
             } as any);
 
             const output = (response as any).output;
@@ -274,7 +293,7 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
         const generationTasks = Array.from({ length: 3 }, (_, idx) => (async () => {
             const imageIndex = idx + 1;
             console.log(`🎨 Generating image ${imageIndex}/3...`);
-            const imageBuffer = await generateImageWithOpenAIUsingReference(prompt, referenceImageBase64, mime);
+            const imageBuffer = await generateImageWithOpenAIUsingReference(prompt, referenceImageBase64, mime, { outputFormat });
             console.log(`☁️ Uploading generated image ${imageIndex}/3 to S3...`);
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const fileName = `generated-${campaignId}-${imageIndex}-${timestamp}.jpg`;

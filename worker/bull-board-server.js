@@ -8,7 +8,10 @@ import Redis from 'ioredis';
 const app = express();
 
 // Create Redis connection
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+    retryStrategy: (times) => Math.min(times * 50, 2000), // retries every 50ms up to 2s
+    maxRetriesPerRequest: null,
+});
 
 // Create queues for monitoring (these connect to the same Redis as the worker)
 const imageGenerationQueue = new Queue('image-generation', { connection: redis });

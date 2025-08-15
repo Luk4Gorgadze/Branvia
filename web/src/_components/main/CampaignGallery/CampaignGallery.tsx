@@ -29,7 +29,7 @@ const CampaignGallery = () => {
     useEffect(() => {
         const fetchCampaigns = async () => {
             try {
-                const result = await getPublicCampaigns({}, user?.id); // Pass userId for rate limiting
+                const result = await getPublicCampaigns({});
                 console.log('Server Action result:', result); // Debug log
 
                 if (result.success && result.data) {

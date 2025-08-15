@@ -1,8 +1,5 @@
 import { Queue } from 'bullmq';
-import { Redis } from 'ioredis';
-
-// Redis connection for web app
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+import redis from '@/_lib/_db/redisClient';
 
 // Create the image generation queue
 export const imageGenerationQueue = new Queue('image-generation', {

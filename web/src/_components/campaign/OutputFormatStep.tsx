@@ -4,8 +4,8 @@ import styles from '@/app/campaign/generate/generate.module.css';
 
 const outputFormats = [
     { id: 'square', name: 'Instagram Square', dimensions: '1024x1024 px' },
-    { id: 'portrait', name: 'Story / Tall', dimensions: '1024x1792 px' },
-    { id: 'landscape', name: 'Wide Banner', dimensions: '1792x1024 px' }
+    { id: 'portrait', name: 'Story / Tall', dimensions: '1024x1536 px' },
+    { id: 'landscape', name: 'Wide Banner', dimensions: '1536x1024 px' }
 ];
 
 interface OutputFormatStepProps {

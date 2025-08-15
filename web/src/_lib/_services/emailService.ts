@@ -1,5 +1,6 @@
 // Email service for directly queuing emails via BullMQ worker
 import { Queue } from 'bullmq';
+import redis from '@/_lib/_db/redisClient';
 
 export interface SubscriptionConfirmationEmailData {
     type: 'subscription_confirmation';
@@ -43,7 +44,7 @@ export type EmailJobData = SubscriptionConfirmationEmailData | WelcomeEmailData 
 
 // Create queue instance pointing to the same Redis as the worker
 const emailQueue = new Queue('email', {
-    connection: process.env.REDIS_URL || 'redis://localhost:6379'
+    connection: redis
 } as any);
 
 // Direct queue access - no API endpoint needed

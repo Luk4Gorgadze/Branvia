@@ -1,8 +1,9 @@
 # Multi-stage build for shared base image
 FROM node:18-alpine AS base
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Install pnpm globally and required OpenSSL packages for Prisma
+RUN npm install -g pnpm && \
+    apk add --no-cache openssl
 
 # Final base image
 FROM base AS branvia-base

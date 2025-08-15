@@ -17,7 +17,7 @@ pnpm --filter branvia-worker check-types
 
 # Build base image
 echo "🐳 Building base Docker image..."
-docker build -f docker/Dockerfile.base -t branvia-base:latest .
+docker build -f docker/Dockerfile.base -t branvia-base:latest --build-arg DATABASE_URL="$DATABASE_URL" .
 
 # Build web app
 echo "🌐 Building web Docker image..."

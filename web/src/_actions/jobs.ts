@@ -1,11 +1,12 @@
 "use server";
 
 import { ImageGenerationRequestSchema } from '@/_lib/_schemas/imageGeneration';
-import { createProtectedServerAction } from '@/_lib/_utils/createServerAction';
+import { createServerAction } from '@/_lib/_utils/createServerAction';
 import { addImageGenerationJob } from '@/_lib/_queues/imageGenerationQueue';
+import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
 
-export const createImageGenerationJob = createProtectedServerAction(
+export const createImageGenerationJob = createServerAction(
     ImageGenerationRequestSchema,
     async (data, prisma) => {
         // First, get the campaign to access its data
@@ -51,16 +52,19 @@ export const createImageGenerationJob = createProtectedServerAction(
             jobId: job.id
         };
     },
-    { maxRequests: 10, windowMs: 60 * 1000 } // 10 jobs per minute
+    { rateLimit: { maxRequests: 10, windowMs: 60 * 1000 }, requireAuth: true } // 10 jobs per minute
 );
 
-export const getImageGenerationJobs = createProtectedServerAction(
-    z.object({ userId: z.string() }),
+export const getImageGenerationJobs = createServerAction(
+    z.object({}), // No userId needed, comes from server-side auth
     async (data, prisma) => {
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
         // Get campaigns that are processing or completed
         const campaigns = await prisma.campaign.findMany({
             where: {
-                userId: data.userId,
+                userId: user.id,
                 status: { in: ['pending', 'processing', 'completed', 'failed'] },
             },
             orderBy: { createdAt: 'desc' },
@@ -68,5 +72,5 @@ export const getImageGenerationJobs = createProtectedServerAction(
 
         return campaigns;
     },
-    { maxRequests: 20, windowMs: 60 * 1000 } // 20 requests per minute
+    { rateLimit: { maxRequests: 20, windowMs: 60 * 1000 }, requireAuth: true } // 20 requests per minute
 );

@@ -45,8 +45,8 @@ export const useSettings = (userId: string | undefined): UseSettingsReturn => {
             setLoading(true);
 
             const [subscriptionResult, creditsResult] = await Promise.all([
-                getCurrentSubscription({ userId }, userId),
-                getUserCredits({ userId }, userId)
+                getCurrentSubscription({}),
+                getUserCredits({})
             ]);
 
             if (subscriptionResult.success && subscriptionResult.data) {
@@ -72,7 +72,7 @@ export const useSettings = (userId: string | undefined): UseSettingsReturn => {
 
         setCancelling(true);
         try {
-            const result = await cancelSubscription({ subscriptionId: subscription.id }, userId!);
+            const result = await cancelSubscription({ subscriptionId: subscription.id });
 
             if (result.success) {
                 setSubscription(prev => prev ? { ...prev, status: 'CANCELED' } : null);

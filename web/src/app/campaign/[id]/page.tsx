@@ -14,21 +14,16 @@ interface Campaign {
     userId: string;
     productTitle: string;
     productDescription: string;
-    selectedStyle?: string;
-    customStyle?: string;
+    selectedStyle: string | null;
+    customStyle: string | null;
     outputFormat: string;
-    productImageS3Key: string;
+    productImageS3Key: string | null;
     generatedImages: string[];
-    prompt?: string; // The AI-generated prompt used for image generation
+    prompt: string | null;
     status: string;
     public: boolean;
-    createdAt: string;
-    user: {
-        id: string;
-        name: string;
-        email: string;
-    };
-
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -64,7 +59,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const fetchCampaign = useCallback(async () => {
         try {
-            const result = await getCampaignById({ campaignId }, user?.id);
+            const result = await getCampaignById({ campaignId });
             if (result.success && result.data) {
                 setCampaign(result.data);
 
@@ -273,7 +268,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                             width: '32%'
                         }}
                     >
-                        {getS3Url(campaign.productImageS3Key) && (
+                        {campaign.productImageS3Key && getS3Url(campaign.productImageS3Key) && (
                             <Image
                                 src={getS3Url(campaign.productImageS3Key)}
                                 alt="Input Product Image"

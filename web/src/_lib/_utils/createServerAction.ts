@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { prisma } from '@/_lib/_db/prismaClient';
+import { getServerUser } from '@/_lib/_auth/auth';
 
 // Rate limiting configuration
 interface RateLimitConfig {
@@ -56,11 +57,10 @@ export function createServerAction<TInput, TOutput>(
     handler: (data: TInput, prismaClient: typeof prisma) => Promise<TOutput>,
     options: {
         rateLimit?: RateLimitConfig;
-        requireAuth?: boolean;
-        userId?: string;
+        requireAuth?: boolean; // Optional: for rate limiting with user ID
     } = {}
 ) {
-    return async (data: TInput, userId?: string): Promise<{
+    return async (data: TInput): Promise<{
         success: boolean;
         data?: TOutput;
         error?: string;
@@ -70,21 +70,36 @@ export function createServerAction<TInput, TOutput>(
             // Validate input data
             const validatedData = schema.parse(data);
 
-            // Check authentication if required
-            if (options.requireAuth && !userId) {
-                return {
-                    success: false,
-                    error: 'Authentication required',
-                };
-            }
+            // Check rate limiting if configured
+            if (options.rateLimit) {
+                let userIdentifier: string;
 
-            // Check rate limiting if userId is provided
-            if (userId && options.rateLimit) {
-                const rateLimitConfig = options.rateLimit;
-                if (!checkRateLimit(userId, rateLimitConfig)) {
+                if (options.requireAuth) {
+                    // If auth is required, get user for rate limiting
+                    try {
+                        const user = await getServerUser();
+                        if (!user) {
+                            return {
+                                success: false,
+                                error: 'Authentication required for rate limiting',
+                            };
+                        }
+                        userIdentifier = user.id;
+                    } catch (error) {
+                        return {
+                            success: false,
+                            error: 'Authentication failed',
+                        };
+                    }
+                } else {
+                    // For public actions, use a generic identifier
+                    userIdentifier = 'public';
+                }
+
+                if (!checkRateLimit(userIdentifier, options.rateLimit)) {
                     return {
                         success: false,
-                        error: `Rate limit exceeded. Maximum ${rateLimitConfig.maxRequests} requests per ${rateLimitConfig.windowMs / 1000} seconds.`,
+                        error: `Rate limit exceeded. Maximum ${options.rateLimit.maxRequests} requests per ${options.rateLimit.windowMs / 1000} seconds.`,
                         rateLimited: true,
                     };
                 }
@@ -118,20 +133,8 @@ export function createServerAction<TInput, TOutput>(
     };
 }
 
-// Convenience function for actions that don't require authentication
-export function createPublicServerAction<TInput, TOutput>(
-    schema: z.ZodSchema<TInput>,
-    handler: (data: TInput, prismaClient: typeof prisma) => Promise<TOutput>,
-    rateLimit?: RateLimitConfig
-) {
-    return createServerAction(schema, handler, { rateLimit });
-}
-
-// Convenience function for actions that require authentication
-export function createProtectedServerAction<TInput, TOutput>(
-    schema: z.ZodSchema<TInput>,
-    handler: (data: TInput, prismaClient: typeof prisma) => Promise<TOutput>,
-    rateLimit?: RateLimitConfig
-) {
-    return createServerAction(schema, handler, { requireAuth: true, rateLimit });
-} 
+// You can use createServerAction directly with options:
+// - For public actions: createServerAction(schema, handler)
+// - For rate-limited public actions: createServerAction(schema, handler, { rateLimit })
+// - For rate-limited authenticated actions: createServerAction(schema, handler, { rateLimit, requireAuth: true })
+// - Authentication is handled directly in your handlers using getServerUser() 
