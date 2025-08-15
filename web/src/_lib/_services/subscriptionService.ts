@@ -22,7 +22,7 @@ export function getMonthlyCreditsForPlan(plan: SubscriptionPlan): number {
 }
 
 export async function spendCredits(userId: string, amount: number, reason: string, metadata?: Record<string, unknown>) {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         const user = await tx.user.findUnique({ where: { id: userId }, select: { availableCredits: true } });
         if (!user) throw new Error('User not found');
         if (user.availableCredits < amount) {
@@ -41,7 +41,7 @@ export async function spendCredits(userId: string, amount: number, reason: strin
 }
 
 export async function topUpCredits(userId: string, amount: number, reason: string, metadata?: Record<string, unknown>) {
-    return await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx: any) => {
         await tx.user.update({ where: { id: userId }, data: { availableCredits: { increment: amount }, lastCreditTopUpAt: new Date() } });
         await tx.creditTransaction.create({
             data: {

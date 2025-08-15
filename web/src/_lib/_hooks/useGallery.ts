@@ -49,7 +49,7 @@ export const useGallery = (userId: string | undefined): UseGalleryReturn => {
                 const result = await getUserCampaigns({});
 
                 if (result.success && result.data) {
-                    const transformedCampaigns = result.data.map(campaign => ({
+                    const transformedCampaigns = result.data.map((campaign: any) => ({
                         ...campaign,
                         createdAt: campaign.createdAt.toISOString()
                     }));
