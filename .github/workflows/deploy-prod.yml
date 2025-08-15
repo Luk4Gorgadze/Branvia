@@ -35,6 +35,7 @@ jobs:
             ssh-add ~/.ssh/github-key
             cd Project
             echo "📥 Pulling latest changes..."
+            git reset --hard
             git pull
             chmod +x scripts/deploy-prod.sh
             ./scripts/deploy-prod.sh

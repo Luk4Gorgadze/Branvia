@@ -27,11 +27,12 @@ sudo docker build -f docker/Dockerfile.web -t branvia-web:latest .
 echo "⚙️ Building worker Docker image..."
 sudo docker build -f docker/Dockerfile.worker -t branvia-worker:latest .
 
-# Start everything
-echo "🚀 Starting services..."
-pnpm docker:prod
-
 echo "🧹 Cleaning up..."
 sudo docker image prune -f
 sudo docker container prune -f
 sudo docker builder prune --filter usage=1h --force
+
+# Start everything
+echo "🚀 Starting services..."
+pnpm docker:prod
+
