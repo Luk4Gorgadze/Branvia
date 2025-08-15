@@ -4,7 +4,13 @@ import { prisma } from "../_db/prismaClient";
 import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
 
+// Get the base URL for the current environment
+const getBaseURL = () => {
+    return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+}
+
 export const auth = betterAuth({
+    baseURL: getBaseURL(),
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
