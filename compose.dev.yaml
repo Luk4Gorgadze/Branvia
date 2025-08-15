@@ -7,11 +7,12 @@ services:
     volumes:
       - redis_data:/data
     restart: always
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
   postgres:
     container_name: branvia_postgres
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

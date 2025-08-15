@@ -89,7 +89,7 @@ export const getCampaignById = createServerAction(
 
         return campaign;
     },
-    { rateLimit: { maxRequests: 20, windowMs: 60 * 1000 }, requireAuth: true } // 20 requests per minute
+    { rateLimit: { maxRequests: 2000, windowMs: 60 * 1000 }, requireAuth: false } // 2000 requests per minute
 );
 
 // Update campaign - requires authentication, rate limited to 10 per minute

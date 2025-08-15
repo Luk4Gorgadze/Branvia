@@ -167,18 +167,37 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
         }
     };
 
-    const downloadImage = async (imageUrl: string, index: number) => {
+    const downloadImage = async (s3Key: string, index: number) => {
         try {
+            // Download through our secure API endpoint
+            const response = await fetch('/api/images/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ s3Key })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Download failed: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+
+            // Create download link
             const link = document.createElement('a');
-            link.href = imageUrl;
-            link.download = `generated-image-${index + 1}.png`;
-            link.target = '_blank';
+            link.href = url;
+            link.download = `${campaign.productTitle.replace(/[^a-zA-Z0-9]/g, '-')}-generated-${index + 1}.jpg`;
+
+            // Trigger download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            // Clean up the blob URL
+            URL.revokeObjectURL(url);
         } catch (error) {
             console.error('Error downloading image:', error);
-            window.open(imageUrl, '_blank');
+            alert('Failed to download image. Please try again.');
         }
     };
 
@@ -232,7 +251,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                     </div>
                                     <button
                                         className={styles.downloadButton}
-                                        onClick={() => downloadImage(getS3Url(imageUrl), index)}
+                                        onClick={() => downloadImage(imageUrl, index)}
                                     >
                                         <Download size={16} />
                                         Download

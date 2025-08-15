@@ -2,7 +2,7 @@ import { Job } from 'bullmq';
 import { prisma } from '@branvia/database';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
-import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -211,14 +211,14 @@ function guessMimeTypeFromKey(s3Key: string): string {
     return 'image/jpeg';
 }
 
-async function downloadImageBase64FromS3(s3Key: string): Promise<{ base64: string; mime: string }> {
+async function downloadImageBase64FromS3(s3Key: string): Promise<{ base64: string; mime: string; buffer: Buffer }> {
     const buffer = await downloadImageFromS3(s3Key);
     const mime = guessMimeTypeFromKey(s3Key);
-    return { base64: buffer.toString('base64'), mime };
+    return { base64: buffer.toString('base64'), mime, buffer };
 }
 
-async function uploadImageToS3(imageBuffer: Buffer, fileName: string, contentType: string = 'image/jpeg'): Promise<string> {
-    const s3Key = `generated-images/${fileName}`;
+async function uploadImageToS3(imageBuffer: Buffer, fileName: string, contentType: string = 'image/jpeg', testing: boolean = false): Promise<string> {
+    const s3Key = testing ? `testing-images/${fileName}` : `generated-images/${fileName}`;
 
     const command = new PutObjectCommand({
         Bucket: process.env.AWS_S3_BUCKET_NAME || '',
@@ -229,6 +229,35 @@ async function uploadImageToS3(imageBuffer: Buffer, fileName: string, contentTyp
 
     await s3Client.send(command);
     return s3Key;
+}
+
+async function uploadImageToPermanentLocation(imageBuffer: Buffer, userId: string, campaignId: string, fileName: string, contentType: string = 'image/jpeg'): Promise<string> {
+    const s3Key = `permanent-uploads/${userId}/${campaignId}/${fileName}`;
+
+    const command = new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME || '',
+        Key: s3Key,
+        Body: imageBuffer,
+        ContentType: contentType
+    });
+
+    await s3Client.send(command);
+    return s3Key;
+}
+
+async function deleteImageFromS3(s3Key: string): Promise<void> {
+    const command = new DeleteObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET_NAME || '',
+        Key: s3Key
+    });
+
+    try {
+        await s3Client.send(command);
+        console.log(`🗑️ Deleted temporary image: ${s3Key}`);
+    } catch (error) {
+        console.error(`❌ Failed to delete temporary image ${s3Key}:`, error);
+        // Don't throw error - we don't want cleanup failure to break the main process
+    }
 }
 
 export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>): Promise<ImageGenerationResult> {
@@ -244,16 +273,36 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
             const mockPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgT1xV6UAAAAASUVORK5CYII=';
             const mockBuffer = Buffer.from(mockPngBase64, 'base64');
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            const generatedImages: string[] = [];
+
+            // Download product image once for both testing and permanent storage
+            const productImageBuffer = await downloadImageFromS3(productImageS3Key);
+
+            // Upload mock images to testing folder
+            const testGeneratedImages: string[] = [];
             for (let i = 1; i <= 3; i++) {
-                const fileName = `mock-generated-${campaignId}-${i}-${timestamp}.png`;
-                const key = await uploadImageToS3(mockBuffer, fileName, 'image/png');
-                generatedImages.push(key);
+                const testKey = await uploadImageToS3(
+                    mockBuffer,
+                    `test-mock-generated-${i}-${timestamp}.png`,
+                    'image/png',
+                    true
+                );
+                testGeneratedImages.push(testKey);
             }
+
+            // Move product image to permanent storage
+            const permanentProductImageKey = await uploadImageToPermanentLocation(
+                productImageBuffer, // Reuse the buffer we already downloaded
+                userId,
+                campaignId,
+                `product-image-${timestamp}.jpg`
+            );
+
+            // Clean up temporary files
+            await deleteImageFromS3(productImageS3Key);
 
             const prompt = `MOCK_PROMPT for ${productTitle}: style=${customStyle || selectedStyle}, format=${outputFormat}`;
             const result: ImageGenerationResult = {
-                generatedImages,
+                generatedImages: testGeneratedImages,
                 prompt,
                 metadata: {
                     style: customStyle || selectedStyle,
@@ -264,9 +313,14 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
 
             await prisma.campaign.update({
                 where: { id: campaignId },
-                data: { generatedImages, prompt, status: 'completed' }
+                data: {
+                    productImageS3Key: permanentProductImageKey,
+                    generatedImages: testGeneratedImages,
+                    prompt,
+                    status: 'completed'
+                }
             });
-            console.log(`✅ [TEST] Mock images stored for campaign ${campaignId}`);
+            console.log(`✅ [TEST] Mock images stored in permanent location for campaign ${campaignId}`);
             // Deduct credits after successful completion (test mode too)
             try {
                 await deductCreditsOnceForCampaign({ userId, campaignId, jobId: job.id!, amount: 50 });
@@ -287,7 +341,7 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
 
         // Step 2: Read reference image and generate images using OpenAI (image-to-image)
         console.log(`📥 Downloading reference product image from S3...`);
-        const { base64: referenceImageBase64, mime } = await downloadImageBase64FromS3(productImageS3Key);
+        const { base64: referenceImageBase64, mime, buffer: productImageBuffer } = await downloadImageBase64FromS3(productImageS3Key);
 
         console.log(`🎨 Generating images with OpenAI (image-to-image) in parallel...`);
         const generationTasks = Array.from({ length: 3 }, (_, idx) => (async () => {
@@ -297,7 +351,7 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
             console.log(`☁️ Uploading generated image ${imageIndex}/3 to S3...`);
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             const fileName = `generated-${campaignId}-${imageIndex}-${timestamp}.jpg`;
-            const generatedImageS3Key = await uploadImageToS3(imageBuffer, fileName);
+            const generatedImageS3Key = await uploadImageToS3(imageBuffer, fileName, 'image/jpeg', false);
             return generatedImageS3Key;
         })());
 
@@ -322,22 +376,42 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
 
         console.log(`✅ Generated ${generatedImages.length} images for job ${job.id}`);
 
-        // Update the campaign with generated images, prompt, and mark as completed
+        // Step 3: Move product image to permanent storage
+        console.log(`🔄 Moving product image to permanent storage...`);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const permanentProductImageKey = await uploadImageToPermanentLocation(
+            productImageBuffer, // Reuse the buffer we already downloaded
+            userId,
+            campaignId,
+            `product-image-${timestamp}.jpg`
+        );
+        console.log(`💾 Product image moved to: ${permanentProductImageKey}`);
+
+        // Step 4: Clean up temporary product image only
+        console.log(`🗑️ Cleaning up temporary product image...`);
+        await deleteImageFromS3(productImageS3Key);
+        console.log(`✅ Temporary product image cleaned up`);
+
+        // Step 5: Update database and deduct credits (only after everything is done)
+        console.log(`💾 Updating campaign ${campaignId} in database...`);
         await prisma.campaign.update({
             where: { id: campaignId },
             data: {
-                generatedImages: generatedImages,
+                productImageS3Key: permanentProductImageKey, // Update with permanent product image
+                generatedImages: generatedImages,   // Keep generated images in their original location
                 prompt: prompt,
                 status: 'completed'
             }
         });
-        console.log(`💾 Updated campaign ${campaignId} with generated images`);
+        console.log(`✅ Campaign ${campaignId} updated successfully`);
+
         // Deduct credits after successful completion
         try {
             await deductCreditsOnceForCampaign({ userId, campaignId, jobId: job.id!, amount: 50 });
         } catch (e) {
             console.error('❌ Failed to deduct credits:', e);
         }
+
         return result;
     } catch (error) {
         console.error(`❌ Error in image generation job ${job.id}:`, error);
