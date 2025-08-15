@@ -36,6 +36,8 @@ jobs:
             cd Project
             echo "📥 Pulling latest changes..."
             git pull
+            chmod +x scripts/deploy-prod.sh
+            ./scripts/deploy-prod.sh
           '
 
       - name: Notify Discord on success
