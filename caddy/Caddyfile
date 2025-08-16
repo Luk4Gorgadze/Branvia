@@ -1,6 +1,7 @@
 # Caddyfile for Branvia
 # Domain: branvia.art
 # Dashboard: dashboard.branvia.art
+# WWW: www.branvia.art (redirects to main)
 
 # Main application
 branvia.art {
@@ -31,6 +32,11 @@ branvia.art {
         output file /var/log/caddy/access.log
         format json
     }
+}
+
+# WWW redirect to main domain
+www.branvia.art {
+    redir https://branvia.art{uri}
 }
 
 # Dashboard subdomain
