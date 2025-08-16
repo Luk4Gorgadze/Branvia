@@ -40,3 +40,7 @@ scripts/
 compose.dev.yaml
 docker-compose.yml
 Dockerfile.base
+
+# Environment variables
+.env
+**/.env

@@ -5,9 +5,8 @@ FROM base AS builder
 WORKDIR /app/worker
 
 COPY worker/ ./
-COPY .env ./
 
 RUN pnpm install
-RUN pnpm dotenv -e .env pnpm run build
+RUN pnpm run build
 
 CMD cd ../packages/database && pnpm run migrate:prod && cd ../../worker && pnpm start
