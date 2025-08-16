@@ -36,7 +36,10 @@ branvia.art {
 
 # WWW redirect to main domain
 www.branvia.art {
-    redir https://branvia.art{uri}
+    redir https://branvia.art{uri} permanent
+    tls {
+        on_demand
+    }
 }
 
 # Dashboard subdomain
