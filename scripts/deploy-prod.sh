@@ -4,8 +4,6 @@ set -e
 
 echo "🚀 Starting deployment..."
 
-pnpm copy-env
-
 # Check types before building (catch errors early)
 echo "🔍 Checking TypeScript types..."
 pnpm --filter branvia-app check-types
