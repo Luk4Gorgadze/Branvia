@@ -1,18 +1,13 @@
-# Use shared base image with built database package
 FROM branvia-base AS base
 
-# Build stage
+# build stage
 FROM base AS builder
 WORKDIR /app/worker
 
-# Copy worker files
 COPY worker/ ./
-
-# Copy .env file for build stage
 COPY .env ./
 
-# Install ALL dependencies (including dev dependencies for building)
 RUN pnpm install
-
-# Build the worker (with dotenv loading environment variables)
 RUN pnpm dotenv -e .env pnpm run build
+
+CMD cd ../packages/database && pnpm run migrate:prod && cd ../../worker && pnpm start

@@ -10,6 +10,7 @@
         "dev": "tsc --watch",
         "generate": "dotenv -e .env prisma generate",
         "migrate": "dotenv -e .env prisma migrate dev",
+        "migrate:prod": "dotenv -e .env prisma migrate deploy",
         "studio": "dotenv -e .env prisma studio",
         "db:push": "dotenv -e .env prisma db push"
     },
