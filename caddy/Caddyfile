@@ -3,6 +3,11 @@
 # Dashboard: dashboard.branvia.art
 # WWW: www.branvia.art (redirects to main)
 
+# WWW redirect to main domain (simple redirect)
+www.branvia.art {
+    redir https://branvia.art{uri} permanent
+}
+
 # Main application
 branvia.art {
     # Reverse proxy to your web container
@@ -31,14 +36,6 @@ branvia.art {
     log {
         output file /var/log/caddy/access.log
         format json
-    }
-}
-
-# WWW redirect to main domain
-www.branvia.art {
-    redir https://branvia.art{uri} permanent
-    tls {
-        on_demand
     }
 }
 
