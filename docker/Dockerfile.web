@@ -2,9 +2,8 @@ FROM base AS web-base
 WORKDIR /app/web
 
 COPY web/ ./
-COPY .env ./
 
 RUN pnpm install
-RUN pnpm dotenv -e .env pnpm run build
+RUN pnpm run build
 
 CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../web && pnpm start

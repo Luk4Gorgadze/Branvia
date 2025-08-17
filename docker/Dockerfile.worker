@@ -2,9 +2,8 @@ FROM base AS worker-base
 WORKDIR /app/worker
 
 COPY worker/ ./
-COPY .env ./
 
 RUN pnpm install
-RUN pnpm dotenv -e .env pnpm run build
+RUN pnpm run build
 
 CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../worker && pnpm start
