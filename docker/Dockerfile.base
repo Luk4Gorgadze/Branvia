@@ -23,3 +23,6 @@ ENV DATABASE_URL=$DATABASE_URL
 WORKDIR /app/packages/database
 RUN pnpm install
 RUN pnpm run generate
+
+# Run database migrations
+RUN pnpm run migrate:deploy
