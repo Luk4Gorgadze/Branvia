@@ -1,19 +1,7 @@
 version: '3.8'
 
 services:
-  caddy:
-    container_name: branvia_caddy_prod
-    image: caddy:2-alpine
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    restart: always
-    depends_on:
-      - web
-    networks:
-      - branvia_network
-
+  # Caddy removed - Traefik handles reverse proxy
   redis:
     container_name: branvia_redis_prod
     image: redis:alpine
