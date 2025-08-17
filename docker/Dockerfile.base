@@ -1,28 +1,19 @@
-# Multi-stage build for shared base image
+# Base image with Node and pnpm
 FROM node:18-alpine AS base
 
-# Install pnpm globally and required OpenSSL packages for Prisma
-RUN npm install -g pnpm && \
-    apk add --no-cache openssl
+# Install pnpm globally and required packages
+RUN npm install -g pnpm \
+    && apk add --no-cache openssl bash python3 make g++
 
-# Final base image
-FROM base AS branvia-base
 WORKDIR /app
 
-# Copy workspace configuration
+# Copy database package for Prisma
 COPY pnpm-workspace.yaml ./
-
-# Copy the complete database package (including Prisma schema)
 COPY packages/database/ ./packages/database/
-
-# Install database dependencies and generate Prisma client
-# Add build args for Prisma
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
 WORKDIR /app/packages/database
 RUN pnpm install
 RUN pnpm run generate
-
-# Run database migrations
-RUN pnpm run migrate:deploy
+RUN pnpm run migrate:prod

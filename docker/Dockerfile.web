@@ -1,7 +1,4 @@
-FROM branvia-base AS base
-
-# build stage
-FROM base AS builder
+FROM base AS web-base
 WORKDIR /app/web
 
 COPY web/ ./
