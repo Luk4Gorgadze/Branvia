@@ -1,7 +1,7 @@
 # Caddyfile for Branvia
-# Domain: branvia.art
+# Simple reverse proxy - Traefik handles domains and HTTPS externally
 
-# Main application - accept both HTTP and HTTPS internally
+# Listen on port 80 internally and proxy everything to web app
 :80 {
     # Reverse proxy to your web container
     reverse_proxy web:3000 {
@@ -11,9 +11,8 @@
         header_up X-Forwarded-Proto {scheme}
     }
     
-    # Security headers
+    # Basic security headers
     header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains"
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
         Referrer-Policy strict-origin-when-cross-origin
@@ -26,6 +25,3 @@
         format json
     }
 }
-
-# Note: HTTP to HTTPS redirect is handled by Traefik on Dokploy
-# Caddy only handles internal HTTPS traffic
