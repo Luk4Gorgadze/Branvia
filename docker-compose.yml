@@ -4,9 +4,6 @@ services:
   caddy:
     container_name: branvia_caddy_prod
     image: caddy:2-alpine
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
