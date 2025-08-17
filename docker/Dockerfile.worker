@@ -3,6 +3,9 @@ WORKDIR /app/worker
 
 COPY worker/ ./
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 RUN pnpm install
 RUN pnpm run build
 
