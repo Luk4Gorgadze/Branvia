@@ -7,4 +7,4 @@ COPY .env ./
 RUN pnpm install
 RUN pnpm dotenv -e .env pnpm run build
 
-CMD cd ../packages/database && pnpm run migrate:prod && cd ../../worker && pnpm start
+CMD cd ../../worker && pnpm start

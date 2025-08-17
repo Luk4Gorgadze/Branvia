@@ -15,5 +15,5 @@ ENV DATABASE_URL=$DATABASE_URL
 
 WORKDIR /app/packages/database
 RUN pnpm install
-RUN pnpm run generate
-RUN pnpm run migrate:prod
+RUN pnpm prisma generate
+RUN pnpm prisma migrate deploy
