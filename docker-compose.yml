@@ -47,7 +47,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
-      target: builder
     command: pnpm start
     env_file: .env
     depends_on:
@@ -72,7 +71,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
-      target: builder
     command: pnpm start
     env_file: .env
     depends_on:
