@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   # Caddy removed - Traefik handles reverse proxy
-  redis:
+  staging_redis:
     container_name: branvia_redis_prod
     image: redis:alpine
     ports:
@@ -17,10 +17,10 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - branvia_network
+      - branvia_network_staging
 
   # BullMQ Worker service
-  worker:
+  staging_worker:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
@@ -39,10 +39,9 @@ services:
         reservations:
           memory: 512M  # Reduced from 1G to 512M
     networks:
-      - branvia_network
-
+      - branvia_network_staging
   # Web application service
-  web:
+  staging_web:
     container_name: branvia_web_prod
     build:
       context: .
@@ -61,10 +60,10 @@ services:
         reservations:
           memory: 256M  # Reduced from 512M to 256M
     networks:
-      - branvia_network
+      - branvia_network_staging
 
 networks:
-  branvia_network:
+  branvia_network_staging:
     driver: bridge
 
 volumes:
