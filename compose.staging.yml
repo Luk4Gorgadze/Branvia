@@ -28,7 +28,7 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
-      redis:
+      staging_redis:
         condition: service_healthy
     restart: always
     deploy:
@@ -50,7 +50,7 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on:
-      redis:
+      staging_redis:
         condition: service_healthy
     restart: always
     deploy:
