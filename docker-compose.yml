@@ -16,8 +16,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - branvia_network
 
   postgres:
     container_name: branvia_postgres_prod
@@ -39,8 +37,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - branvia_network
 
   # BullMQ Worker service
   worker:
@@ -50,7 +46,7 @@ services:
       args:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
-    depends_on:
+    depends_on: 
       redis:
         condition: service_healthy
       postgres:
@@ -63,8 +59,6 @@ services:
           memory: 1G  # Reduced from 2G to 1G
         reservations:
           memory: 512M  # Reduced from 1G to 512M
-    networks:
-      - branvia_network
 
   # Web application service
   web:
@@ -87,12 +81,6 @@ services:
           memory: 512M  # Reduced from 1G to 512M for 8GB RAM
         reservations:
           memory: 256M  # Reduced from 512M to 256M
-    networks:
-      - branvia_network
-
-networks:
-  branvia_network:
-    driver: bridge
 
 volumes:
   redis_data:
