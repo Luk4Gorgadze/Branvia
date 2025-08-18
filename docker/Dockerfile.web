@@ -9,4 +9,4 @@ RUN echo "DATABASE_URL from base: $DATABASE_URL"
 RUN pnpm install
 RUN pnpm run build
 
-CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../web && pnpm start
+CMD cd ../packages/database && pnpm prisma migrate deploy --verbose && cd ../../web && pnpm start
