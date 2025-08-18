@@ -47,6 +47,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     command: pnpm start
     env_file: .env
     depends_on:
@@ -71,6 +73,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.web
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     command: pnpm start
     env_file: .env
     depends_on:

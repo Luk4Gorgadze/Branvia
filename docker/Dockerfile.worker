@@ -9,4 +9,4 @@ ENV DATABASE_URL=$DATABASE_URL
 RUN pnpm install
 RUN pnpm run build
 
-CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../worker && pnpm start
+CMD pnpm start
