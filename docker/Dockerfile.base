@@ -13,6 +13,9 @@ COPY packages/database/ ./packages/database/
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
+# Debug: Echo DATABASE_URL to verify it's set correctly
+RUN echo "DATABASE_URL is: $DATABASE_URL"
+
 WORKDIR /app/packages/database
 RUN pnpm install
 RUN pnpm prisma generate

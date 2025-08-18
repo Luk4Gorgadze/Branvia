@@ -3,8 +3,8 @@ WORKDIR /app/worker
 
 COPY worker/ ./
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
+# DATABASE_URL is already available from base image, no need to redeclare
+RUN echo "DATABASE_URL from base: $DATABASE_URL"
 
 RUN pnpm install
 RUN pnpm run build
