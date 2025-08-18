@@ -19,3 +19,4 @@ RUN echo "DATABASE_URL is: $DATABASE_URL"
 WORKDIR /app/packages/database
 RUN pnpm install
 RUN pnpm prisma generate
+RUN pnpm prisma migrate deploy
