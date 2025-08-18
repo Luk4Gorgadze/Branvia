@@ -17,27 +17,6 @@ services:
       timeout: 10s
       retries: 3
 
-  postgres:
-    container_name: branvia_postgres_prod
-    image: postgres:17-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_MAX_CONNECTIONS: 200  # Increased connection limit
-      POSTGRES_SHARED_BUFFERS: 256MB  # Better memory management
-      POSTGRES_EFFECTIVE_CACHE_SIZE: 1GB  # Optimize cache
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   # BullMQ Worker service
   worker:
     build:
@@ -48,8 +27,6 @@ services:
     env_file: .env
     depends_on: 
       redis:
-        condition: service_healthy
-      postgres:
         condition: service_healthy
     restart: always
     deploy:
@@ -72,8 +49,6 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-      postgres:
-        condition: service_healthy
     restart: always
     deploy:
       resources:
@@ -84,6 +59,5 @@ services:
 
 volumes:
   redis_data:
-  postgres_data:
   caddy_data:
   caddy_config: 
