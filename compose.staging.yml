@@ -5,6 +5,8 @@ services:
   staging_redis:
     container_name: branvia_redis_staging
     image: redis:alpine
+    ports:
+      - 6379
     volumes:
       - redis_data:/data
     restart: always
