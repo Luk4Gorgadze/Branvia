@@ -1,10 +1,6 @@
 // New subscription service for managing user subscriptions and credits - commit marker
 import { prisma } from '@/_lib/_db/prismaClient';
 import { cancelPayPalSubscription } from './paypalService';
-// import dotenv from 'dotenv';
-// dotenv.config();
-// console.log('🚀 PayPal env:', process.env.PAYPAL_MODE);
-// console.log('🚀 Plans IDs:', process.env.PAYPAL_STARTER_PLAN_ID, process.env.PAYPAL_PROFESSIONAL_PLAN_ID, process.env.PAYPAL_ENTERPRISE_PLAN_ID);
 
 export type SubscriptionPlan = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
 

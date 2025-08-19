@@ -3,10 +3,10 @@ version: '3.8'
 services:
   # Caddy removed - Traefik handles reverse proxy
   staging_redis:
-    container_name: branvia_redis_prod
+    container_name: branvia_redis_staging
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - 6379
     volumes:
       - redis_data:/data
     restart: always
@@ -28,7 +28,7 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
-      redis:
+      staging_redis:
         condition: service_healthy
     restart: always
     deploy:
@@ -42,7 +42,7 @@ services:
       - branvia_network_staging
   # Web application service
   staging_web:
-    container_name: branvia_web_prod
+    container_name: branvia_web_staging
     build:
       context: .
       dockerfile: docker/Dockerfile.web
@@ -50,9 +50,11 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on:
-      redis:
+      staging_redis:
         condition: service_healthy
     restart: always
+    ports:
+      - 3000
     deploy:
       resources:
         limits:

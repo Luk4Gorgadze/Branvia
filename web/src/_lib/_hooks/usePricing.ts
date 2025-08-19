@@ -72,7 +72,10 @@ export const usePricing = (userId: string | undefined): UsePricingReturn => {
     };
 
     const handleSubscribe = async (planId: string, paypalPlanId: string) => {
+        console.log('🚀 handleSubscribe called with:', { planId, paypalPlanId });
+
         if (!paypalPlanId) {
+            console.log('❌ No paypalPlanId provided');
             setError('Plan not configured');
             return;
         }
@@ -81,6 +84,9 @@ export const usePricing = (userId: string | undefined): UsePricingReturn => {
         setError(null);
 
         try {
+            console.log('📡 Making API call to /api/subscriptions/create...');
+            console.log('📡 Request payload:', { planId: paypalPlanId });
+
             // TODO: Replace with Server Action when available
             const response = await fetch('/api/subscriptions/create', {
                 method: 'POST',
@@ -92,17 +98,22 @@ export const usePricing = (userId: string | undefined): UsePricingReturn => {
                 })
             });
 
+            console.log('📥 API response received:', response.status, response.statusText);
             const data = await response.json();
+            console.log('📥 Response data:', data);
 
             if (data.success && data.approveUrl) {
+                console.log('✅ Success! Redirecting to:', data.approveUrl);
                 // Redirect to PayPal approval
                 if (typeof window !== 'undefined') {
                     window.location.href = data.approveUrl;
                 }
             } else {
+                console.log('❌ API returned error:', data.error);
                 setError(data.error || 'Failed to create subscription');
             }
-        } catch {
+        } catch (error) {
+            console.log('💥 Network error:', error);
             setError('Network error occurred');
         } finally {
             setLoading(null);
