@@ -16,9 +16,15 @@ const PricingSection = () => {
     } = usePricing(user?.id);
 
     const handleGetStarted = (planId: keyof typeof PLAN_CONFIG) => {
+        console.log('🎯 handleGetStarted called with planId:', planId);
         const planConfig = PLAN_CONFIG[planId];
+        console.log('🎯 Plan config:', planConfig);
+
         if (planConfig.paypalPlanId) {
+            console.log('🎯 Calling handleSubscribe with:', planId, planConfig.paypalPlanId);
             handleSubscribe(planId, planConfig.paypalPlanId);
+        } else {
+            console.log('❌ No paypalPlanId found for plan:', planId);
         }
     };
 
