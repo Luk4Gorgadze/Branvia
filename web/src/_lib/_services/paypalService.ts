@@ -11,12 +11,21 @@ export async function getPayPalAccessToken(): Promise<string | null> {
         const clientId = process.env.PAYPAL_CLIENT_ID;
         const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
+        console.log('🔑 PayPal service - Base URL:', base);
+        console.log('🔑 PayPal service - Client ID exists:', !!clientId);
+        console.log('🔑 PayPal service - Client Secret exists:', !!clientSecret);
+
         if (!clientId || !clientSecret) {
-            console.error('PayPal credentials not configured');
+            console.error('❌ PayPal credentials not configured');
+            console.error('❌ Client ID:', clientId ? 'EXISTS' : 'MISSING');
+            console.error('❌ Client Secret:', clientSecret ? 'EXISTS' : 'MISSING');
             return null;
         }
 
-        const response = await fetch(`${base}/v1/oauth2/token`, {
+        const tokenUrl = `${base}/v1/oauth2/token`;
+        console.log('🔗 Token URL:', tokenUrl);
+
+        const response = await fetch(tokenUrl, {
             method: 'POST',
             headers: {
                 'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
@@ -25,8 +34,17 @@ export async function getPayPalAccessToken(): Promise<string | null> {
             body: 'grant_type=client_credentials'
         });
 
+        console.log('📥 Token response status:', response.status);
+
         if (!response.ok) {
-            console.error('Failed to get PayPal access token');
+            console.error('❌ Failed to get PayPal access token');
+            console.error('❌ Response status:', response.status);
+            try {
+                const errorText = await response.text();
+                console.error('❌ Error response:', errorText);
+            } catch (e) {
+                console.error('❌ Could not read error response');
+            }
             return null;
         }
 
