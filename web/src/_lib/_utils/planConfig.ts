@@ -1,7 +1,7 @@
 export const PLAN_CONFIG = {
     STARTER: {
         id: 'STARTER',
-        paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID || 'P-294586120M852722PNCSLONI',
+        paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID || '',
         price: 29,
         features: [
             "2000 credits/month",
