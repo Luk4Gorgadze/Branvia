@@ -21,6 +21,7 @@ services:
 
   # BullMQ Worker service
   staging_worker:
+    image: branvia_worker:staging
     build:
       context: .
       dockerfile: docker/Dockerfile.worker
@@ -43,11 +44,24 @@ services:
   # Web application service
   staging_web:
     container_name: branvia_web_staging
+    image: branvia_web:staging
     build:
       context: .
       dockerfile: docker/Dockerfile.web
       args:
         DATABASE_URL: ${DATABASE_URL}
+        # PayPal/Backend args
+        PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
+        PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
+        PAYPAL_MODE: ${PAYPAL_MODE}
+        PAYPAL_BASE_URL: ${PAYPAL_BASE_URL}
+        # Auth/Runtime config passed at build time
+        TRUSTED_ORIGINS: ${TRUSTED_ORIGINS}
+        # Next.js public runtime
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID}
+        NEXT_PUBLIC_PAYPAL_PROFESSIONAL_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_PROFESSIONAL_PLAN_ID}
+        NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID}
     env_file: .env
     depends_on:
       staging_redis:

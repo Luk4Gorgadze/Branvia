@@ -7,6 +7,7 @@
         "docker:dev": "docker compose --env-file .env -f compose.dev.yaml up -d",
         "docker:prod": "docker compose --env-file .env -f docker-compose.yml up -d",
         "docker:down": "docker compose down",
+        "docker:build:nocache": "node scripts/build-docker-nocache.js",
         "dev": "pnpm prisma:build && concurrently --kill-others --names \"web,worker\" --prefix-colors \"blue,green\" \"pnpm dev:web\" \"pnpm dev:worker\"",
         "dev:with-dashboard": "pnpm prisma:build && concurrently --kill-others --names \"web,worker,dashboard\" --prefix-colors \"blue,green,cyan\" \"pnpm dev:web\" \"pnpm dev:worker\" \"pnpm dev:dashboard\"",
         "copy-env": "node scripts/copy-env.js",
