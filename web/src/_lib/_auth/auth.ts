@@ -9,8 +9,17 @@ const getBaseURL = () => {
     return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 }
 
+const getTrustedOrigins = (): string[] => {
+    const configured = process.env.TRUSTED_ORIGINS;
+    if (configured && configured.trim().length > 0) {
+        return configured.split(',').map((o) => o.trim()).filter(Boolean);
+    }
+    return [getBaseURL()];
+};
+
 export const auth = betterAuth({
     baseURL: getBaseURL(),
+    trustedOrigins: getTrustedOrigins(),
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
