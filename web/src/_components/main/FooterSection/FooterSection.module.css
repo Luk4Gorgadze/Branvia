@@ -105,6 +105,16 @@
     color: #9ca3af;
 }
 
+.footerVersion {
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.35rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e5e7eb;
+    font-size: 0.8rem;
+}
+
 .footerSocial {
     display: flex;
     gap: 1.5rem;

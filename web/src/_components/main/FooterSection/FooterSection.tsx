@@ -45,7 +45,7 @@ const FooterSection = () => {
 
                 <div className={styles.footerBottom}>
                     <div className={styles.footerCopyright}>
-                        <p>&copy; 2025 Branvia. All rights reserved.</p>
+                        <p>&copy; 2025 Branvia. All rights reserved. <span className={styles.footerVersion}>v.1.0.0</span></p>
                     </div>
 
                     <div className={styles.footerSocial}>
