@@ -1,8 +1,12 @@
 import { WebhookClient } from 'discord.js';
 
-// Initialize Discord webhook client
-const webhookClient = new WebhookClient({
-    url: process.env.DISCORD_WEBHOOK_URL || ''
+// Initialize Discord webhook clients once at startup
+const paymentsWebhookClient = new WebhookClient({
+    url: process.env.DISCORD_PAYMENTS_WEBHOOK_URL || ''
+});
+
+const feedbackWebhookClient = new WebhookClient({
+    url: process.env.DISCORD_FEEDBACK_WEBHOOK_URL || ''
 });
 
 // Discord embed colors
@@ -21,11 +25,26 @@ export interface DiscordNotificationData {
     fields?: Array<{ name: string; value: string; inline?: boolean }>;
     timestamp?: Date;
     footer?: string;
+    webhookType: 'payments' | 'feedback';
 }
 
 export async function sendDiscordNotification(data: DiscordNotificationData) {
-    if (!process.env.DISCORD_WEBHOOK_URL) {
-        console.log('⚠️ Discord webhook URL not configured, skipping notification');
+    let webhookClient: WebhookClient | null = null;
+
+    switch (data.webhookType) {
+        case 'payments':
+            webhookClient = paymentsWebhookClient;
+            break;
+        case 'feedback':
+            webhookClient = feedbackWebhookClient;
+            break;
+        default:
+            console.error(`❌ Unknown webhook type: ${data.webhookType}`);
+            return;
+    }
+
+    if (!webhookClient.url) {
+        console.log(`⚠️ Discord ${data.webhookType} webhook URL not configured, skipping notification`);
         return;
     }
 
@@ -37,7 +56,7 @@ export async function sendDiscordNotification(data: DiscordNotificationData) {
             fields: data.fields || [],
             timestamp: data.timestamp?.toISOString() || new Date().toISOString(),
             footer: {
-                text: data.footer || 'Branvia Payment System'
+                text: data.footer || (data.webhookType === 'payments' ? 'Payment System' : 'Feedback')
             }
         };
 
@@ -45,9 +64,9 @@ export async function sendDiscordNotification(data: DiscordNotificationData) {
             embeds: [embed]
         });
 
-        console.log(`✅ Discord notification sent: ${data.title}`);
+        console.log(`✅ Discord ${data.webhookType} notification sent: ${data.title}`);
     } catch (error) {
-        console.error('❌ Failed to send Discord notification:', error);
+        console.error(`❌ Failed to send Discord ${data.webhookType} notification:`, error);
         // Don't throw - Discord failures shouldn't break the main flow
     }
 }
@@ -73,7 +92,7 @@ export async function sendPaymentSuccessNotification(data: {
             { name: 'Credits Added', value: `${data.credits} credits`, inline: true }
         ],
         timestamp: new Date(),
-        footer: 'Payment System'
+        webhookType: 'payments'
     });
 }
 
@@ -94,7 +113,7 @@ export async function sendPaymentFailureNotification(data: {
             ...(data.reason ? [{ name: 'Reason', value: data.reason, inline: false }] : [])
         ],
         timestamp: new Date(),
-        footer: 'Payment System'
+        webhookType: 'payments'
     });
 }
 
@@ -114,7 +133,7 @@ export async function sendSubscriptionSuspendedNotification(data: {
             { name: 'Action Required', value: 'User needs to resolve payment issue', inline: false }
         ],
         timestamp: new Date(),
-        footer: 'Payment System'
+        webhookType: 'payments'
     });
 }
 
@@ -136,6 +155,32 @@ export async function sendSubscriptionActivatedNotification(data: {
             { name: 'Initial Credits', value: `${data.credits} credits`, inline: true }
         ],
         timestamp: new Date(),
-        footer: 'Payment System'
+        webhookType: 'payments'
+    });
+}
+
+export async function sendCampaignFeedbackNotification(data: {
+    userId: string;
+    userName: string;
+    campaignId: string;
+    message: string;
+}) {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://branvia.art';
+    const campaignUrl = `${baseUrl}/campaign/${data.campaignId}`;
+    const raw = (data.message || '').trim();
+    const truncated = raw.length > 1000 ? `${raw.slice(0, 1000)}…` : raw;
+    const formattedMessage = `>>> ${truncated}`; // Discord block quote style
+
+    await sendDiscordNotification({
+        title: '📝 Campaign Feedback',
+        description: `Campaign: ${campaignUrl}`,
+        color: 0x17a2b8,
+        fields: [
+            { name: 'User', value: `${data.userName} (${data.userId})`, inline: true },
+            { name: 'Campaign ID', value: data.campaignId, inline: true },
+            { name: 'Feedback', value: formattedMessage, inline: false },
+        ],
+        timestamp: new Date(),
+        webhookType: 'feedback'
     });
 }

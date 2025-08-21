@@ -1,9 +1,10 @@
 "use server";
 
-import { CreateCampaignSchema, GetUserCampaignsSchema } from '@/_lib/_schemas/campaigns';
+import { CreateCampaignSchema, GetUserCampaignsSchema, SubmitCampaignFeedbackSchema } from '@/_lib/_schemas/campaigns';
 import { createServerAction } from '@/_lib/_utils/createServerAction';
 import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
+import { queueDiscordNotification } from '@/_lib/_services/discordNotificationService';
 
 // Create campaign - requires authentication, rate limited to 5 per minute
 export const createCampaign = createServerAction(
@@ -151,6 +152,51 @@ export const deleteCampaign = createServerAction(
         });
 
         return { success: true, message: 'Campaign deleted successfully' };
+    },
+    { rateLimit: { maxRequests: 5, windowMs: 60 * 1000 }, requireAuth: true }
+);
+
+// Submit one-time campaign feedback (owner-only). Sends to Discord via queue.
+export const submitCampaignFeedback = createServerAction(
+    SubmitCampaignFeedbackSchema,
+    async (data, prisma) => {
+        const user = await getServerUser();
+        if (!user) throw new Error('User not authenticated');
+
+        const campaign = await prisma.campaign.findUnique({ where: { id: data.campaignId } });
+        if (!campaign) throw new Error('Campaign not found');
+        if (campaign.userId !== user.id) throw new Error('Access denied');
+        if (campaign.feedbackSubmitted) throw new Error('Feedback already submitted');
+
+        // Resolve user's subscription to include with feedback
+        const latestSubscription = await prisma.subscription.findFirst({
+            where: { userId: user.id, status: 'ACTIVE' },
+            orderBy: { startedAt: 'desc' },
+            select: { id: true, paypalSubscriptionId: true },
+        });
+        const subscriptionId = latestSubscription?.paypalSubscriptionId || latestSubscription?.id || 'unknown';
+
+        // Update campaign to mark feedback submitted
+        await prisma.campaign.update({
+            where: { id: data.campaignId },
+            data: {
+                feedbackSubmitted: true,
+                feedbackMessage: data.message,
+                feedbackAt: new Date(),
+            },
+        });
+
+        // Enqueue Discord notification
+        await queueDiscordNotification({
+            type: 'campaign_feedback',
+            userId: user.id,
+            userName: user.name || user.email || 'Unknown',
+            campaignId: data.campaignId,
+            message: data.message,
+            subscriptionId,
+        });
+
+        return { success: true };
     },
     { rateLimit: { maxRequests: 5, windowMs: 60 * 1000 }, requireAuth: true }
 );

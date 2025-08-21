@@ -1,9 +1,9 @@
 import { Job } from 'bullmq';
-import { sendPaymentSuccessNotification, sendPaymentFailureNotification, sendSubscriptionSuspendedNotification, sendSubscriptionActivatedNotification } from '../_lib/discordService.js';
+import { sendPaymentSuccessNotification, sendPaymentFailureNotification, sendSubscriptionSuspendedNotification, sendSubscriptionActivatedNotification, sendCampaignFeedbackNotification } from '../_lib/discordService.js';
 
 // Define DiscordNotificationJobData interface here since we removed the separate queue file
 export interface DiscordNotificationJobData {
-    type: 'payment_success' | 'payment_failure' | 'subscription_suspended' | 'subscription_activated';
+    type: 'payment_success' | 'payment_failure' | 'subscription_suspended' | 'subscription_activated' | 'campaign_feedback';
     userId: string;
     userName: string;
     subscriptionId: string;
@@ -11,6 +11,8 @@ export interface DiscordNotificationJobData {
     amount?: number;
     credits?: number;
     reason?: string;
+    campaignId?: string;
+    message?: string;
 }
 
 export async function discordNotificationProcessor(job: Job<DiscordNotificationJobData>) {
@@ -28,6 +30,14 @@ export async function discordNotificationProcessor(job: Job<DiscordNotificationJ
                     amount: data.amount || 0,
                     subscriptionId: data.subscriptionId,
                     credits: data.credits || 0
+                });
+                break;
+            case 'campaign_feedback':
+                await sendCampaignFeedbackNotification({
+                    userId: data.userId,
+                    userName: data.userName,
+                    campaignId: data.campaignId || 'unknown',
+                    message: data.message || 'No message provided',
                 });
                 break;
             case 'payment_failure':

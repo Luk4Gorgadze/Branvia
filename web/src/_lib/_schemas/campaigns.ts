@@ -20,6 +20,12 @@ export const CreateCampaignSchema = z.object({
 // Get user campaigns schema - no userId needed, comes from server-side auth
 export const GetUserCampaignsSchema = z.object({});
 
+// Submit feedback schema
+export const SubmitCampaignFeedbackSchema = z.object({
+    campaignId: z.string().min(1),
+    message: z.string().min(5).max(1000)
+});
+
 // Campaign response schema
 export const CampaignResponseSchema = z.object({
     id: z.string(),
@@ -34,9 +40,13 @@ export const CampaignResponseSchema = z.object({
     public: z.boolean(),
     createdAt: z.date(),
     updatedAt: z.date(),
+    feedbackSubmitted: z.boolean().optional(),
+    feedbackMessage: z.string().nullable().optional(),
+    feedbackAt: z.date().nullable().optional(),
 });
 
 // Type exports for use in components
 export type CreateCampaignData = z.infer<typeof CreateCampaignSchema>;
 export type GetUserCampaignsData = z.infer<typeof GetUserCampaignsSchema>;
+export type SubmitCampaignFeedbackData = z.infer<typeof SubmitCampaignFeedbackSchema>;
 export type CampaignResponse = z.infer<typeof CampaignResponseSchema>; 
