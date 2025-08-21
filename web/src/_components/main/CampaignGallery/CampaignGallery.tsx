@@ -4,6 +4,7 @@ import styles from './CampaignGallery.module.css';
 import { CampaignDiv } from "@/_components/ui/CampaignDiv";
 import { useUser } from '@/_lib/_providers';
 import { getPublicCampaigns } from '@/_actions/campaigns';
+import { getS3Url } from "@/_lib/_utils/s3Utils";
 
 // Platform data
 const AI_PLATFORMS = [
@@ -33,6 +34,7 @@ const CampaignGallery = () => {
                 console.log('Server Action result:', result); // Debug log
 
                 if (result.success && result.data) {
+                    console.log('Campaigns fetched successfully:', result.data);
                     setCampaigns(result.data);
                 } else {
                     console.warn('No campaigns returned or error:', result);
@@ -55,14 +57,21 @@ const CampaignGallery = () => {
         </div>
     );
 
-    const renderCampaignCard = (campaign: any, index: number) => (
-        <CampaignDiv
-            key={campaign.id || index}
-            href={`/campaign/${campaign.id || index}`}
-            imageUrl={campaign.generatedImages?.[0] || "/example.png"}
-            overlayText={campaign.productTitle || "See details"}
-        />
-    );
+    const renderCampaignCard = (campaign: any, index: number) => {
+        // Only render if campaign has required fields
+        if (!campaign.id || !campaign.generatedImages || !campaign.productTitle) {
+            return null;
+        }
+
+        return (
+            <CampaignDiv
+                key={campaign.id}
+                href={`/campaign/${campaign.id}`}
+                imageUrl={getS3Url(campaign.generatedImages[0]) || "/example.png"}
+                overlayText={campaign.productTitle}
+            />
+        );
+    };
 
     return (
         <section className={styles.promptSection} id="gallery">
@@ -91,7 +100,7 @@ const CampaignGallery = () => {
                 </div>
             </div>
 
-            <div className={styles.promptCardHolder}>
+            <div className={styles.campaignGrid}>
                 {loading ? (
                     // Show loading state
                     Array.from({ length: 6 }).map((_, index) => (
@@ -101,11 +110,12 @@ const CampaignGallery = () => {
                         </div>
                     ))
                 ) : campaigns.length > 0 ? (
-                    // Show real campaigns
-                    campaigns.map((campaign, index) => renderCampaignCard(campaign, index))
+                    campaigns.map((campaign, index) => renderCampaignCard(campaign, index)).filter(Boolean)
                 ) : (
-                    // Fallback to mock data if no campaigns
-                    Array.from({ length: 10 }).map((_, index) => renderCampaignCard({}, index))
+                    // Show message when no campaigns available
+                    <div className={styles.noCampaigns}>
+                        <p>No campaigns available yet. Check back soon!</p>
+                    </div>
                 )}
             </div>
         </section>

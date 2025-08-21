@@ -8,6 +8,7 @@ import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
 import { getOutputFormatResolution, getOutputFormatLabel } from '@/_lib/_schemas/imageGeneration';
 import { getCampaignById, submitCampaignFeedback } from '@/_actions/campaigns';
+import { getS3Url } from "@/_lib/_utils/s3Utils";
 
 interface Campaign {
     id: string;
@@ -44,25 +45,6 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
 
     const { id: campaignId } = use(params);
-
-    // Generate S3 URL for a file
-    const getS3Url = (s3Key: string) => {
-        const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
-        const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
-
-        if (!bucketName) {
-            console.error('NEXT_PUBLIC_AWS_S3_BUCKET_NAME is not defined');
-            return '';
-        }
-
-        if (!s3Key || s3Key.trim() === '') {
-            console.error('S3 key is empty or invalid:', s3Key);
-            return '';
-        }
-
-        const url = `https://${bucketName}.s3.${region}.amazonaws.com/${s3Key}`;
-        return url;
-    };
 
     const fetchCampaign = useCallback(async () => {
         try {
@@ -170,7 +152,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     // Check access control: redirect if user doesn't have access
-    if (!campaign.public && (!user || campaign.userId !== user.id)) {
+    if (!campaign.public && (!user || (campaign.userId !== user.id && !user.is_admin))) {
         router.push('/');
         return null;
     }

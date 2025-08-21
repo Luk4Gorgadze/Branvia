@@ -29,6 +29,7 @@ model User {
     email              String
     emailVerified      Boolean
     image              String?
+    is_admin           Boolean             @default(false)
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
     sessions           Session[]

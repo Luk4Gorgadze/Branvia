@@ -65,6 +65,10 @@ export const ReviewStep = ({
                 </div>
             </div>
 
+            <div className={styles.generationWarning}>
+                <p>⚠️ Image generation typically takes 1-2 minutes. Please be patient while we create your visuals.</p>
+            </div>
+
             <button
                 className={`${styles.generateButton} ${isSubmitted ? styles.submitted : ''}`}
                 onClick={onGenerate}

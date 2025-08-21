@@ -79,17 +79,16 @@ async function deductCreditsOnceForCampaign(params: { userId: string; campaignId
 async function generatePromptWithGemini(productTitle: string, productDescription: string, style: string, format: 'square' | 'portrait' | 'landscape'): Promise<string> {
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const promptTemplate = `You are an expert commercial product photographer. 
-    Write a single-paragraph, highly detailed prompt (max 120 words) for DALL·E 3 image generation, 
-    based on this product: ${productTitle}, ${productDescription}. 
-    The final image must exactly preserve the product’s shape, proportions, textures, colors, and branding 
-    as shown in the reference image — do not change or replace any details. 
-    Enhance only the background and surrounding environment to match the ${style} aesthetic, 
-    using a premium editorial photography approach. Describe professional studio lighting 
-    (e.g., soft diffused light from a 45° octabox, subtle fill lighting), 
-    camera style (DSLR with 85mm f/1.4 lens, shallow depth of field), and a clean, 
-    gradient or minimal textured backdrop that complements the product. 
-    The result should be ultra-realistic, refined, and ready for luxury marketing. Format: ${format}.`;
+    const promptTemplate = `You are an expert commercial product photographer.
+    Generate a concise, detailed prompt (max 120 words) for image generation.
+    The product is: ${productTitle}, ${productDescription}.
+    **The product must remain identical** in shape, proportions, textures, colors, and branding — do not alter it in any way.
+    Only change the environment and background to reflect the ${style} aesthetic.
+    You must explicitly specify a realistic camera body and lens setup that best fits this product type (e.g., macro lens for small items, portrait lens for bottles, wide lens for furniture).
+    Background should enhance the product — it may be clean, artistic, or contextually styled, but must not distract from the product.
+    Ensure ultra-realistic quality, natural lighting, professional depth of field, and refined presentation for high-end marketing.
+    Format: ${format}. Reference image provided for guidance.`;
+
 
 
     const result = await model.generateContent(promptTemplate);
@@ -101,73 +100,104 @@ function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function generateImagesWithOpenAIUsingReference(
+
+async function generateImagesWithResponsesAPI(
     prompt: string,
     referenceImageBase64: string,
     mime: string,
     options?: {
         model?: string;
-        maxRetries?: number;
-        outputFormat?: 'square' | 'portrait' | 'landscape';
         numberOfImages?: number;
+        outputFormat?: 'square' | 'portrait' | 'landscape';
+        maxRetries?: number;
     }
 ): Promise<Buffer[]> {
-    const model = options?.model ?? 'gpt-image-1';
+    const model = options?.model ?? 'gpt-4.1-mini';
+    const numberOfImages = options?.numberOfImages ?? 3;
     const maxRetries = options?.maxRetries ?? 2;
     const outputFormat = options?.outputFormat ?? 'square';
-    const numberOfImages = options?.numberOfImages ?? 3;
 
-    const size = {
+    const sizeMap: Record<string, string> = {
         square: '1024x1024',
         portrait: '1024x1536',
         landscape: '1536x1024',
-    }[outputFormat];
+    };
+    const size = sizeMap[outputFormat];
 
-    const referenceBuffer = Buffer.from(referenceImageBase64, 'base64');
-    const referenceFile = await toFile(
-        referenceBuffer,
-        `reference.${(mime.split('/')[1] || 'jpg').replace(/[^a-zA-Z0-9]/g, '')}`,
-        { type: mime }
-    );
+    const referenceDataUrl = `data:${mime};base64,${referenceImageBase64}`;
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        try {
-            const resp = await openai.images.edit({
-                model,
-                prompt,
-                image: referenceFile as any,
-                n: numberOfImages,
-                size: size as any,
-                input_fidelity: 'high',
-            } as any);
+    // Create parallel calls for numberOfImages
+    const generationPromises = Array.from({ length: numberOfImages }, () => {
+        let attempt = 0;
 
-            const data = (resp as any).data as Array<{ b64_json?: string }> | undefined;
-            const base64Images = (data ?? [])
-                .map((d) => d?.b64_json)
-                .filter((v): v is string => typeof v === 'string');
+        const attemptGeneration = async (): Promise<Buffer> => {
+            try {
+                const response = await openai.responses.create({
+                    model,
+                    input: [
+                        {
+                            role: 'user',
+                            content: [
+                                { type: 'input_text', text: `${prompt}\n\nGenerate the final image now. Do not ask clarifying questions.` },
+                                { type: 'input_image', image_url: referenceDataUrl }
+                            ],
+                        },
+                    ],
+                    tools: [
+                        {
+                            type: 'image_generation',
+                            size: `${size}`
+                        }
+                    ],
+                    tool_choice: {
+                        type: 'image_generation'
+                    } as any
+                } as any);
 
-            if (base64Images.length > 0) {
-                return base64Images.map((b64) => Buffer.from(b64, 'base64'));
+
+                const output = (response as any).output;
+                const imageData = output
+                    ?.filter((o: any) => o.type === 'image_generation_call')
+                    ?.map((o: any) => o.result) as string[] | undefined;
+
+                if (imageData && imageData.length > 0) {
+                    const imageBase64 = imageData[0];
+                    return Buffer.from(imageBase64, 'base64');
+                }
+
+                const fallback = output?.content?.[0]?.image_base64 as string | undefined;
+                if (fallback) {
+                    return Buffer.from(fallback, 'base64');
+                }
+
+                // If no image returned, trigger retry/exit via catch handler
+                throw new Error('No image data received from OpenAI Responses API');
+            } catch (err) {
+                if (attempt < maxRetries) {
+                    attempt++;
+                    await new Promise((r) => setTimeout(r, 500 + attempt * 300));
+                    return attemptGeneration();
+                }
+                throw err;
             }
+        };
 
-            if (attempt < maxRetries) {
-                await sleep(500 + attempt * 300);
-                continue;
-            }
+        return attemptGeneration();
+    });
 
-            throw new Error('No image data received from OpenAI Images API');
-        } catch (error) {
-            if (attempt < maxRetries) {
-                await sleep(500 + attempt * 300);
-                continue;
-            }
-            console.error('❌ OpenAI Images API Error:', error);
-            throw error;
-        }
-    }
+    // Wait for all images in parallel
+    const results = await Promise.allSettled(generationPromises);
 
-    throw new Error('No image data after retries');
+    const buffers = results
+        .filter((r): r is PromiseFulfilledResult<Buffer> => r.status === 'fulfilled')
+        .map(r => r.value);
+
+    if (buffers.length === 0) throw new Error('All image generations failed');
+
+    return buffers;
 }
+
+
 
 async function downloadImageFromS3(s3Key: string): Promise<Buffer> {
     const command = new GetObjectCommand({
@@ -328,7 +358,7 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
         const { base64: referenceImageBase64, mime } = await downloadImageBase64FromS3(productImageS3Key);
 
         console.log(`🎨 Generating 3 images with a single OpenAI call (image-to-image)...`);
-        const imageBuffers = await generateImagesWithOpenAIUsingReference(prompt, referenceImageBase64, mime, { outputFormat, numberOfImages: 3 });
+        const imageBuffers = await generateImagesWithResponsesAPI(prompt, referenceImageBase64, mime, { outputFormat, numberOfImages: 3 });
 
         console.log(`☁️ Uploading generated images to S3...`);
         const uploadSettled = await Promise.allSettled(
