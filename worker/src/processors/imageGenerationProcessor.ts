@@ -2,6 +2,7 @@ import { Job } from 'bullmq';
 import { prisma } from '@branvia/database';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
+import { toFile } from 'openai/uploads';
 import { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand, CopyObjectCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 
@@ -108,84 +109,59 @@ async function generateImagesWithOpenAIUsingReference(
         model?: string;
         maxRetries?: number;
         outputFormat?: 'square' | 'portrait' | 'landscape';
-        n?: number;
+        numberOfImages?: number;
     }
 ): Promise<Buffer[]> {
-    const model = options?.model ?? 'gpt-4.1-mini';
+    const model = options?.model ?? 'gpt-image-1';
     const maxRetries = options?.maxRetries ?? 2;
     const outputFormat = options?.outputFormat ?? 'square';
-    const n = options?.n ?? 3;
+    const numberOfImages = options?.numberOfImages ?? 3;
 
-    const resolution = {
-        square: { width: 1024, height: 1024 },
-        portrait: { width: 1024, height: 1536 },
-        landscape: { width: 1536, height: 1024 }
+    const size = {
+        square: '1024x1024',
+        portrait: '1024x1536',
+        landscape: '1536x1024',
     }[outputFormat];
+
+    const referenceBuffer = Buffer.from(referenceImageBase64, 'base64');
+    const referenceFile = await toFile(
+        referenceBuffer,
+        `reference.${(mime.split('/')[1] || 'jpg').replace(/[^a-zA-Z0-9]/g, '')}`,
+        { type: mime }
+    );
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
         try {
-            const response = await openai.responses.create({
+            const resp = await openai.images.edit({
                 model,
-                input: [
-                    {
-                        role: 'user',
-                        content: [
-                            { type: 'input_text', text: `${prompt}\n\nGenerate the final image now. Do not ask clarifying questions.` },
-                            { type: 'input_image', image_url: `data:${mime};base64,${referenceImageBase64}` },
-                        ],
-                    },
-                ],
-                tools: [
-                    {
-                        type: 'image_generation',
-                        size: `${resolution.width}x${resolution.height}`,
-                        input_fidelity: 'high',
-                        n,
-                    } as any
-                ],
-                tool_choice: {
-                    type: 'image_generation'
-                } as any
+                prompt,
+                image: referenceFile as any,
+                n: numberOfImages,
+                size: size as any,
+                input_fidelity: 'high',
             } as any);
 
-            const output = (response as any).output;
-            // Try primary path: multiple image_generation_call results
-            const imageData = output
-                ?.filter((o: any) => o.type === 'image_generation_call')
-                ?.map((o: any) => o.result) as string[] | undefined;
-
-            let base64Images: string[] = [];
-            if (Array.isArray(imageData) && imageData.length > 0) {
-                base64Images = imageData;
-                console.log(`✅ Generated ${base64Images.length} images with OpenAI`);
-            } else {
-                // Fallback: some responses may embed images in content array
-                const maybeContent = (output?.content ?? []) as any[];
-                base64Images = maybeContent
-                    .map((c: any) => (c && typeof c.image_base64 === 'string') ? c.image_base64 : undefined)
-                    .filter((v: any): v is string => typeof v === 'string');
-            }
+            const data = (resp as any).data as Array<{ b64_json?: string }> | undefined;
+            const base64Images = (data ?? [])
+                .map((d) => d?.b64_json)
+                .filter((v): v is string => typeof v === 'string');
 
             if (base64Images.length > 0) {
-                return base64Images.map(b64 => Buffer.from(b64, 'base64'));
+                return base64Images.map((b64) => Buffer.from(b64, 'base64'));
             }
-
-            try {
-                console.error(`OpenAI output (attempt ${attempt + 1}/${maxRetries + 1}) had no images`);
-            } catch { }
 
             if (attempt < maxRetries) {
                 await sleep(500 + attempt * 300);
                 continue;
             }
 
-            throw new Error('No image data received from OpenAI Responses API');
+            throw new Error('No image data received from OpenAI Images API');
         } catch (error) {
             if (attempt < maxRetries) {
                 await sleep(500 + attempt * 300);
                 continue;
             }
-            console.error('❌ OpenAI Error Response:', error);
+            console.error('❌ OpenAI Images API Error:', error);
             throw error;
         }
     }
@@ -352,7 +328,7 @@ export async function imageGenerationProcessor(job: Job<ImageGenerationJobData>)
         const { base64: referenceImageBase64, mime } = await downloadImageBase64FromS3(productImageS3Key);
 
         console.log(`🎨 Generating 3 images with a single OpenAI call (image-to-image)...`);
-        const imageBuffers = await generateImagesWithOpenAIUsingReference(prompt, referenceImageBase64, mime, { outputFormat, n: 3 });
+        const imageBuffers = await generateImagesWithOpenAIUsingReference(prompt, referenceImageBase64, mime, { outputFormat, numberOfImages: 3 });
 
         console.log(`☁️ Uploading generated images to S3...`);
         const uploadSettled = await Promise.allSettled(
