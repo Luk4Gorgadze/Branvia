@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/_lib/_providers';
 import { CampaignForm } from '@/_components/campaign/CampaignForm';
@@ -14,14 +14,19 @@ const CampaignGeneratePage = () => {
     const { user } = useUser();
     const router = useRouter();
     const [currentStep, setCurrentStep] = useState(1);
+    const hasRedirected = useRef(false);
 
     const { formData, updateFormData, canProceed } = useCampaignForm();
     const { uploadImage, deleteImage, isUploading } = useImageUpload();
     const { generateCampaign, isGenerating, isSubmitted } = useCampaignGeneration();
 
-    // Redirect if not logged in
-    if (!user) {
-        router.push('/');
+    // Redirect if not logged in (only once)
+    if (!user && !hasRedirected.current) {
+        hasRedirected.current = true;
+        // Use window.location.href to avoid SSR issues
+        if (typeof window !== 'undefined') {
+            window.location.href = '/';
+        }
         return null;
     }
 
