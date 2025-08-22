@@ -18,4 +18,10 @@ RUN echo "DATABASE_URL is: $DATABASE_URL"
 
 WORKDIR /app/packages/database
 RUN pnpm install
-# NOTE: Prisma client generation moved to individual services to ensure latest schema
+
+# Generate Prisma client and run migrations during build
+RUN echo "🔧 Generating Prisma client..." && \
+    pnpm prisma generate && \
+    echo "🔄 Running database migrations..." && \
+    pnpm prisma migrate deploy && \
+    echo "✅ Database setup completed!"

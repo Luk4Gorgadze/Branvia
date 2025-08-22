@@ -17,18 +17,7 @@ services:
     # This service just builds the base image, no need to run anything
     command: ["echo", "Base image built successfully"]
 
-  # Database migration service - runs first
-  staging_migration:
-    container_name: branvia_migration_staging
-    image: branvia_base:staging
-    env_file: .env
-    restart: "no"
-    networks:
-      - branvia_network_staging
-    depends_on:
-      staging_setup:
-        condition: service_completed_successfully
-  
+  # Caddy removed - Traefik handles reverse proxy
   staging_redis:
     container_name: branvia_redis_staging
     image: redis:alpine
@@ -48,12 +37,14 @@ services:
 
   # BullMQ Worker service
   staging_worker:
-    image: branvia_base:staging
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+      args:
+        DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
       staging_setup:
-        condition: service_completed_successfully
-      staging_migration:
         condition: service_completed_successfully
       staging_redis:
         condition: service_healthy
@@ -67,10 +58,10 @@ services:
           memory: 512M  # Reduced from 1G to 512M
     networks:
       - branvia_network_staging
+
   # Web application service
   staging_web:
     container_name: branvia_web_staging
-    image: branvia_web:staging
     build:
       context: .
       dockerfile: docker/Dockerfile.web
@@ -92,8 +83,6 @@ services:
     env_file: .env
     depends_on:
       staging_setup:
-        condition: service_completed_successfully
-      staging_migration:
         condition: service_completed_successfully
       staging_redis:
         condition: service_healthy
