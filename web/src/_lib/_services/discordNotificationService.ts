@@ -3,7 +3,7 @@ import { Queue } from 'bullmq';
 import redis from '@/_lib/_db/redisClient';
 
 export interface DiscordNotificationData {
-    type: 'payment_success' | 'payment_failure' | 'subscription_suspended' | 'subscription_activated';
+    type: 'payment_success' | 'payment_failure' | 'subscription_suspended' | 'subscription_activated' | 'campaign_feedback';
     userId: string;
     userName: string;
     subscriptionId: string;
@@ -11,6 +11,9 @@ export interface DiscordNotificationData {
     amount?: number;
     credits?: number;
     reason?: string;
+    // Campaign feedback specific
+    campaignId?: string;
+    message?: string;
 }
 
 // Create queue instance pointing to the same Redis as the worker

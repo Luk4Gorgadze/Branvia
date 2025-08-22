@@ -10,6 +10,7 @@ type User = {
     createdAt?: Date;
     updatedAt?: Date;
     image?: string | null;
+    is_admin?: boolean;
 } | undefined;
 
 interface UserContextType {

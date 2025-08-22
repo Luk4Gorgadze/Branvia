@@ -29,6 +29,7 @@ model User {
     email              String
     emailVerified      Boolean
     image              String?
+    is_admin           Boolean             @default(false)
     createdAt          DateTime            @default(now())
     updatedAt          DateTime            @updatedAt
     sessions           Session[]
@@ -123,6 +124,10 @@ model Campaign {
     prompt             String? // The AI-generated prompt used for image generation
     status             String          @default("pending") // pending, processing, completed, failed
     public             Boolean         @default(false) // Whether the campaign is publicly accessible
+    // Owner feedback to admin (Discord). Only once per campaign.
+    feedbackSubmitted  Boolean         @default(false)
+    feedbackMessage    String?
+    feedbackAt         DateTime?
     productUploads     ProductUpload[] // Relation to track uploads
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt

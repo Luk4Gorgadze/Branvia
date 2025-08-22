@@ -7,7 +7,8 @@ import { useState, useEffect, use, useCallback } from 'react';
 import { useUser } from '@/_lib/_providers';
 import { useRouter } from 'next/navigation';
 import { getOutputFormatResolution, getOutputFormatLabel } from '@/_lib/_schemas/imageGeneration';
-import { getCampaignById } from '@/_actions/campaigns';
+import { getCampaignById, submitCampaignFeedback } from '@/_actions/campaigns';
+import { getS3Url } from "@/_lib/_utils/s3Utils";
 
 interface Campaign {
     id: string;
@@ -24,6 +25,9 @@ interface Campaign {
     public: boolean;
     createdAt: Date;
     updatedAt: Date;
+    feedbackSubmitted?: boolean;
+    feedbackMessage?: string | null;
+    feedbackAt?: Date | null;
 }
 
 const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -35,27 +39,12 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const [error, setError] = useState<string | null>(null);
     const [refreshing, setRefreshing] = useState(false);
     const [inputImageAspectRatio, setInputImageAspectRatio] = useState<number>(1);
+    const [feedback, setFeedback] = useState('');
+    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+    const [feedbackError, setFeedbackError] = useState<string | null>(null);
+    const [feedbackSuccess, setFeedbackSuccess] = useState<string | null>(null);
 
     const { id: campaignId } = use(params);
-
-    // Generate S3 URL for a file
-    const getS3Url = (s3Key: string) => {
-        const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
-        const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
-
-        if (!bucketName) {
-            console.error('NEXT_PUBLIC_AWS_S3_BUCKET_NAME is not defined');
-            return '';
-        }
-
-        if (!s3Key || s3Key.trim() === '') {
-            console.error('S3 key is empty or invalid:', s3Key);
-            return '';
-        }
-
-        const url = `https://${bucketName}.s3.${region}.amazonaws.com/${s3Key}`;
-        return url;
-    };
 
     const fetchCampaign = useCallback(async () => {
         try {
@@ -127,8 +116,20 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     </div>
                     <div className={styles.inputImageSection}>
                         <h3 className={styles.sectionTitle}>Input Product Image</h3>
-                        <div className={styles.inputImageContainer} style={{ aspectRatio: 1, width: '32%' }}>
-                            <Skeleton />
+                        <div className={styles.inputAndFeedbackRow}>
+                            <div className={styles.inputImageContainer} style={{ aspectRatio: 1, width: '32%' }}>
+                                <Skeleton />
+                            </div>
+                            <div className={styles.feedbackCard}>
+                                <div className={styles.feedbackHeader}>
+                                    <h3 className={styles.sectionTitle}>Send Feedback</h3>
+                                </div>
+                                <p className={styles.feedbackHelper}>Tell us how we can improve this result. This can be submitted once.</p>
+                                <Skeleton style={{ height: 120 }} />
+                                <div>
+                                    <Skeleton style={{ height: 38, width: 140 }} />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -151,7 +152,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     // Check access control: redirect if user doesn't have access
-    if (!campaign.public && (!user || campaign.userId !== user.id)) {
+    if (!campaign.public && (!user || (campaign.userId !== user.id && !user.is_admin))) {
         router.push('/');
         return null;
     }
@@ -211,6 +212,30 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     const getResolutionInfo = () => {
         const resolution = getOutputFormatResolution(campaign.outputFormat as string);
         return `${resolution.width}×${resolution.height}`;
+    };
+
+    const isOwner = !!user && campaign.userId === user.id;
+    const canShowFeedback = isOwner && !campaign.feedbackSubmitted;
+
+    const handleSubmitFeedback = async () => {
+        if (!campaign) return;
+        setFeedbackSubmitting(true);
+        setFeedbackError(null);
+        setFeedbackSuccess(null);
+        try {
+            const result = await submitCampaignFeedback({ campaignId: campaign.id, message: feedback.trim() });
+            if (result.success) {
+                setFeedbackSuccess('Feedback sent successfully. Thank you!');
+                setCampaign({ ...campaign, feedbackSubmitted: true, feedbackMessage: feedback, feedbackAt: new Date() as any });
+                setFeedback('');
+            } else {
+                setFeedbackError(result.error || 'Failed to submit feedback');
+            }
+        } catch (e: any) {
+            setFeedbackError(e?.message || 'Failed to submit feedback');
+        } finally {
+            setFeedbackSubmitting(false);
+        }
     };
 
     return (
@@ -277,23 +302,68 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                     </div>
                 </div>
 
-                {/* Input Product Image */}
+                {/* Input Product Image + Feedback (owner only) */}
                 <div className={styles.inputImageSection}>
                     <h3 className={styles.sectionTitle}>Input Product Image</h3>
-                    <div
-                        className={styles.inputImageContainer}
-                        style={{
-                            aspectRatio: inputImageAspectRatio,
-                            width: '32%'
-                        }}
-                    >
-                        {campaign.productImageS3Key && getS3Url(campaign.productImageS3Key) && (
-                            <Image
-                                src={getS3Url(campaign.productImageS3Key)}
-                                alt="Input Product Image"
-                                fill
-                                style={{ objectFit: 'cover' }}
-                            />
+                    <div className={styles.inputAndFeedbackRow}>
+                        <div
+                            className={styles.inputImageContainer}
+                            style={{
+                                aspectRatio: inputImageAspectRatio,
+                                width: '32%'
+                            }}
+                        >
+                            {campaign.productImageS3Key && getS3Url(campaign.productImageS3Key) && (
+                                <Image
+                                    src={getS3Url(campaign.productImageS3Key)}
+                                    alt="Input Product Image"
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                />
+                            )}
+                        </div>
+
+                        {canShowFeedback ? (
+                            <div className={styles.feedbackCard}>
+                                <div className={styles.feedbackHeader}>
+                                    <h3 className={styles.sectionTitle}>Send Feedback</h3>
+                                </div>
+                                <p className={styles.feedbackHelper}>Tell us how we can improve this result. This can be submitted once.</p>
+                                {feedbackError && <div className={styles.error} style={{ marginBottom: 8 }}>{feedbackError}</div>}
+                                {feedbackSuccess && <div className={styles.success} style={{ marginBottom: 8 }}>{feedbackSuccess}</div>}
+                                <textarea
+                                    value={feedback}
+                                    onChange={(e) => setFeedback(e.target.value)}
+                                    className={styles.feedbackTextarea}
+                                    placeholder="Your feedback..."
+                                    maxLength={1000}
+                                    rows={4}
+                                />
+                                <button
+                                    onClick={handleSubmitFeedback}
+                                    className={styles.feedbackButton}
+                                    disabled={feedbackSubmitting || feedback.trim().length < 5}
+                                >
+                                    {feedbackSubmitting ? 'Sending...' : 'Send to Branvia'}
+                                </button>
+                            </div>
+                        ) : (
+                            isOwner && campaign.feedbackSubmitted && (
+                                <div className={styles.feedbackCard}>
+                                    <div className={styles.feedbackHeader}>
+                                        <h3 className={styles.sectionTitle}>Feedback</h3>
+                                    </div>
+                                    <p className={styles.feedbackHelper}>
+                                        Feedback already sent{campaign.feedbackAt ? ` on ${new Date(campaign.feedbackAt as any).toLocaleString()}` : ''}.
+                                    </p>
+                                    {campaign.feedbackMessage && (
+                                        <div className={styles.promptSection}>
+                                            <div className={styles.promptHeader}><h4>Your message</h4></div>
+                                            <p className={styles.promptText}>{campaign.feedbackMessage}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )
                         )}
                     </div>
                 </div>

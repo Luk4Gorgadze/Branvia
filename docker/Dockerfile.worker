@@ -7,6 +7,15 @@ COPY worker/ ./
 RUN echo "DATABASE_URL from base: $DATABASE_URL"
 
 RUN pnpm install
+
+# CRITICAL: Re-generate Prisma client with latest schema before build
+WORKDIR /app/packages/database
+RUN echo "🔧 Generating Prisma client with latest schema..."
+RUN pnpm prisma generate
+
+# Now build the worker with updated Prisma client
+WORKDIR /app/worker
+RUN echo "📦 Building Worker application..."
 RUN pnpm run build
 
-CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../worker && pnpm start
+CMD ["pnpm", "start"]

@@ -12,15 +12,20 @@
         "migrate": "dotenv -e .env prisma migrate dev",
         "migrate:prod": "dotenv -e .env prisma migrate deploy",
         "studio": "dotenv -e .env prisma studio",
-        "db:push": "dotenv -e .env prisma db push"
+        "db:push": "dotenv -e .env prisma db push",
+        "seed": "dotenv -e .env prisma db seed"
     },
     "dependencies": {
         "@prisma/client": "^5.22.0",
+        "dotenv": "^16.6.1",
         "dotenv-cli": "^10.0.0",
         "prisma": "^5.22.0"
     },
     "devDependencies": {
         "typescript": "5.8.2",
         "@types/node": "^22.15.3"
+    },
+    "prisma": {
+        "seed": "node prisma/seed.js"
     }
 }

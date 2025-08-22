@@ -1,10 +1,26 @@
+'use client'
 import React from 'react';
 import { Sparkles, Zap, Eye } from 'lucide-react';
 import styles from './HeroSection.module.css';
 import Image from "next/image";
 import Link from "next/link";
 import { WordsPullUp } from '@/_components/ui/WordsPullUp';
+import { useUser } from '@/_lib/_providers/UserProvider';
+import { signInGoogle } from '@/_lib/_auth/authClient';
+
 const HeroSection = () => {
+    const { user } = useUser();
+
+    const handleStartCreating = async () => {
+        if (user) {
+            // User is logged in, redirect to generate page
+            window.location.href = '/campaign/generate';
+        } else {
+            // User is not logged in, start BetterAuth Google sign-in
+            await signInGoogle();
+        }
+    };
+
     return (
         <div className={styles.luxuryPage} id="hero">
             <Image
@@ -27,11 +43,11 @@ const HeroSection = () => {
                     <WordsPullUp text="Elevate your brand's visual identity" className={styles.heroTitle} />
 
                     <p className={styles.heroSubtitle}>
-                        Luxury-level, AI-generated visuals made for small business marketing.
+                        Premium AI visuals and prompts to create refined, high-impact results for individuals and small brands.
                     </p>
 
                     <div className={styles.ctaSection}>
-                        <button className={styles.primaryCta}>
+                        <button className={styles.primaryCta} onClick={handleStartCreating}>
                             <Zap size={20} />
                             Start Creating
                         </button>

@@ -1,0 +1,15 @@
+FROM base AS migration
+
+WORKDIR /app/packages/database
+
+# Generate Prisma client
+RUN pnpm prisma generate
+
+# The migration service will wait for database to be ready, then run migrations
+CMD ["sh", "-c", "echo '🔄 Waiting for database to be ready...' && \
+     until pnpm prisma db execute --stdin < /dev/null 2>/dev/null; do \
+       echo '⏳ Database not ready, waiting...' && sleep 2; \
+     done && \
+     echo '✅ Database is ready, running migrations...' && \
+     pnpm prisma migrate deploy && \
+     echo '✅ Migrations completed successfully!'"]

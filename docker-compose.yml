@@ -1,7 +1,22 @@
 version: '3.8'
 
 services:
-  # Caddy removed - Traefik handles reverse proxy
+  # Setup service - uses base image directly to ensure it gets rebuilt
+  setup:
+    container_name: branvia_setup_prod
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.base
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    image: branvia_base:latest
+    env_file: .env
+    restart: "no"
+    networks:
+      - branvia_network
+    # This service just builds the base image, no need to run anything
+    command: ["echo", "Base image built successfully"]
+
   redis:
     container_name: branvia_redis_prod
     image: redis:alpine
@@ -28,6 +43,8 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
+      setup:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
     restart: always
@@ -48,6 +65,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.web
       args:
+        REDIS_URL: ${REDIS_URL}
         DATABASE_URL: ${DATABASE_URL}
         PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
         PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
@@ -60,6 +78,8 @@ services:
         NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID}
     env_file: .env
     depends_on:
+      setup:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
     restart: always

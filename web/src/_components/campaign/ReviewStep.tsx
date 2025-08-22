@@ -11,7 +11,8 @@ const stylePresets = [
     { id: 'rustic-natural', name: 'Rustic & Natural' },
     { id: 'bright-playful', name: 'Bright & Playful' },
     { id: 'sleek-modern', name: 'Sleek & Modern' },
-    { id: 'soft-dreamy', name: 'Soft & Dreamy' }
+    { id: 'soft-dreamy', name: 'Soft & Dreamy' },
+    { id: 'moody-atmospheric', name: 'Moody & Atmospheric' }
 ];
 
 const outputFormats = [
@@ -63,6 +64,10 @@ export const ReviewStep = ({
                     <h3>Format</h3>
                     <p>{selectedFormatName}</p>
                 </div>
+            </div>
+
+            <div className={styles.generationWarning}>
+                <p>⚠️ Image generation typically takes 1-2 minutes. Please be patient while we create your visuals.</p>
             </div>
 
             <button

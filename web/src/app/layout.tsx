@@ -34,8 +34,20 @@ export default async function RootLayout({
     console.error("Failed to resolve session, continuing as logged out.", error);
     sessionErrored = true;
   }
+
+  const isProd = process.env.NEXT_PUBLIC_APP_URL === "https://branvia.art";
+
   return (
     <html lang="en">
+      <head>
+        {isProd && (
+          <script
+            defer
+            src="https://umami.branvia.art/script.js"
+            data-website-id="cb758827-defa-4983-b16e-c6baf616b5a4"
+          />
+        )}
+      </head>
       <body>
         {/* If session lookup failed, trigger a client-side signOut to clear bad cookies */}
         <SessionRepair shouldSignOut={sessionErrored} />

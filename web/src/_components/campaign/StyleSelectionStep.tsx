@@ -9,49 +9,55 @@ const stylePresets = [
         id: 'clean-minimal',
         name: 'Clean & Minimal',
         description: 'Simple, uncluttered backgrounds with focus on product',
-        preview: '/example.png'
+        preview: '/gen_styles/minimal.png'
     },
     {
         id: 'warm-cozy',
         name: 'Warm & Cozy',
         description: 'Soft lighting, warm tones, comfortable atmosphere',
-        preview: '/example.png'
+        preview: '/gen_styles/warm.png'
     },
     {
         id: 'bold-vibrant',
         name: 'Bold & Vibrant',
         description: 'High contrast, bright colors, energetic feel',
-        preview: '/example.png'
+        preview: '/gen_styles/bold.png'
     },
     {
         id: 'elegant-luxurious',
         name: 'Elegant & Luxurious',
         description: 'Sophisticated lighting, premium materials, upscale feel',
-        preview: '/example.png'
+        preview: '/gen_styles/elegant.png'
     },
     {
         id: 'rustic-natural',
         name: 'Rustic & Natural',
         description: 'Organic textures, earthy tones, handmade feel',
-        preview: '/example.png'
+        preview: '/gen_styles/rustic.png'
     },
     {
         id: 'bright-playful',
         name: 'Bright & Playful',
         description: 'Fun colors, dynamic compositions, cheerful mood',
-        preview: '/example.png'
+        preview: '/gen_styles/bright.png'
     },
     {
         id: 'sleek-modern',
         name: 'Sleek & Modern',
         description: 'Clean lines, contemporary design, tech-forward',
-        preview: '/example.png'
+        preview: '/gen_styles/modern.png'
     },
     {
         id: 'soft-dreamy',
         name: 'Soft & Dreamy',
         description: 'Gentle lighting, pastel colors, ethereal quality',
-        preview: '/example.png'
+        preview: '/gen_styles/dreamy.png'
+    },
+    {
+        id: 'moody-atmospheric',
+        name: 'Moody & Atmospheric',
+        description: 'Dark muted tones, soft lighting, dramatic shadows, cinematic and premium vibe for edgy products.',
+        preview: '/gen_styles/moody.png'
     }
 ];
 

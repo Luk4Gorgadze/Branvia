@@ -17,9 +17,9 @@ const FooterSection = () => {
                         <div className={styles.footerColumn}>
                             <h4 className={styles.footerTitle}>Product</h4>
                             <ul className={styles.footerList}>
-                                <li><a href="#gallery">Gallery</a></li>
-                                <li><a href="#pricing">Pricing</a></li>
-                                <li><a href="#about">About</a></li>
+                                <li><Link href={`${process.env.NEXT_PUBLIC_APP_URL}/#gallery`}>Examples</Link></li>
+                                <li><Link href={`${process.env.NEXT_PUBLIC_APP_URL}/#pricing`}>Pricing</Link></li>
+                                <li><Link href={`${process.env.NEXT_PUBLIC_APP_URL}/#about`}>About</Link></li>
                             </ul>
                         </div>
 
@@ -45,13 +45,12 @@ const FooterSection = () => {
 
                 <div className={styles.footerBottom}>
                     <div className={styles.footerCopyright}>
-                        <p>&copy; 2025 Branvia. All rights reserved.</p>
+                        <p>&copy; 2025 Branvia. All rights reserved. <span className={styles.footerVersion}>v.1.0.0</span></p>
                     </div>
 
                     <div className={styles.footerSocial}>
-                        <a href="#twitter" className={styles.socialLink}>Twitter</a>
-                        <a href="#linkedin" className={styles.socialLink}>LinkedIn</a>
-                        <a href="#instagram" className={styles.socialLink}>Instagram</a>
+                        <a href="https://www.facebook.com/people/Branvia/61579682373134/" className={styles.socialLink} target="_blank" rel="noopener noreferrer">Facebook</a>
+                        <a href="https://www.instagram.com/branvia.art/" className={styles.socialLink} target="_blank" rel="noopener noreferrer">Instagram</a>
                     </div>
                 </div>
             </div>
