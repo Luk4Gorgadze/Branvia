@@ -24,4 +24,6 @@ RUN echo "🔧 Generating Prisma client..." && \
     pnpm prisma generate && \
     echo "🔄 Running database migrations..." && \
     pnpm prisma migrate deploy && \
+    echo "🌱 Seeding database..." && \
+    pnpm prisma db seed && \
     echo "✅ Database setup completed!"

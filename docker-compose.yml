@@ -1,20 +1,22 @@
 version: '3.8'
 
 services:
-  # Database migration service - runs first
-  migration:
-    container_name: branvia_migration_prod
+  # Setup service - uses base image directly to ensure it gets rebuilt
+  setup:
+    container_name: branvia_setup_prod
     build:
       context: .
-      dockerfile: docker/Dockerfile.migration
+      dockerfile: docker/Dockerfile.base
       args:
         DATABASE_URL: ${DATABASE_URL}
+    image: branvia_base:latest
     env_file: .env
     restart: "no"
     networks:
       - branvia_network
+    # This service just builds the base image, no need to run anything
+    command: ["echo", "Base image built successfully"]
 
-  # Caddy removed - Traefik handles reverse proxy
   redis:
     container_name: branvia_redis_prod
     image: redis:alpine
@@ -41,7 +43,7 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
-      migration:
+      setup:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
@@ -76,7 +78,7 @@ services:
         NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID}
     env_file: .env
     depends_on:
-      migration:
+      setup:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
