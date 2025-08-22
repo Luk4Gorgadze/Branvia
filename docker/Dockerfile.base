@@ -12,8 +12,6 @@ COPY pnpm-workspace.yaml ./
 COPY packages/database/ ./packages/database/
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
-ARG SCHEMA_VERSION
-ENV SCHEMA_VERSION=${SCHEMA_VERSION:-$(date +%s)}
 
 # Debug: Echo DATABASE_URL to verify it's set correctly
 RUN echo "DATABASE_URL is: $DATABASE_URL"
