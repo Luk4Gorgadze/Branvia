@@ -9,6 +9,8 @@ RUN echo "DATABASE_URL from base: $DATABASE_URL"
 # Inject envs for Next.js runtime at build time
 ARG REDIS_URL
 ENV REDIS_URL=$REDIS_URL
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 ARG PAYPAL_CLIENT_ID
 ENV PAYPAL_CLIENT_ID=$PAYPAL_CLIENT_ID
 ARG PAYPAL_CLIENT_SECRET
@@ -33,8 +35,7 @@ ENV NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID=$NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID
 
 RUN pnpm install
 
-# Generate Prisma client with latest schema
-RUN cd ../packages/database && pnpm prisma migrate deploy && cd ../../web
+CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../web
 
 RUN pnpm run build
 
