@@ -6,25 +6,25 @@ import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
 import { queueDiscordNotification } from '@/_lib/_services/discordNotificationService';
 import { publicDataCache } from '@/_lib/_utils/redisCache';
-
-// Campaign type for public campaigns
+// Campaign type matching the current Prisma schema
 interface Campaign {
     id: string;
-    status: string;
-    productImageS3Key: string | null;
+    userId: string;
     productTitle: string;
     productDescription: string;
     selectedStyle: string | null;
     customStyle: string | null;
     outputFormat: string;
+    productImageS3Key: string | null;
     generatedImages: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    prompt: string | null;
+    status: string;
     public: boolean;
-    userId: string;
     feedbackSubmitted: boolean;
     feedbackMessage: string | null;
     feedbackAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 // Create campaign - requires authentication, rate limited to 5 per minute
