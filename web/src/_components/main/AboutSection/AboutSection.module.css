@@ -1,27 +1,30 @@
 .aboutSection {
     color: #fff;
-    width: 84vw;
+    width: 100vw;
     margin: auto;
     margin-top: 5rem;
     margin-bottom: 5rem;
     padding-top: 10rem;
     padding-bottom: 10rem;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.8) 0%, rgba(249, 71, 22, 0.8) 100%);
 }
 
 .aboutHeadline {
     font-family: 'Inter', Arial, sans-serif;
     font-size: 1.8rem;
     font-weight: 500;
-    margin-bottom: 2.5rem;
     color: #fff;
     letter-spacing: -0.01em;
     justify-content: center;
 }
 
 .aboutContent {
+    width: 84vw;
+    margin: auto;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     gap: 1rem;
 }
 

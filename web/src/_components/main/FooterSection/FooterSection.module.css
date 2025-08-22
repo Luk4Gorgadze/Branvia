@@ -164,4 +164,8 @@
     .footerDescription {
         font-size: 0.9rem;
     }
+
+    .footerSocial {
+        margin-bottom: 2rem;
+    }
 }
