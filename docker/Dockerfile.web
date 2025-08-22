@@ -32,6 +32,10 @@ ARG NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID
 ENV NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID=$NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID
 
 RUN pnpm install
+
+# Generate Prisma client with latest schema
+RUN cd ../packages/database && pnpm prisma generate && cd ../../web
+
 RUN pnpm run build
 
 CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../web && pnpm start
