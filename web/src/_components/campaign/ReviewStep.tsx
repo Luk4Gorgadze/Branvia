@@ -11,7 +11,8 @@ const stylePresets = [
     { id: 'rustic-natural', name: 'Rustic & Natural' },
     { id: 'bright-playful', name: 'Bright & Playful' },
     { id: 'sleek-modern', name: 'Sleek & Modern' },
-    { id: 'soft-dreamy', name: 'Soft & Dreamy' }
+    { id: 'soft-dreamy', name: 'Soft & Dreamy' },
+    { id: 'moody-atmospheric', name: 'Moody & Atmospheric' }
 ];
 
 const outputFormats = [
