@@ -2,13 +2,6 @@ FROM base AS migration
 
 WORKDIR /app/packages/database
 
-# Copy only the database package and its dependencies
-COPY packages/database/ ./
-COPY pnpm-workspace.yaml ./
-
-# Install dependencies
-RUN pnpm install
-
 # Generate Prisma client
 RUN pnpm prisma generate
 

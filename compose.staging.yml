@@ -1,20 +1,34 @@
 version: '3.8'
 
 services:
-  # Database migration service - runs first
-  staging_migration:
-    container_name: branvia_migration_staging
+  # Setup service - uses base image directly to ensure it gets rebuilt
+  staging_setup:
+    container_name: branvia_setup_staging
     build:
       context: .
-      dockerfile: docker/Dockerfile.migration
+      dockerfile: docker/Dockerfile.base
       args:
         DATABASE_URL: ${DATABASE_URL}
+    image: branvia_base:staging
     env_file: .env
     restart: "no"
     networks:
       - branvia_network_staging
+    # This service just builds the base image, no need to run anything
+    command: ["echo", "Base image built successfully"]
 
-  # Caddy removed - Traefik handles reverse proxy
+  # Database migration service - runs first
+  staging_migration:
+    container_name: branvia_migration_staging
+    image: branvia_base:staging
+    env_file: .env
+    restart: "no"
+    networks:
+      - branvia_network_staging
+    depends_on:
+      staging_setup:
+        condition: service_completed_successfully
+  
   staging_redis:
     container_name: branvia_redis_staging
     image: redis:alpine
@@ -34,14 +48,11 @@ services:
 
   # BullMQ Worker service
   staging_worker:
-    image: branvia_worker:staging
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.worker
-      args:
-        DATABASE_URL: ${DATABASE_URL}
+    image: branvia_base:staging
     env_file: .env
     depends_on: 
+      staging_setup:
+        condition: service_completed_successfully
       staging_migration:
         condition: service_completed_successfully
       staging_redis:
@@ -80,6 +91,8 @@ services:
         NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID}
     env_file: .env
     depends_on:
+      staging_setup:
+        condition: service_completed_successfully
       staging_migration:
         condition: service_completed_successfully
       staging_redis:
