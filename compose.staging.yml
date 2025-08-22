@@ -49,6 +49,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.web
       args:
+        REDIS_URL: ${REDIS_URL}
         DATABASE_URL: ${DATABASE_URL}
         # PayPal/Backend args
         PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}

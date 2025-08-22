@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { prisma } from '@/_lib/_db/prismaClient';
 import { getServerUser } from '@/_lib/_auth/auth';
+import redis from '@/_lib/_db/redisClient';
 
 // Rate limiting configuration
 interface RateLimitConfig {
@@ -14,34 +15,44 @@ const DEFAULT_RATE_LIMIT: RateLimitConfig = {
     windowMs: 60 * 1000, // 1 minute
 };
 
-// In-memory rate limiting store (for production, use Redis)
+// In-memory rate limiting store (fallback if Redis unavailable)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-// Rate limiting function
-function checkRateLimit(userId: string, config: RateLimitConfig): boolean {
-    const now = Date.now();
+// Redis-based rate limit check with in-memory fallback
+async function checkRateLimit(userId: string, config: RateLimitConfig): Promise<boolean> {
     const key = `rate_limit:${userId}`;
-    const record = rateLimitStore.get(key);
 
-    if (!record || now > record.resetTime) {
-        // Reset or create new rate limit window
-        rateLimitStore.set(key, {
-            count: 1,
-            resetTime: now + config.windowMs,
-        });
+    // Try Redis first
+    try {
+        const windowSeconds = Math.ceil(config.windowMs / 1000);
+        // Try to set initial value with expiry if not exists
+        const setResult = await redis.set(key, '1', 'EX', windowSeconds, 'NX');
+        if (setResult === 'OK') {
+            return true; // First request in the window
+        }
+        // Key exists; increment
+        const count = await redis.incr(key);
+        return count <= config.maxRequests;
+    } catch (e) {
+        // Fallback to in-memory if Redis is not available
+        const now = Date.now();
+        const record = rateLimitStore.get(key);
+        if (!record || now > record.resetTime) {
+            rateLimitStore.set(key, {
+                count: 1,
+                resetTime: now + config.windowMs,
+            });
+            return true;
+        }
+        if (record.count >= config.maxRequests) {
+            return false;
+        }
+        record.count++;
         return true;
     }
-
-    if (record.count >= config.maxRequests) {
-        return false; // Rate limit exceeded
-    }
-
-    // Increment count
-    record.count++;
-    return true;
 }
 
-// Clean up expired rate limit records
+// Clean up expired rate limit records (in-memory only)
 setInterval(() => {
     const now = Date.now();
     for (const [key, record] of rateLimitStore.entries()) {
@@ -96,10 +107,11 @@ export function createServerAction<TInput, TOutput>(
                     userIdentifier = 'public';
                 }
 
-                if (!checkRateLimit(userIdentifier, options.rateLimit)) {
+                const allowed = await checkRateLimit(userIdentifier, options.rateLimit);
+                if (!allowed) {
                     return {
                         success: false,
-                        error: `Rate limit exceeded. Maximum ${options.rateLimit.maxRequests} requests per ${options.rateLimit.windowMs / 1000} seconds.`,
+                        error: `Rate limit exceeded. Maximum ${options.rateLimit.maxRequests} requests per ${Math.ceil(options.rateLimit.windowMs / 1000)} seconds.`,
                         rateLimited: true,
                     };
                 }

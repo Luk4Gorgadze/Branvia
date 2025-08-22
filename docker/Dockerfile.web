@@ -6,7 +6,9 @@ COPY web/ ./
 # DATABASE_URL is already available from base image, no need to redeclare
 RUN echo "DATABASE_URL from base: $DATABASE_URL"
 
-# Inject PayPal envs for Next.js runtime at build time
+# Inject envs for Next.js runtime at build time
+ARG REDIS_URL
+ENV REDIS_URL=$REDIS_URL
 ARG PAYPAL_CLIENT_ID
 ENV PAYPAL_CLIENT_ID=$PAYPAL_CLIENT_ID
 ARG PAYPAL_CLIENT_SECRET

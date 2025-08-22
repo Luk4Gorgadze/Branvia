@@ -43,7 +43,7 @@ export const getPublicCampaigns = createServerAction(
 
         return campaigns;
     },
-    { rateLimit: { maxRequests: 20, windowMs: 60 * 1000 } } // 20 requests per minute
+    { rateLimit: { maxRequests: 1000, windowMs: 60 * 1000 } } // 1000 requests per minute
 );
 
 // Get user campaigns - requires authentication, rate limited to 10 per minute
