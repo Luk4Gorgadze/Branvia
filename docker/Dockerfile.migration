@@ -5,7 +5,6 @@ WORKDIR /app/packages/database
 # Copy only the database package and its dependencies
 COPY packages/database/ ./
 COPY pnpm-workspace.yaml ./
-COPY pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install
