@@ -65,6 +65,24 @@ export const getPublicCampaigns = createServerAction(
         // If not in cache, fetch from database
         const campaigns = await prisma.campaign.findMany({
             where: { public: true },
+            select: {
+                id: true,
+                status: true,
+                productImageS3Key: true,
+                productTitle: true,
+                productDescription: true,
+                selectedStyle: true,
+                customStyle: true,
+                outputFormat: true,
+                generatedImages: true,
+                createdAt: true,
+                updatedAt: true,
+                public: true,
+                userId: true,
+                feedbackSubmitted: true,
+                feedbackMessage: true,
+                feedbackAt: true,
+            },
             orderBy: { createdAt: 'desc' },
             take: 10,
         });
