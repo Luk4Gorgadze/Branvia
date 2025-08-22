@@ -39,11 +39,8 @@ export default function GalleryPage() {
             <div className={styles.grid}>
                 {loading
                     ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                        <div key={i} className={styles.card}>
-                            <div className={styles.image} style={{ aspectRatio: 1 }}>
-                                <Skeleton />
-                            </div>
-                            <Skeleton style={{ height: 18 }} />
+                        <div key={i} className={styles.skeletonCard}>
+                            <Skeleton className={styles.skeletonImage} shimmer={true} />
                         </div>
                     ))
                     : pageItems.map((campaign) => {

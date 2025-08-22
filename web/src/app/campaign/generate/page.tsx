@@ -31,6 +31,12 @@ const CampaignGeneratePage = () => {
     }
 
     const handleImageUpload = async (file: File) => {
+        if (!user) {
+            console.error('User not authenticated');
+            alert('Please log in to upload images.');
+            return;
+        }
+
         try {
             const { s3Key, url } = await uploadImage(file, user.id);
             updateFormData({

@@ -5,6 +5,7 @@ import { createServerAction } from '@/_lib/_utils/createServerAction';
 import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
 import { queueDiscordNotification } from '@/_lib/_services/discordNotificationService';
+import { publicDataCache } from '@/_lib/_utils/redisCache';
 
 // Create campaign - requires authentication, rate limited to 5 per minute
 export const createCampaign = createServerAction(
@@ -31,15 +32,25 @@ export const createCampaign = createServerAction(
     { rateLimit: { maxRequests: 5, windowMs: 60 * 1000 }, requireAuth: true } // 5 campaigns per minute
 );
 
-// Get public campaigns - no authentication required, rate limited to 20 per minute
+// Get public campaigns - cached in Redis for performance
 export const getPublicCampaigns = createServerAction(
     z.object({}), // Empty schema since no input needed
     async (_, prisma) => {
+        // Try to get from cache first
+        const cached = await publicDataCache.get('campaigns');
+        if (cached) {
+            return cached;
+        }
+
+        // If not in cache, fetch from database
         const campaigns = await prisma.campaign.findMany({
             where: { public: true },
             orderBy: { createdAt: 'desc' },
             take: 10,
         });
+
+        // Cache the result
+        await publicDataCache.set('campaigns', campaigns);
 
         return campaigns;
     },

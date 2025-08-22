@@ -5,6 +5,7 @@ import { CampaignDiv } from "@/_components/ui/CampaignDiv";
 import { useUser } from '@/_lib/_providers';
 import { getPublicCampaigns } from '@/_actions/campaigns';
 import { getS3Url } from "@/_lib/_utils/s3Utils";
+import { Skeleton } from '@/_components/ui/Skeleton';
 
 // Platform data
 const AI_PLATFORMS = [
@@ -29,15 +30,13 @@ const CampaignGallery = () => {
 
     useEffect(() => {
         const fetchCampaigns = async () => {
+            setLoading(true); // Ensure loading starts immediately
             try {
                 const result = await getPublicCampaigns({});
-                console.log('Server Action result:', result); // Debug log
 
                 if (result.success && result.data) {
-                    console.log('Campaigns fetched successfully:', result.data);
                     setCampaigns(result.data);
                 } else {
-                    console.warn('No campaigns returned or error:', result);
                     setCampaigns([]);
                 }
             } catch (error) {
@@ -73,6 +72,12 @@ const CampaignGallery = () => {
         );
     };
 
+    const renderSkeletonCard = (index: number) => (
+        <div key={index} className={styles.loadingCard}>
+            <Skeleton className={styles.loadingImage} shimmer={true} />
+        </div>
+    );
+
     return (
         <section className={styles.promptSection} id="gallery">
             {user && (
@@ -102,20 +107,23 @@ const CampaignGallery = () => {
 
             <div className={styles.campaignGrid}>
                 {loading ? (
-                    // Show loading state
-                    Array.from({ length: 6 }).map((_, index) => (
-                        <div key={index} className={styles.loadingCard}>
-                            <div className={styles.loadingImage}></div>
-                            <div className={styles.loadingText}></div>
-                        </div>
-                    ))
+                    // Show skeleton loading state with animations
+                    (() => {
+                        return Array.from({ length: 8 }).map((_, index) => renderSkeletonCard(index));
+                    })()
                 ) : campaigns.length > 0 ? (
-                    campaigns.map((campaign, index) => renderCampaignCard(campaign, index)).filter(Boolean)
+                    (() => {
+                        return campaigns.map((campaign, index) => renderCampaignCard(campaign, index)).filter(Boolean);
+                    })()
                 ) : (
                     // Show message when no campaigns available
-                    <div className={styles.noCampaigns}>
-                        <p>No campaigns available yet. Check back soon!</p>
-                    </div>
+                    (() => {
+                        return (
+                            <div className={styles.noCampaigns}>
+                                <p>No campaigns available yet. Check back soon!</p>
+                            </div>
+                        );
+                    })()
                 )}
             </div>
         </section>
