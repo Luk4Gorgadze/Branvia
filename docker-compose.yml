@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  # Database migration service - runs first
+  migration:
+    container_name: branvia_migration_prod
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.migration
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    env_file: .env
+    restart: "no"
+    networks:
+      - branvia_network
+
   # Caddy removed - Traefik handles reverse proxy
   redis:
     container_name: branvia_redis_prod
@@ -28,6 +41,8 @@ services:
         DATABASE_URL: ${DATABASE_URL}
     env_file: .env
     depends_on: 
+      migration:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
     restart: always
@@ -61,6 +76,8 @@ services:
         NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID: ${NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID}
     env_file: .env
     depends_on:
+      migration:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
     restart: always

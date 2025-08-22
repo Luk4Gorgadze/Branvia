@@ -33,14 +33,8 @@ ENV NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID=$NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID
 
 RUN pnpm install
 
-# CRITICAL: Re-generate Prisma client with latest schema before build
-WORKDIR /app/packages/database
-RUN echo "🔧 Generating Prisma client with latest schema..."
-RUN pnpm prisma generate
-
-# Now build the Next.js app with updated Prisma client
 WORKDIR /app/web
 RUN echo "📦 Building Next.js application..."
 RUN pnpm run build
 
-CMD cd ../packages/database && pnpm prisma migrate deploy && cd ../../web && pnpm start
+CMD ["pnpm", "start"]
