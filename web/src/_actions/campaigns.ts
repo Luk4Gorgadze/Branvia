@@ -6,26 +6,9 @@ import { getServerUser } from '@/_lib/_auth/auth';
 import { z } from 'zod';
 import { queueDiscordNotification } from '@/_lib/_services/discordNotificationService';
 import { publicDataCache } from '@/_lib/_utils/redisCache';
-// Campaign type matching the current Prisma schema
-interface Campaign {
-    id: string;
-    userId: string;
-    productTitle: string;
-    productDescription: string;
-    selectedStyle: string | null;
-    customStyle: string | null;
-    outputFormat: string;
-    productImageS3Key: string | null;
-    generatedImages: string[];
-    prompt: string | null;
-    status: string;
-    public: boolean;
-    feedbackSubmitted: boolean;
-    feedbackMessage: string | null;
-    feedbackAt: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-}
+// Import Prisma types directly to ensure type compatibility
+import { prisma } from '@/_lib/_db/prismaClient';
+type Campaign = NonNullable<Awaited<ReturnType<typeof prisma.campaign.findFirst>>>;
 
 // Create campaign - requires authentication, rate limited to 5 per minute
 export const createCampaign = createServerAction(
