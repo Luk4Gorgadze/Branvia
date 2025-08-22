@@ -9,6 +9,7 @@ services:
       dockerfile: docker/Dockerfile.migration
       args:
         DATABASE_URL: ${DATABASE_URL}
+        SCHEMA_VERSION: ${SCHEMA_VERSION:-$(date +%s)}
     env_file: .env
     restart: "no"
     networks:
@@ -39,6 +40,7 @@ services:
       dockerfile: docker/Dockerfile.worker
       args:
         DATABASE_URL: ${DATABASE_URL}
+        SCHEMA_VERSION: ${SCHEMA_VERSION:-$(date +%s)}
     env_file: .env
     depends_on: 
       migration:
@@ -65,6 +67,7 @@ services:
       args:
         REDIS_URL: ${REDIS_URL}
         DATABASE_URL: ${DATABASE_URL}
+        SCHEMA_VERSION: ${SCHEMA_VERSION:-$(date +%s)}
         PAYPAL_CLIENT_ID: ${PAYPAL_CLIENT_ID}
         PAYPAL_CLIENT_SECRET: ${PAYPAL_CLIENT_SECRET}
         PAYPAL_MODE: ${PAYPAL_MODE}

@@ -7,15 +7,17 @@ RUN npm install -g pnpm \
 
 WORKDIR /app
 
-# Copy database package for Prisma
+# Copy database package for Prisma (but don't generate client yet)
 COPY pnpm-workspace.yaml ./
 COPY packages/database/ ./packages/database/
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
+ARG SCHEMA_VERSION
+ENV SCHEMA_VERSION=${SCHEMA_VERSION:-$(date +%s)}
 
 # Debug: Echo DATABASE_URL to verify it's set correctly
 RUN echo "DATABASE_URL is: $DATABASE_URL"
 
 WORKDIR /app/packages/database
 RUN pnpm install
-RUN pnpm prisma generate
+# NOTE: Prisma client generation moved to individual services to ensure latest schema
