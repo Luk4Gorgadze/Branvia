@@ -21,6 +21,10 @@ interface Campaign {
     createdAt: Date;
     updatedAt: Date;
     public: boolean;
+    userId: string;
+    feedbackSubmitted: boolean;
+    feedbackMessage: string | null;
+    feedbackAt: Date | null;
 }
 
 // Create campaign - requires authentication, rate limited to 5 per minute
