@@ -37,6 +37,7 @@ const CampaignGallery = () => {
                 if (result.success && result.data) {
                     setCampaigns(result.data);
                 } else {
+                    console.warn('No campaigns returned or error:', result);
                     setCampaigns([]);
                 }
             } catch (error) {

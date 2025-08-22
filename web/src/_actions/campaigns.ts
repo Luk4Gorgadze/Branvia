@@ -7,6 +7,22 @@ import { z } from 'zod';
 import { queueDiscordNotification } from '@/_lib/_services/discordNotificationService';
 import { publicDataCache } from '@/_lib/_utils/redisCache';
 
+// Campaign type for public campaigns
+interface Campaign {
+    id: string;
+    status: string;
+    productImageS3Key: string | null;
+    productTitle: string;
+    productDescription: string;
+    selectedStyle: string | null;
+    customStyle: string | null;
+    outputFormat: string;
+    generatedImages: string[];
+    createdAt: Date;
+    updatedAt: Date;
+    public: boolean;
+}
+
 // Create campaign - requires authentication, rate limited to 5 per minute
 export const createCampaign = createServerAction(
     CreateCampaignSchema,
@@ -35,9 +51,9 @@ export const createCampaign = createServerAction(
 // Get public campaigns - cached in Redis for performance
 export const getPublicCampaigns = createServerAction(
     z.object({}), // Empty schema since no input needed
-    async (_, prisma) => {
+    async (_, prisma): Promise<Campaign[]> => {
         // Try to get from cache first
-        const cached = await publicDataCache.get('campaigns');
+        const cached = await publicDataCache.get<Campaign[]>('campaigns');
         if (cached) {
             return cached;
         }
