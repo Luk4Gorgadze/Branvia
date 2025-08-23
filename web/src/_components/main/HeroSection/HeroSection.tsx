@@ -56,23 +56,23 @@ const BeforeAfterSlider = () => {
                 onTouchMove={handleTouchMove}
                 onTouchEnd={() => setIsDragging(false)}
             >
-                {/* Before Image (Background) */}
+                {/* After Image (Background) */}
                 <div className={styles.beforeImage}>
                     <Image
-                        src="/hero_example/Bracelet-input.jpg"
+                        src="/hero_example/Bracelet-result.jpg"
                         alt="Original product image"
                         fill
                         className={styles.sliderImage}
                     />
                 </div>
 
-                {/* After Image (Clipped) */}
+                {/* Before Image (Clipped) */}
                 <div
                     className={styles.afterImage}
                     style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
                 >
                     <Image
-                        src="/hero_example/Bracelet-result.jpg"
+                        src="/hero_example/Bracelet-input.jpg"
                         alt="AI-generated result"
                         fill
                         className={styles.sliderImage}
