@@ -3,7 +3,7 @@
     background: #000000;
     padding: 120px 20px 40px;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .header {
@@ -23,14 +23,14 @@
     justify-content: center;
     gap: 16px;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .header p {
     font-size: 1.1rem;
     opacity: 0.8;
     color: #888888;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .content {
@@ -70,7 +70,7 @@
     font-weight: 600;
     margin: 0;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .sectionContent {
@@ -95,7 +95,7 @@
     font-weight: 500;
     color: #888888;
     font-size: 0.95rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .value {
@@ -105,7 +105,7 @@
     text-align: right;
     max-width: 60%;
     word-break: break-all;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .statusBadge {
@@ -118,7 +118,7 @@
     background: #222222;
     border-radius: 20px;
     border: 1px solid currentColor;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .statusExplanation {
@@ -133,7 +133,7 @@
     margin: 0;
     color: #888888;
     font-size: 0.9rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .creditsDisplay {
@@ -156,7 +156,7 @@
     font-size: 1.1rem;
     color: #888888;
     font-weight: 500;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .creditsInfo {
@@ -167,7 +167,7 @@
     padding: 16px;
     background: #222222;
     border-radius: 8px;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .cancelButton {
@@ -181,6 +181,7 @@
     transition: all 0.3s ease;
     font-size: 1rem;
     margin-top: 16px;
+    font-family: var(--font-primary);
 }
 
 .cancelButton:hover {
@@ -200,6 +201,7 @@
     transition: all 0.3s ease;
     font-size: 1rem;
     margin-top: 16px;
+    font-family: var(--font-primary);
 }
 
 .subscribeButton:hover,
@@ -226,7 +228,7 @@
     color: #888888;
     margin-bottom: 20px;
     font-size: 1rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 /* Modal Styles */
@@ -259,14 +261,14 @@
     font-size: 1.5rem;
     margin-bottom: 16px;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .modal p {
     color: #888888;
     margin-bottom: 24px;
     line-height: 1.6;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .modalActions {
@@ -286,7 +288,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .cancelModalButton:hover {
@@ -304,7 +306,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .confirmCancelButton:hover {
@@ -324,7 +326,7 @@
     font-size: 1.2rem;
     color: #888888;
     padding: 60px 20px;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 /* Responsive Design */
