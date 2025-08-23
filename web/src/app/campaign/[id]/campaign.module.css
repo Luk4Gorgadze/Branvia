@@ -8,7 +8,7 @@
     margin-top: 100px;
     gap: 3rem;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 /* Cost Display */
@@ -232,6 +232,7 @@
     transition: all 0.2s ease;
     font-size: 0.9rem;
     font-weight: 500;
+    font-family: var(--font-primary);
 }
 
 .downloadButton:hover {
@@ -285,7 +286,7 @@
     color: #fff;
     margin: 0;
     line-height: 1.2;
-    font-family: 'Playfair Display', serif;
+    font-family: var(--font-primary);
 }
 
 /* Product Description */
@@ -330,6 +331,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 0.9rem;
+    font-family: var(--font-primary);
 }
 
 .copyButton:hover {

@@ -9,7 +9,7 @@ const FooterSection = () => {
                     <div className={styles.footerBrand}>
                         <h3 className={styles.footerLogo}>Branvia</h3>
                         <p className={styles.footerDescription}>
-                            Empowering small businesses with high-quality, AI-generated product images for premium marketing.
+                            Empowering small businesses and individuals with high-quality, AI-generated product images for premium marketing.
                         </p>
                     </div>
 

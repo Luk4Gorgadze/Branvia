@@ -4,7 +4,7 @@
     justify-content: center;
     min-height: 100vh;
     background: #000000;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     color: #fff;
     padding: 2rem;
 }
@@ -38,7 +38,7 @@
 }
 
 .title {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 1.75rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -46,7 +46,7 @@
 }
 
 .description {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 1rem;
     font-weight: 400;
     margin-bottom: 1.5rem;
@@ -67,11 +67,11 @@
     color: #666666;
     font-weight: 500;
     margin-bottom: 0.5rem;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 .subscriptionIdValue {
-    font-family: 'GeistMono', monospace;
+    font-family: var(--font-primary);
     font-size: 0.8rem;
     color: #cccccc;
     word-break: break-all;
@@ -98,7 +98,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     text-decoration: none;
 }
 
@@ -119,7 +119,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     text-decoration: none;
 }
 
@@ -131,7 +131,7 @@
 .footer {
     font-size: 0.75rem;
     color: #666666;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
 }
 
 @media (max-width: 640px) {

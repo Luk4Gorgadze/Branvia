@@ -3,7 +3,7 @@
     min-height: 100vh;
     background: #000;
     color: #fff;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     padding: 2rem 0;
     margin-top: 80px;
 }
@@ -229,12 +229,14 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    font-family: var(--font-primary);
 }
 
 .formGroup label {
     font-weight: 600;
     font-size: 1rem;
     opacity: 0.9;
+    font-family: var(--font-primary);
 }
 
 .textInput,
@@ -247,6 +249,7 @@
     font-size: 1rem;
     transition: all 0.2s ease;
     resize: vertical;
+    font-family: var(--font-primary);
 }
 
 .textInput:focus,
@@ -259,6 +262,7 @@
 .textInput::placeholder,
 .textArea::placeholder {
     color: rgba(255, 255, 255, 0.5);
+    font-family: var(--font-primary);
 }
 
 .validationInfo {
@@ -267,6 +271,7 @@
     align-items: center;
     margin-top: 0.5rem;
     font-size: 0.85rem;
+    font-family: var(--font-primary);
 }
 
 .validationInfo .error {
@@ -324,6 +329,7 @@
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.5rem 0;
+    font-family: var(--font-primary);
 }
 
 .styleCard p {
@@ -342,6 +348,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 1rem 0;
+    font-family: var(--font-primary);
 }
 
 /* Format Grid */
@@ -390,12 +397,14 @@
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
+    font-family: var(--font-primary);
 }
 
 .formatInfo p {
     font-size: 0.9rem;
     opacity: 0.7;
     margin: 0;
+    font-family: var(--font-primary);
 }
 
 /* Review Section */
@@ -442,6 +451,7 @@
     font-size: 0.9rem;
     color: #ffc107;
     font-weight: 500;
+    font-family: var(--font-primary);
 }
 
 /* Generate Button */
@@ -462,6 +472,7 @@
     width: 100%;
     max-width: 300px;
     margin: 0 auto;
+    font-family: var(--font-primary);
 }
 
 .generateButton:hover:not(:disabled) {
@@ -519,6 +530,7 @@
     transition: all 0.2s ease;
     font-size: 1rem;
     font-weight: 500;
+    font-family: var(--font-primary);
 }
 
 .navButton:hover {
@@ -549,6 +561,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1rem;
     backdrop-filter: blur(10px);
+    font-family: var(--font-primary);
 }
 
 .loginMessage h2 {

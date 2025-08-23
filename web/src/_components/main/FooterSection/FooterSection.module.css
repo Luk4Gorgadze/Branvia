@@ -36,7 +36,7 @@
 }
 
 .footerDescription {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 1rem;
     line-height: 1.6;
     color: #e5e7eb;
@@ -57,7 +57,7 @@
 }
 
 .footerTitle {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 1.1rem;
     font-weight: 600;
     color: #fff;
@@ -78,7 +78,7 @@
 }
 
 .footerList a {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 0.95rem;
     color: #e5e7eb;
     text-decoration: none;
@@ -100,7 +100,7 @@
 }
 
 .footerCopyright {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 0.9rem;
     color: #9ca3af;
 }
@@ -118,10 +118,11 @@
 .footerSocial {
     display: flex;
     gap: 1.5rem;
+    font-family: var(--font-primary);
 }
 
 .socialLink {
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: var(--font-primary);
     font-size: 0.9rem;
     color: #e5e7eb;
     text-decoration: none;
