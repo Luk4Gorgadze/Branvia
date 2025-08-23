@@ -102,13 +102,31 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let user: { id: string; name?: string; email?: string; emailVerified?: boolean; createdAt?: Date; updatedAt?: Date; image?: string | null } | undefined = undefined;
+  let user: { id: string; name?: string; email?: string; emailVerified?: boolean; createdAt?: Date; updatedAt?: Date; image?: string | null; is_admin?: boolean } | undefined = undefined;
   let sessionErrored = false;
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
-    user = session?.user ?? undefined;
+
+    if (session?.user) {
+      // Fetch full user object with admin privileges
+      const { prisma } = await import('@/_lib/_db/prismaClient');
+      const fullUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          emailVerified: true,
+          createdAt: true,
+          updatedAt: true,
+          image: true,
+          is_admin: true
+        }
+      });
+      user = fullUser || undefined;
+    }
   } catch (error) {
     console.error("Failed to resolve session, continuing as logged out.", error);
     sessionErrored = true;
