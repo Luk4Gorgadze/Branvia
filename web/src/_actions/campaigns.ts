@@ -87,8 +87,23 @@ export const getCampaignById = createServerAction(
     z.object({ campaignId: z.string() }),
     async (data, prisma) => {
         const user = await getServerUser();
-        if (!user) throw new Error('User not authenticated');
 
+        // Try to get from cache first (only for completed campaigns)
+        const cacheKey = `campaign:${data.campaignId}`;
+        const cached = await publicDataCache.get<Campaign>(cacheKey);
+
+        if (cached && cached.status === 'completed') {
+            // For completed campaigns, check access permissions
+            if (!user && !cached.public) {
+                throw new Error('Access denied');
+            }
+            if (user && !cached.public && cached.userId !== user.id) {
+                throw new Error('Access denied');
+            }
+            return cached;
+        }
+
+        // Fetch fresh data from database
         const campaign = await prisma.campaign.findUnique({
             where: { id: data.campaignId },
         });
@@ -97,9 +112,22 @@ export const getCampaignById = createServerAction(
             throw new Error('Campaign not found');
         }
 
-        // Ensure user can only access their own campaigns or public ones
+        // If no user is authenticated, only allow access to public campaigns
+        if (!user) {
+            if (!campaign.public) {
+                throw new Error('Access denied');
+            }
+            return campaign;
+        }
+
+        // If user is authenticated, allow access to their own campaigns or public ones
         if (!campaign.public && campaign.userId !== user.id) {
             throw new Error('Access denied');
+        }
+
+        // Cache completed campaigns for performance (they never change)
+        if (campaign.status === 'completed') {
+            await publicDataCache.set(cacheKey, campaign, 60 * 60 * 24 * 7); // Cache for 1 week
         }
 
         return campaign;
