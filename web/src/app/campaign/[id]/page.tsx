@@ -152,6 +152,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     }
 
     // Check access control: redirect if user doesn't have access
+    // Note: Server action also validates access, but client-side redirect provides better UX
     if (!campaign.public && (!user || (campaign.userId !== user.id && !user.is_admin))) {
         router.push('/');
         return null;
@@ -215,7 +216,8 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
     };
 
     const isOwner = !!user && campaign.userId === user.id;
-    const canShowFeedback = isOwner && !campaign.feedbackSubmitted;
+    const isAdmin = !!user && user.is_admin;
+    const canShowFeedback = (isOwner || isAdmin) && !campaign.feedbackSubmitted;
 
     const handleSubmitFeedback = async () => {
         if (!campaign) return;
@@ -348,7 +350,7 @@ const CampaignPage = ({ params }: { params: Promise<{ id: string }> }) => {
                                 </button>
                             </div>
                         ) : (
-                            isOwner && campaign.feedbackSubmitted && (
+                            (isOwner || isAdmin) && campaign.feedbackSubmitted && (
                                 <div className={styles.feedbackCard}>
                                     <div className={styles.feedbackHeader}>
                                         <h3 className={styles.sectionTitle}>Feedback</h3>
