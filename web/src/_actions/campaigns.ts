@@ -86,7 +86,16 @@ export const getUserCampaigns = createServerAction(
 export const getCampaignById = createServerAction(
     z.object({ campaignId: z.string() }),
     async (data, prisma) => {
-        const user = await getServerUser();
+        const authUser = await getServerUser();
+
+        // Get full user object with admin privileges if authenticated
+        let user = null;
+        if (authUser) {
+            user = await prisma.user.findUnique({
+                where: { id: authUser.id },
+                select: { id: true, is_admin: true }
+            });
+        }
 
         // Try to get from cache first (only for completed campaigns)
         const cacheKey = `campaign:${data.campaignId}`;
@@ -97,7 +106,7 @@ export const getCampaignById = createServerAction(
             if (!user && !cached.public) {
                 throw new Error('Access denied');
             }
-            if (user && !cached.public && cached.userId !== user.id) {
+            if (user && !cached.public && cached.userId !== user.id && !user.is_admin) {
                 throw new Error('Access denied');
             }
             return cached;
@@ -120,8 +129,8 @@ export const getCampaignById = createServerAction(
             return campaign;
         }
 
-        // If user is authenticated, allow access to their own campaigns or public ones
-        if (!campaign.public && campaign.userId !== user.id) {
+        // If user is authenticated, allow access to their own campaigns, public ones, or if admin
+        if (!campaign.public && campaign.userId !== user.id && !user.is_admin) {
             throw new Error('Access denied');
         }
 
@@ -152,13 +161,23 @@ export const updateCampaign = createServerAction(
         const user = await getServerUser();
         if (!user) throw new Error('User not authenticated');
 
-        // Verify ownership before updating
+        // Verify ownership or admin privileges before updating
         const existingCampaign = await prisma.campaign.findUnique({
             where: { id: data.campaignId },
             select: { userId: true }
         });
 
-        if (!existingCampaign || existingCampaign.userId !== user.id) {
+        if (!existingCampaign) {
+            throw new Error('Campaign not found');
+        }
+
+        // Get full user object with admin privileges
+        const fullUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { id: true, is_admin: true }
+        });
+
+        if (!fullUser || (existingCampaign.userId !== user.id && !fullUser.is_admin)) {
             throw new Error('Access denied');
         }
 
@@ -179,13 +198,23 @@ export const deleteCampaign = createServerAction(
         const user = await getServerUser();
         if (!user) throw new Error('User not authenticated');
 
-        // Verify ownership before deleting
+        // Verify ownership or admin privileges before deleting
         const existingCampaign = await prisma.campaign.findUnique({
             where: { id: data.campaignId },
             select: { userId: true }
         });
 
-        if (!existingCampaign || existingCampaign.userId !== user.id) {
+        if (!existingCampaign) {
+            throw new Error('Campaign not found');
+        }
+
+        // Get full user object with admin privileges
+        const fullUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { id: true, is_admin: true }
+        });
+
+        if (!fullUser || (existingCampaign.userId !== user.id && !fullUser.is_admin)) {
             throw new Error('Access denied');
         }
 
@@ -207,7 +236,16 @@ export const submitCampaignFeedback = createServerAction(
 
         const campaign = await prisma.campaign.findUnique({ where: { id: data.campaignId } });
         if (!campaign) throw new Error('Campaign not found');
-        if (campaign.userId !== user.id) throw new Error('Access denied');
+
+        // Get full user object with admin privileges
+        const fullUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { id: true, is_admin: true }
+        });
+
+        if (!fullUser || (campaign.userId !== user.id && !fullUser.is_admin)) {
+            throw new Error('Access denied');
+        }
         if (campaign.feedbackSubmitted) throw new Error('Feedback already submitted');
 
         // Resolve user's subscription to include with feedback
