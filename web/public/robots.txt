@@ -1,0 +1,46 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://branvia.art/sitemap.xml
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1
+
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /private/
+
+# Allow important pages
+Allow: /
+Allow: /contact
+Allow: /help
+Allow: /documentation
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /cookie-policy
+
+# Allow specific campaign result pages
+Allow: /campaign/cmen7tgn8000ffy1dxbbjju19
+Allow: /campaign/cmen7tgmt000dfy1dpxyvnnam
+Allow: /campaign/cmen7tgmn000bfy1d4gkqokno
+Allow: /campaign/cmen7tgmg0009fy1d60wl5ub3
+Allow: /campaign/cmen7tgm90007fy1d1uezz5bz
+Allow: /campaign/cmen7tgm30005fy1dq53vsv3n
+Allow: /campaign/cmen7tglv0003fy1dmq7vg857
+Allow: /campaign/cmen7tgll0001fy1ddd2cg09s
