@@ -7,9 +7,9 @@ export type SubscriptionPlan = 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
 export function getMonthlyCreditsForPlan(plan: SubscriptionPlan): number {
     switch (plan) {
         case 'STARTER':
-            return 2000;
+            return 1000;
         case 'PROFESSIONAL':
-            return 5000; // Adjust per pricing once finalized
+            return 2500; // Adjusted per new pricing
         case 'ENTERPRISE':
             return 0; // Placeholder; Enterprise not yet available
         default:

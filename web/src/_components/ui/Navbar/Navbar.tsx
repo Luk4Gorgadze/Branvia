@@ -7,10 +7,12 @@ import { signInGoogle, signOut } from "@/_lib/_auth/authClient";
 import { useUser } from "@/_lib/_providers";
 import Link from "next/link";
 import { Settings } from "lucide-react";
+import { useUmami } from "@/_lib/_hooks/useUmami";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const { user, setUser } = useUser();
+    const { trackClick, trackInteraction } = useUmami();
 
     return (
         <>
@@ -21,7 +23,10 @@ const Navbar = () => {
                     <button
                         className={styles.hamburger}
                         aria-label="Open menu"
-                        onClick={() => setMenuOpen(true)}
+                        onClick={() => {
+                            setMenuOpen(true);
+                            trackClick('hamburger_menu', 'navbar', { action: 'open' });
+                        }}
                     >
                         <span></span>
                         <span></span>
@@ -45,13 +50,17 @@ const Navbar = () => {
                                     <Settings size={20} />
                                 </Link>
                                 <button className={styles.ctaNav} onClick={async () => {
+                                    trackClick('sign_out', 'navbar', { location: 'desktop' });
                                     await signOut()
                                     setUser(undefined)
                                     window.location.reload()
                                 }}>Sign Out</button>
                             </>
                         ) : (
-                            <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
+                            <button className={styles.ctaNav} onClick={() => {
+                                trackClick('sign_in_google', 'navbar', { location: 'desktop' });
+                                signInGoogle();
+                            }}>Continue with Google</button>
                         )}
                     </div>
                 </div>
@@ -70,7 +79,10 @@ const Navbar = () => {
                         <button
                             className={styles.closeButton}
                             aria-label="Close menu"
-                            onClick={() => setMenuOpen(false)}
+                            onClick={() => {
+                                setMenuOpen(false);
+                                trackClick('close_menu', 'navbar', { action: 'close' });
+                            }}
                         >
                             &times;
                         </button>
@@ -92,13 +104,17 @@ const Navbar = () => {
                                         <span>Settings</span>
                                     </Link>
                                     <button className={styles.ctaNav} onClick={async () => {
+                                        trackClick('sign_out', 'navbar', { location: 'mobile' });
                                         await signOut()
                                         setUser(undefined)
                                         window.location.reload()
                                     }}>Sign Out</button>
                                 </>
                             ) : (
-                                <button className={styles.ctaNav} onClick={() => signInGoogle()}>Continue with Google</button>
+                                <button className={styles.ctaNav} onClick={() => {
+                                    trackClick('sign_in_google', 'navbar', { location: 'mobile' });
+                                    signInGoogle();
+                                }}>Continue with Google</button>
                             )}
                         </div>
                     </motion.div>
