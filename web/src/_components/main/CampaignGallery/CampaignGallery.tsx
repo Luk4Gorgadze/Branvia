@@ -28,7 +28,7 @@ const CampaignGallery = () => {
     const { user } = useUser();
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const { trackView, trackClick } = useUmami();
+    const { trackPageView, trackButtonClick } = useUmami();
 
     useEffect(() => {
         const fetchCampaigns = async () => {
@@ -59,7 +59,7 @@ const CampaignGallery = () => {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        trackView('campaign_gallery', {
+                        trackPageView('campaign gallery', {
                             user_status: user ? 'logged_in' : 'logged_out',
                             campaigns_count: campaigns.length,
                             timestamp: new Date().toISOString()
@@ -77,7 +77,14 @@ const CampaignGallery = () => {
         }
 
         return () => observer.disconnect();
-    }, [trackView, user, campaigns.length]);
+    }, [trackPageView, user, campaigns.length]);
+
+    const handleCampaignClick = (campaignId: string) => {
+        trackButtonClick('campaign card', 'gallery', {
+            campaign_id: campaignId,
+            location: 'main_gallery'
+        });
+    };
 
     const renderPlatformItem = (platform: string, key: string) => (
         <div key={key} className={styles.platformItem}>

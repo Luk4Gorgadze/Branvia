@@ -13,11 +13,11 @@ const BeforeAfterSlider = () => {
     const [sliderPosition, setSliderPosition] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const { trackInteraction } = useUmami();
+    const { trackUserAction } = useUmami();
 
     const handleMouseDown = () => {
         setIsDragging(true);
-        trackInteraction('slider_start', 'before_after_slider', { action: 'start_drag' });
+        trackUserAction('slider interaction', 'before after slider', { action: 'start_drag' });
     };
     const handleMouseUp = () => setIsDragging(false);
 
@@ -109,7 +109,7 @@ const BeforeAfterSlider = () => {
 
 const HeroSection = () => {
     const { user } = useUser();
-    const { trackClick, trackView } = useUmami();
+    const { trackPageView, trackButtonClick } = useUmami();
 
     // Track when hero section comes into view
     useEffect(() => {
@@ -117,7 +117,7 @@ const HeroSection = () => {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        trackView('hero_section', {
+                        trackPageView('hero section', {
                             user_status: user ? 'logged_in' : 'logged_out',
                             timestamp: new Date().toISOString()
                         });
@@ -134,10 +134,10 @@ const HeroSection = () => {
         }
 
         return () => observer.disconnect();
-    }, [trackView, user]);
+    }, [trackPageView, user]);
 
     const handleStartCreating = async () => {
-        trackClick('start_creating', 'hero_section', {
+        trackButtonClick('start creating', 'hero section', {
             user_status: user ? 'logged_in' : 'logged_out',
             location: 'primary_cta'
         });
@@ -184,7 +184,7 @@ const HeroSection = () => {
                         <Link
                             href="#gallery"
                             className={styles.secondaryCta}
-                            onClick={() => trackClick('see_examples', 'hero_section', { location: 'secondary_cta' })}
+                            onClick={() => trackButtonClick('see examples', 'hero section', { location: 'secondary_cta' })}
                         >
                             <Eye size={20} />
                             See Examples

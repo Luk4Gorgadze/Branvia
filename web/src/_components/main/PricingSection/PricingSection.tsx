@@ -16,7 +16,7 @@ const PricingSection = () => {
         handleSubscribe,
         getSubscriptionStatus
     } = usePricing(user?.id);
-    const { trackView, trackClick } = useUmami();
+    const { trackPageView, trackButtonClick } = useUmami();
 
     // Track when pricing section comes into view
     useEffect(() => {
@@ -24,7 +24,7 @@ const PricingSection = () => {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        trackView('pricing_section', {
+                        trackPageView('pricing section', {
                             user_status: user ? 'logged_in' : 'logged_out',
                             current_plan: currentSubscription?.plan || 'none',
                             timestamp: new Date().toISOString()
@@ -42,7 +42,15 @@ const PricingSection = () => {
         }
 
         return () => observer.disconnect();
-    }, [trackView, user, currentSubscription?.plan]);
+    }, [trackPageView, user, currentSubscription?.plan]);
+
+    const handlePlanClick = (planName: string, planType: string) => {
+        trackButtonClick('pricing plan', 'pricing section', {
+            plan: planName,
+            plan_type: planType,
+            user_status: user ? 'logged_in' : 'logged_out'
+        });
+    };
 
     const handleGetStarted = (planId: keyof typeof PLAN_CONFIG) => {
         console.log('🎯 handleGetStarted called with planId:', planId);
@@ -50,7 +58,7 @@ const PricingSection = () => {
         console.log('🎯 Plan config:', planConfig);
 
         // Track pricing interaction
-        trackClick('pricing_plan_click', 'pricing_section', {
+        trackButtonClick('pricing plan', 'pricing section', {
             plan: planId,
             price: planConfig.price,
             user_status: user ? 'logged_in' : 'logged_out'
