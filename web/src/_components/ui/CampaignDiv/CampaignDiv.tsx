@@ -13,14 +13,14 @@ type Props = {
 }
 
 export default function CampaignDiv({ href, imageUrl, alt = 'Campaign', overlayText = 'See details' }: Props) {
-    const { trackClick } = useUmami();
+    const { trackButtonClick } = useUmami();
 
     return (
         <Link
             href={href}
             className={styles.card}
             style={{ cursor: 'pointer' }}
-            onClick={() => trackClick('campaign_example', 'gallery', {
+            onClick={() => trackButtonClick('campaign example', 'gallery', {
                 campaign_id: href.split('/').pop() || 'unknown',
                 overlay_text: overlayText
             })}

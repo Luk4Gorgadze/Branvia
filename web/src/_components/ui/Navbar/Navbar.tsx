@@ -12,7 +12,7 @@ import { useUmami } from "@/_lib/_hooks/useUmami";
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const { user, setUser } = useUser();
-    const { trackClick, trackInteraction } = useUmami();
+    const { trackButtonClick, trackUserAction } = useUmami();
 
     return (
         <>
@@ -25,7 +25,7 @@ const Navbar = () => {
                         aria-label="Open menu"
                         onClick={() => {
                             setMenuOpen(true);
-                            trackClick('hamburger_menu', 'navbar', { action: 'open' });
+                            trackButtonClick('hamburger menu', 'navbar', { action: 'open' });
                         }}
                     >
                         <span></span>
@@ -50,7 +50,7 @@ const Navbar = () => {
                                     <Settings size={20} />
                                 </Link>
                                 <button className={styles.ctaNav} onClick={async () => {
-                                    trackClick('sign_out', 'navbar', { location: 'desktop' });
+                                    trackUserAction('sign out', 'navbar', { location: 'desktop' });
                                     await signOut()
                                     setUser(undefined)
                                     window.location.reload()
@@ -58,7 +58,7 @@ const Navbar = () => {
                             </>
                         ) : (
                             <button className={styles.ctaNav} onClick={() => {
-                                trackClick('sign_in_google', 'navbar', { location: 'desktop' });
+                                trackUserAction('sign in', 'google auth', { location: 'desktop' });
                                 signInGoogle();
                             }}>Continue with Google</button>
                         )}
@@ -81,7 +81,7 @@ const Navbar = () => {
                             aria-label="Close menu"
                             onClick={() => {
                                 setMenuOpen(false);
-                                trackClick('close_menu', 'navbar', { action: 'close' });
+                                trackButtonClick('close menu', 'navbar', { action: 'close' });
                             }}
                         >
                             &times;
@@ -104,7 +104,7 @@ const Navbar = () => {
                                         <span>Settings</span>
                                     </Link>
                                     <button className={styles.ctaNav} onClick={async () => {
-                                        trackClick('sign_out', 'navbar', { location: 'mobile' });
+                                        trackUserAction('sign out', 'navbar', { location: 'mobile' });
                                         await signOut()
                                         setUser(undefined)
                                         window.location.reload()
@@ -112,7 +112,7 @@ const Navbar = () => {
                                 </>
                             ) : (
                                 <button className={styles.ctaNav} onClick={() => {
-                                    trackClick('sign_in_google', 'navbar', { location: 'mobile' });
+                                    trackUserAction('sign in', 'google auth', { location: 'mobile' });
                                     signInGoogle();
                                 }}>Continue with Google</button>
                             )}
