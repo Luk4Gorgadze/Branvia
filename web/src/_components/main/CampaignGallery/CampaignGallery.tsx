@@ -6,6 +6,7 @@ import { useUser } from '@/_lib/_providers';
 import { getPublicCampaigns } from '@/_actions/campaigns';
 import { getS3Url } from "@/_lib/_utils/s3Utils";
 import { Skeleton } from '@/_components/ui/Skeleton';
+import { useUmami } from '@/_lib/_hooks/useUmami';
 
 // Platform data
 const AI_PLATFORMS = [
@@ -27,6 +28,7 @@ const CampaignGallery = () => {
     const { user } = useUser();
     const [campaigns, setCampaigns] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const { trackView, trackClick } = useUmami();
 
     useEffect(() => {
         const fetchCampaigns = async () => {
@@ -50,6 +52,32 @@ const CampaignGallery = () => {
 
         fetchCampaigns();
     }, [user?.id]);
+
+    // Track when gallery section comes into view
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        trackView('campaign_gallery', {
+                            user_status: user ? 'logged_in' : 'logged_out',
+                            campaigns_count: campaigns.length,
+                            timestamp: new Date().toISOString()
+                        });
+                        observer.disconnect(); // Only track once
+                    }
+                });
+            },
+            { threshold: 0.3 }
+        );
+
+        const galleryElement = document.getElementById('gallery');
+        if (galleryElement) {
+            observer.observe(galleryElement);
+        }
+
+        return () => observer.disconnect();
+    }, [trackView, user, campaigns.length]);
 
     const renderPlatformItem = (platform: string, key: string) => (
         <div key={key} className={styles.platformItem}>

@@ -2,9 +2,9 @@ export const PLAN_CONFIG = {
     STARTER: {
         id: 'STARTER',
         paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID || '',
-        price: 29,
+        price: 12,
         features: [
-            "2000 credits/month",
+            "1000 credits/month",
             "Standard resolution",
             "Limited commercial use (must credit us)"
         ]
@@ -12,9 +12,9 @@ export const PLAN_CONFIG = {
     PROFESSIONAL: {
         id: 'PROFESSIONAL',
         paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_PROFESSIONAL_PLAN_ID || '',
-        price: 59,
+        price: 29,
         features: [
-            "5000 credits/month",
+            "2500 credits/month",
             "High resolution",
             "Commercial usage rights",
         ]

@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
                 if (user) {
                     // Get plan pricing
                     const planPricing = {
-                        'STARTER': 29,
-                        'PROFESSIONAL': 59,
+                        'STARTER': 12,
+                        'PROFESSIONAL': 29,
                         'ENTERPRISE': 199
                     };
 

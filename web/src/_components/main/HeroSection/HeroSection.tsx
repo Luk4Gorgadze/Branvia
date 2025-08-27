@@ -7,13 +7,18 @@ import Link from "next/link";
 import { WordsPullUp } from '@/_components/ui/WordsPullUp';
 import { useUser } from '@/_lib/_providers/UserProvider';
 import { signInGoogle } from '@/_lib/_auth/authClient';
+import { useUmami } from '@/_lib/_hooks/useUmami';
 
 const BeforeAfterSlider = () => {
     const [sliderPosition, setSliderPosition] = useState(50);
     const [isDragging, setIsDragging] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const { trackInteraction } = useUmami();
 
-    const handleMouseDown = () => setIsDragging(true);
+    const handleMouseDown = () => {
+        setIsDragging(true);
+        trackInteraction('slider_start', 'before_after_slider', { action: 'start_drag' });
+    };
     const handleMouseUp = () => setIsDragging(false);
 
     const handleMouseMove = (e: React.MouseEvent) => {
@@ -104,8 +109,39 @@ const BeforeAfterSlider = () => {
 
 const HeroSection = () => {
     const { user } = useUser();
+    const { trackClick, trackView } = useUmami();
+
+    // Track when hero section comes into view
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        trackView('hero_section', {
+                            user_status: user ? 'logged_in' : 'logged_out',
+                            timestamp: new Date().toISOString()
+                        });
+                        observer.disconnect(); // Only track once
+                    }
+                });
+            },
+            { threshold: 0.5 }
+        );
+
+        const heroElement = document.getElementById('hero');
+        if (heroElement) {
+            observer.observe(heroElement);
+        }
+
+        return () => observer.disconnect();
+    }, [trackView, user]);
 
     const handleStartCreating = async () => {
+        trackClick('start_creating', 'hero_section', {
+            user_status: user ? 'logged_in' : 'logged_out',
+            location: 'primary_cta'
+        });
+
         if (user) {
             // User is logged in, redirect to generate page
             window.location.href = '/campaign/generate';
@@ -145,7 +181,11 @@ const HeroSection = () => {
                             <Zap size={20} />
                             Start Creating
                         </button>
-                        <Link href="#gallery" className={styles.secondaryCta}>
+                        <Link
+                            href="#gallery"
+                            className={styles.secondaryCta}
+                            onClick={() => trackClick('see_examples', 'hero_section', { location: 'secondary_cta' })}
+                        >
                             <Eye size={20} />
                             See Examples
                         </Link>
