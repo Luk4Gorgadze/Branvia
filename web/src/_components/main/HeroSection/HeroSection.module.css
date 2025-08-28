@@ -351,11 +351,17 @@
     font-size: 1.2rem;
     font-weight: 400;
     opacity: 0.9;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.25rem;
     max-width: 32rem;
-    line-height: 1.6;
+    line-height: 1.45;
     color: #e2e8f0;
     animation: fadeIn 1s ease-out 1.2s both;
+}
+
+/* Tighten spacing when multiple subtitles are stacked */
+.heroSubtitle+.heroSubtitle {
+    margin-top: 0.25rem;
+    margin-bottom: 2rem;
 }
 
 @keyframes fadeIn {

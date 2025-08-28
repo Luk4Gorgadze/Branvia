@@ -173,7 +173,10 @@ const HeroSection = () => {
                     <WordsPullUp text="Elevate your brand's visual identity" className={styles.heroTitle} />
 
                     <p className={styles.heroSubtitle}>
-                        Premium AI visuals and prompts to create refined, high-impact results for individuals and small brands.
+                        Premium AI visuals for individuals and small brands.
+                    </p>
+                    <p className={styles.heroSubtitle}>
+                        No prompts to write - just describe your product. Fast, budget‑friendly alternative to costly photoshoots.
                     </p>
 
                     <div className={styles.ctaSection}>
