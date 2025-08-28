@@ -22,8 +22,8 @@ RUN pnpm install
 # Generate Prisma client and run migrations during build
 RUN echo "🔧 Generating Prisma client..." && \
     pnpm prisma generate && \
-    echo "🔄 Running database migrations..." && \
-    pnpm prisma migrate deploy && \
-    echo "🌱 Seeding database..." && \
-    pnpm prisma db seed && \
-    echo "✅ Database setup completed!"
+    # echo "🔄 Running database migrations..." && \
+    # pnpm prisma migrate deploy && \
+    # echo "🌱 Seeding database..." && \
+    # pnpm prisma db seed && \
+    # echo "✅ Database setup completed!"
