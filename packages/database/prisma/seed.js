@@ -5,7 +5,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-    // Ensure a demo user exists
+    // Ensure a demo user exists 
     const demoEmail = 'demo@branvia.art';
     const demoUser = await prisma.user.upsert({
         where: { email: demoEmail },
