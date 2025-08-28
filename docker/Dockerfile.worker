@@ -1,21 +1,34 @@
-FROM base AS worker-base
-WORKDIR /app/worker
+FROM node:18-alpine
 
-COPY worker/ ./
+WORKDIR /app
 
-# DATABASE_URL is already available from base image, no need to redeclare
-RUN echo "DATABASE_URL from base: $DATABASE_URL"
+# Install pnpm
+RUN npm install -g pnpm && apk add --no-cache openssl bash python3 make g++
 
+# Provide DATABASE_URL at build-time if passed by builder
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+# Workspace root files
+COPY pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
+
+# Copy packages and worker app
+COPY packages ./packages
+COPY worker ./worker
+
+# Install workspace deps
 RUN pnpm install
 
-# CRITICAL: Re-generate Prisma client with latest schema before build
+# Generate Prisma client (no DB access required)
 WORKDIR /app/packages/database
-RUN echo "🔧 Generating Prisma client with latest schema..."
-RUN pnpm prisma generate
+RUN echo "🔧 Generating Prisma client with latest schema..." && pnpm prisma generate
 
-# Now build the worker with updated Prisma client
+# Apply database migrations during build (requires DATABASE_URL)
+RUN echo "🔄 Applying Prisma migrations..." && pnpm prisma migrate deploy
+
+# Build worker
 WORKDIR /app/worker
-RUN echo "📦 Building Worker application..."
-RUN pnpm run build
+RUN echo "📦 Building Worker application..." && pnpm run build
 
 CMD ["pnpm", "start"]
