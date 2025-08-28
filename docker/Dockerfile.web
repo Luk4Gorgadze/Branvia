@@ -7,7 +7,7 @@ RUN npm install -g pnpm && apk add --no-cache openssl bash python3 make g++
 
 # Workspace root files
 COPY pnpm-workspace.yaml ./
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Copy packages and web app
 COPY packages ./packages

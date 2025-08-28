@@ -11,7 +11,7 @@ ENV DATABASE_URL=$DATABASE_URL
 
 # Workspace root files
 COPY pnpm-workspace.yaml ./
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Copy packages and worker app
 COPY packages ./packages
