@@ -39,7 +39,7 @@ model User {
     creditTransactions CreditTransaction[]
 
     // Credits and subscription
-    availableCredits  Int            @default(0)
+    availableCredits  Int            @default(50)
     lastCreditTopUpAt DateTime?
     subscriptions     Subscription[]
 

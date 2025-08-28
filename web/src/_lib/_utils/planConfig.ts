@@ -1,11 +1,21 @@
 export const PLAN_CONFIG = {
+    FREE: {
+        id: 'FREE',
+        paypalPlanId: '',
+        price: 0,
+        features: [
+            "50 credits (one-time)",
+            "Standard resolution",
+            "Try before subscribing"
+        ]
+    },
     STARTER: {
         id: 'STARTER',
         paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID || '',
         price: 12,
         features: [
             "1000 credits/month",
-            "Standard resolution",
+            "High resolution",
             "Limited commercial use (must credit us)"
         ]
     },
@@ -18,25 +28,13 @@ export const PLAN_CONFIG = {
             "High resolution",
             "Commercial usage rights",
         ]
-    },
-    ENTERPRISE: {
-        id: 'ENTERPRISE',
-        paypalPlanId: process.env.NEXT_PUBLIC_PAYPAL_ENTERPRISE_PLAN_ID || '',
-        price: 199,
-        features: [
-            "Custom credits",
-            "Customization features",
-            "Priority support",
-            "API access",
-            "White-label options"
-        ]
     }
 };
 
 export const PLAN_HIERARCHY = {
+    'FREE': 0,
     'STARTER': 1,
-    'PROFESSIONAL': 2,
-    'ENTERPRISE': 3
+    'PROFESSIONAL': 2
 } as const;
 
 export const getPlanConfig = (planId: keyof typeof PLAN_CONFIG) => {

@@ -5,6 +5,7 @@ import { PLAN_CONFIG, PLAN_HIERARCHY } from '@/_lib/_utils/planConfig';
 import styles from './PricingSection.module.css';
 import PriceCard from "./PriceCard";
 import { useUmami } from '@/_lib/_hooks/useUmami';
+import { signInGoogle } from '@/_lib/_auth/authClient';
 import { useEffect } from 'react';
 
 const PricingSection = () => {
@@ -72,11 +73,32 @@ const PricingSection = () => {
         }
     };
 
+    const handleStartFree = async () => {
+        trackButtonClick('start free', 'pricing section', {
+            user_status: user ? 'logged_in' : 'logged_out'
+        });
+
+        if (user) {
+            window.location.href = '/campaign/generate';
+        } else {
+            await signInGoogle();
+        }
+    };
+
     return (
         <section className={styles.pricingSection} id="pricing">
             <div className={styles.pricingHeadline}>Pricing</div>
             <div className={styles.pricingContent}>
                 <div className={styles.pricingCards}>
+                    <PriceCard
+                        title="Free"
+                        price={PLAN_CONFIG.FREE.price}
+                        features={PLAN_CONFIG.FREE.features}
+                        onButtonClick={handleStartFree}
+                        disabled={false}
+                        hasActiveSubscription={false}
+                        subscriptionStatus={null}
+                    />
                     <PriceCard
                         title="Starter"
                         price={PLAN_CONFIG.STARTER.price}
@@ -98,15 +120,6 @@ const PricingSection = () => {
                         subscriptionStatus={getSubscriptionStatus('PROFESSIONAL')}
                     />
 
-                    <PriceCard
-                        title="Enterprise"
-                        price={PLAN_CONFIG.ENTERPRISE.price}
-                        features={PLAN_CONFIG.ENTERPRISE.features}
-                        onButtonClick={() => console.log("Enterprise coming soon")}
-                        disabled={true}
-                        hasActiveSubscription={currentSubscription?.plan === 'ENTERPRISE' && currentSubscription?.status === 'ACTIVE'}
-                        subscriptionStatus={getSubscriptionStatus('ENTERPRISE')}
-                    />
                 </div>
 
                 {error && (
