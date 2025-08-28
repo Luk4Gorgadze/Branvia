@@ -1,12 +1,24 @@
-FROM base AS web-base
-WORKDIR /app/web
+FROM node:18-alpine
 
-COPY web/ ./
+WORKDIR /app
 
-# DATABASE_URL is already available from base image, no need to redeclare
-RUN echo "DATABASE_URL from base: $DATABASE_URL"
+# Install pnpm
+RUN npm install -g pnpm && apk add --no-cache openssl bash python3 make g++
 
-# Inject envs for Next.js runtime at build time
+# Workspace root files
+COPY pnpm-workspace.yaml ./
+COPY package.json ./
+
+# Copy packages and web app
+COPY packages ./packages
+COPY web ./web
+
+# Install workspace deps
+RUN pnpm install
+
+# Inject envs for Next.js build-time if needed
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 ARG REDIS_URL
 ENV REDIS_URL=$REDIS_URL
 ARG PAYPAL_CLIENT_ID
@@ -25,11 +37,8 @@ ARG AWS_SECRET_ACCESS_KEY
 ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 ARG AWS_S3_BUCKET_NAME
 ENV AWS_S3_BUCKET_NAME=$AWS_S3_BUCKET_NAME
-
 ARG TRUSTED_ORIGINS
 ENV TRUSTED_ORIGINS=$TRUSTED_ORIGINS
-
-# Also inject the public plan IDs if you have them
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_PAYPAL_STARTER_PLAN_ID
@@ -43,16 +52,15 @@ ENV NEXT_PUBLIC_AWS_S3_BUCKET_NAME=$NEXT_PUBLIC_AWS_S3_BUCKET_NAME
 ARG NEXT_PUBLIC_AWS_REGION
 ENV NEXT_PUBLIC_AWS_REGION=$NEXT_PUBLIC_AWS_REGION
 
-RUN pnpm install
-
-# CRITICAL: Re-generate Prisma client with latest schema before build
+# Generate Prisma client (no DB access required)
 WORKDIR /app/packages/database
-RUN echo "🔧 Generating Prisma client with latest schema..."
-RUN pnpm prisma generate
+RUN echo "🔧 Generating Prisma client with latest schema..." && pnpm prisma generate
 
-# Now build the Next.js app with updated Prisma client
+# Apply database migrations during build (requires DATABASE_URL)
+RUN echo "🔄 Applying Prisma migrations..." && pnpm prisma migrate deploy
+
+# Build Next.js app
 WORKDIR /app/web
-RUN echo "📦 Building Next.js application..."
-RUN pnpm run build
+RUN echo "📦 Building Next.js application..." && pnpm run build
 
 CMD ["pnpm", "start"]
