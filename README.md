@@ -1,122 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/create-next-app).
+## Branvia
 
-## Getting Started
+Website: https://branvia.art
 
-First, run the development server:
-```
-docker build -f Dockerfile.base -t branvia-base:latest .
-```
+A monorepo for AI product image generation with a Next.js web app, a BullMQ worker, and a shared Prisma database package.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
-
-## Type Checking & Auto-Fixing
-
-This project includes several tools to catch and fix issues early in development:
-
-### TypeScript Type Checking
-
-Check for type errors without building:
-```bash
-# Check web package types
-pnpm --filter branvia-app check-types
-
-# Check worker package types
-pnpm --filter branvia-worker check-types
-
-# Check database package types
-pnpm --filter @branvia/database check-types
-
-# Check all packages at once
-pnpm check-types
+### Project structure
+```text
+/ (repo root)
+├─ packages/
+│  └─ database/               # Prisma schema, client, migrations, seed
+│     ├─ prisma/
+│     │  ├─ schema.prisma
+│     │  └─ migrations/
+│     └─ index.ts
+├─ web/                        # Next.js 15 app (React 19)
+│  ├─ src/
+│  │  ├─ _actions/            # Server actions (wrapped via createServerAction)
+│  │  ├─ _components/         # Shared UI/components
+│  │  ├─ _lib/                # Auth, DB, queues, S3, schemas, services, utils
+│  │  └─ app/                 # App Router pages and API routes
+│  └─ public/                 # Static assets
+├─ worker/                     # BullMQ processors and queue workers
+│  └─ src/
+│     ├─ processors/          # imageGeneration, email, cleanup, discord
+│     └─ queues/
+├─ docker/                     # Dockerfiles for web and worker
+├─ scripts/                    # Helper scripts (deploy, env copy, cleanup)
+├─ docker-compose.yml          # Production compose
+├─ compose.dev.yaml            # Development compose
+└─ pnpm-workspace.yaml         # Monorepo workspace config
 ```
 
-### ESLint Auto-Fixing
+### Tech stack
+- **Frontend**: Next.js 15, React 19, TypeScript, Framer Motion
+- **Server actions**: Zod-validated via `createServerAction` with Redis rate limiting
+- **Background jobs**: BullMQ with Redis, Bull Board for monitoring
+- **Database**: PostgreSQL via Prisma (`@branvia/database` package)
+- **Storage**: AWS S3 (`@aws-sdk/client-s3`)
+- **Auth**: `better-auth` (no next-auth)
+- **Cache/Queues**: Redis (`ioredis`)
+- **AI APIs**: Google Gemini (`@google/generative-ai`), OpenAI (`openai`) used primarily in worker processors
+- **Monorepo**: pnpm workspaces
+- **CI/Build helpers**: Type checks and scripts under `scripts/`
 
-Automatically fix many code issues:
-```bash
-# Fix web package linting issues
-pnpm --filter branvia-app lint --fix
+### Deployment
+- **Infrastructure**: Hetzner VPS
+- **Orchestration/Management**: Dokploy (manages app services, env, deploys)
+- **Containers**: Web and Worker built from `docker/Dockerfile.web` and `docker/Dockerfile.worker`, composed via `docker-compose.yml` (prod) or `compose.dev.yaml` (dev).
 
-# Fix worker package linting issues
-pnpm --filter branvia-worker lint --fix
+For development and scripts, a single `.env` is used at the repo root and commands are run from the root. Use pnpm globally; web/worker/database packages are wired via `workspace:*`.
 
-# Fix all packages
-pnpm lint --fix
-```
+### Startup analysis
+- **Current traction**: Estimated reach ~2,000; ~400 site visits; low conversions.
+- **Initial hypothesis**: Unlike Moodpaper (wallpapers by mood), Branvia solves a real business problem and should convert better.
+- **Finding**: Targeting the right audience is harder than expected. Many SMBs/solopreneurs default to tools like Canva or Nano Banana and can self-serve.
+- **Competitive reality**: Strong horizontal tools lower switching costs; Branvia must deliver clearly superior outcomes or speed.
+- **Value hypothesis**: Problem is real, but perceived value/urgency isn’t high enough for the current audience and positioning.
 
-### Next.js 15+ API Route Auto-Fix
+- **Potential next steps (concise)**:
+  - Narrow ICP to segments with recurring need and willingness to pay (e.g., Amazon/Etsy sellers, DTC with weekly launches, agencies).
+  - Focus on one killer workflow that beats Canva/Nano on outcome quality or time-to-result (e.g., batch on-brand product scenes with zero prompt hassle).
+  - Embed where users already are (Shopify/WooCommerce/Notion/Drive) to reduce friction; consider a Chrome app or simple CLI for batch.
+  - Strengthen proof: before/after case studies, ROI metrics, social proof on landing, and an opinionated starter pack.
+  - Rethink onboarding: demo-first, templates-by-vertical, try-without-upload, no-account first render.
 
-For Next.js 15+ API routes with dynamic parameters, the project includes an auto-fix script:
+### Screenshots
 
-```bash
-# Automatically fix API route type signatures
-node scripts/fix-api-routes.js
-```
+- Product example (Choco):
 
-This script:
-- Finds all `route.ts` files in the web app
-- Updates `{ params }` to `context` parameter
-- Changes `params.id` to `context.params.id`
-- Handles the new async `params` Promise pattern
+![Choco](web/public/screenshots/choco.png)
 
-### Pre-Build Validation
+- Analytics (Umami):
 
-The deployment script automatically runs type checks before building Docker images:
-```bash
-./scripts/deploy-prod.sh
-```
+![Umami](web/public/screenshots/umami.png)
 
-This ensures:
-- TypeScript compilation errors are caught early
-- No time is wasted on Docker builds with type errors
-- Faster feedback loop for developers
+---
 
-### Common Type Issues & Fixes
-
-**Next.js 15+ API Routes:**
-```typescript
-// ❌ Old pattern (Next.js 14)
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-    const id = params.id;
-}
-
-// ✅ New pattern (Next.js 15+)
-export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
-    const params = await context.params;
-    const id = params.id;
-}
-```
-
-**Workspace Dependencies:**
-- Use `workspace:*` in package.json for monorepo dependencies
-- Ensure packages are built before Docker builds
-- Run type checks from the root directory
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This monorepo will be reused for future startups and experiments. The website will remain online at `branvia.art` for a while but is planned to be shut down soon.
+    
