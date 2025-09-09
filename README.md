@@ -4,6 +4,10 @@ Website: https://branvia.art
 
 A monorepo for AI product image generation with a Next.js web app, a BullMQ worker, and a shared Prisma database package.
 
+### Project idea: 
+
+An AI-powered platform for small businesses, solopreneurs, and creators to generate professional, on-brand product images quickly-removing the need for complex photo shoots or design tools. Branvia focuses on speed, consistency, and ease-of-use compared to Canva or similar tools.
+
 ### Project structure
 ```text
 / (repo root)
